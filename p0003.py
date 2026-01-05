@@ -5,4 +5,5 @@ def find_prime_factors(n: int) -> set[int]:
             return find_prime_factors(i) | find_prime_factors(n//i)
     return {n}
 
-print(max(find_prime_factors(600851475143)))  # 6857
+if __name__ == "__main__":
+    print(max(find_prime_factors(600851475143)))  # 6857

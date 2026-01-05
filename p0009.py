@@ -8,4 +8,5 @@ def find_ptriplet_prod():
             if a+b+c_est == 1000 and a**2 + b**2 == c_est**2:
                 return a*b*c_est
 
-print(find_ptriplet_prod())  # 31875000
+if __name__ == "__main__":
+    print(find_ptriplet_prod())  # 31875000
