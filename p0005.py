@@ -1,7 +1,4 @@
 
-import itertools
-import math
-
 import numba
 
 @numba.jit
