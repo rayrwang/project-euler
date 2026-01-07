@@ -1,17 +1,10 @@
 
-# Project Euler
+All solutions only use the Python standard library, and Numba to speed up the code.
 
 ## Files
 
 ```
 project-euler/
 |-- funcs.py  # Functions used across solutions
-|-- pxxxx.py  # Solution(s) for Problem xxxx
-|-- ...
-```
-
-## Python Requirements
-
-```
-numba
+|-- pXXXX.py  # Solution(s) for Problem XXXX
 ```
