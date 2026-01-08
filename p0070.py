@@ -3,8 +3,6 @@ from collections import Counter
 
 import numba
 
-from funcs import is_prime
-
 @numba.jit
 def find_prime_factors(n: int) -> list[int]:
     for i in range(2, int(n**0.5)+1):

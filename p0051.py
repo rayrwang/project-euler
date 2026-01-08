@@ -1,8 +1,6 @@
 
 import itertools
 
-import numba
-
 from funcs import is_prime
 
 def smallest_prime():

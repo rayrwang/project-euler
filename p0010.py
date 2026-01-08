@@ -1,6 +1,4 @@
 
-import numba
-
 from funcs import is_prime
 
 if __name__ == "__main__":
