@@ -19,7 +19,7 @@ if __name__ == "__main__":
             # Check answer:
             # The solution is written as a comment on the line with a print statement
             solution = None
-            solution_pattern = "print\(.+#"
+            solution_pattern = r"print\(.+#"
             with open(name, "r") as f:
                 for line in f:
                     if re.search(solution_pattern, line):
