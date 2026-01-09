@@ -6,6 +6,9 @@ import time
 import re
 
 if __name__ == "__main__":
+    correct = 0
+    incorrect = 0
+    unverified = 0
     solutions = 0
     t_start_all = time.perf_counter()
     for name in sorted(os.listdir()):
@@ -29,12 +32,16 @@ if __name__ == "__main__":
                             break
             if solution:
                 if answer == solution:
+                    correct += 1
                     print(f"{answer} ✔️")
                 else:
+                    incorrect += 1
                     print(f"{answer} ❌ (solution: {solution})")
             else:
+                unverified += 1
                 print(f"{answer} ? (no solution found)")
 
             print(f"(in {time.perf_counter()-t_start_solution:.1f}s)")
             
     print(f"Ran {solutions} solutions in {time.perf_counter()-t_start_all:.1f}s.")
+    print(f"({correct} correct, {incorrect} incorrect, {unverified}, unverified)")
