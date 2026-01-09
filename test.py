@@ -10,13 +10,22 @@ if __name__ == "__main__":
     incorrect = 0
     unverified = 0
     solutions = 0
+    timed_out = 0
+    timeout_s = 60
     t_start_all = time.perf_counter()
     for name in sorted(os.listdir()):
         if name.startswith("p"):
             solutions += 1
             print(f"\nProblem {int(name[1:5])}:")
             t_start_solution = time.perf_counter()
-            proc = subprocess.run([sys.executable or "python", name], capture_output=True)
+            try:
+                proc = subprocess.run([sys.executable or "python", name],
+                                    capture_output=True,
+                                    timeout=timeout_s)
+            except subprocess.TimeoutExpired:
+                timed_out += 1
+                print(f"Timeout after {timeout_s}s.")
+                continue
             answer = proc.stdout.decode().strip()
 
             # Check answer:
@@ -44,4 +53,4 @@ if __name__ == "__main__":
             print(f"(in {time.perf_counter()-t_start_solution:.1f}s)")
             
     print(f"Ran {solutions} solutions in {time.perf_counter()-t_start_all:.1f}s.")
-    print(f"({correct} correct, {incorrect} incorrect, {unverified} unverified)")
+    print(f"({correct} correct, {incorrect} incorrect, {unverified} unverified, {timed_out} timed out)")
