@@ -1,6 +1,8 @@
 
 import numba
 
+from funcs import count_divisors
+
 @numba.jit
 def triangle():
     sum = 0
@@ -9,17 +11,6 @@ def triangle():
         sum += next
         next += 1
         yield sum
-
-@numba.jit
-def count_divisors(n):
-    divisors = 0
-    for i in range(1, int(n**0.5)+1):
-        if n % i == 0:
-            if i**2 == n:
-                divisors += 1
-            else:
-                divisors += 2
-    return divisors
 
 if __name__ == "__main__":
     for t in triangle():

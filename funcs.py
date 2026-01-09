@@ -41,3 +41,26 @@ def nCr(n: int, r: int, /) -> int:
     for i in range(max(r, n-r)+1, n+1):
         prod *= i
     return int(prod / fact(min(r, n-r)))
+
+@numba.jit
+def count_divisors(n: int, /) -> int:
+    divisors = 0
+    for i in range(1, int(n**0.5)+1):
+        if n % i == 0:
+            if i**2 == n:
+                divisors += 1
+            else:
+                divisors += 2
+    return divisors
+
+@numba.jit
+def sum_proper_divisors(n: int, /) -> int:
+    s = 0
+    for i in range(1, int(n**0.5)+1):
+        if n % i == 0:
+            if i**2 == n:
+                s += i
+            else:
+                s += i
+                s += n // i
+    return s - n

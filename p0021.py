@@ -1,15 +1,5 @@
 
-def d(n: int, /) -> int:
-    """Sum proper divisors"""
-    s = 0
-    for i in range(1, int(n**0.5)+1):
-        if n % i == 0:
-            if i**2 == n:
-                s += i
-            else:
-                s += i
-                s += n // i
-    return s - n
+from funcs import sum_proper_divisors as d
 
 if __name__ == "__main__":
     s = 0
