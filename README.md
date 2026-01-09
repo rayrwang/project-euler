@@ -8,5 +8,5 @@ project-euler/
 |-- funcs.py  # Functions used across solutions
 |-- pXXXX.py  # Solution(s) for Problem XXXX
 |-- ...
-|-- test.py   # Run and print execution times for all solutions
+|-- test.py   # Run and check all solutions
 ```
