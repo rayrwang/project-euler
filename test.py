@@ -44,4 +44,4 @@ if __name__ == "__main__":
             print(f"(in {time.perf_counter()-t_start_solution:.1f}s)")
             
     print(f"Ran {solutions} solutions in {time.perf_counter()-t_start_all:.1f}s.")
-    print(f"({correct} correct, {incorrect} incorrect, {unverified}, unverified)")
+    print(f"({correct} correct, {incorrect} incorrect, {unverified} unverified)")
