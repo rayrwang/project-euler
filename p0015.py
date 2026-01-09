@@ -1,5 +1,6 @@
 
-from funcs import fact, nCr
+# from funcs import fact
+from funcs import nCr
 
 if __name__ == "__main__":
     # print(int(fact(40) / (fact(20)*fact(20))))  # 137846528820
