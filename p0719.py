@@ -2,7 +2,6 @@
 if __name__ == "__main__":
     s = 0
     for root in range(2, 1_000_000+1):
-        print(root)
         square = root**2
         digits = str(square)
         for split_pattern in range(2**(len(digits)-1)):  # len(digits) - 1 possible split locations
