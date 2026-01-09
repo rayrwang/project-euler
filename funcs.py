@@ -2,7 +2,7 @@
 import numba
 
 @numba.jit
-def is_prime(n):
+def is_prime(n: int, /) -> bool:
     if n == 2 or n == 3 or n == 5:
         return True
     if n % 2 == 0 or n % 3 == 0 or n % 5 == 0:
@@ -15,11 +15,11 @@ def is_prime(n):
     return True
 
 @numba.jit
-def is_square(n):
+def is_square(n: int, /) -> bool:
     return (int(n**0.5))**2 == n
 
 @numba.jit
-def gcd(x, y):
+def gcd(x: int, y: int, /) -> int:
     """Greatest common divisor using Euclid's algorithm"""
     a = max(x, y)
     b = min(x, y)
@@ -28,3 +28,16 @@ def gcd(x, y):
         a, b = b, rem
         rem = a % b
     return b
+
+def fact(n: int, /) -> int:
+    prod = 1
+    for i in range(2, n+1):
+        prod *= i
+    return prod
+
+def nCr(n: int, r: int, /) -> int:
+    """n! / (r!(n-r)!)"""
+    prod = 1
+    for i in range(max(r, n-r)+1, n+1):
+        prod *= i
+    return int(prod / fact(min(r, n-r)))
