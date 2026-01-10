@@ -1,10 +1,10 @@
 
-def lexical_perm(l: list):
-    if len(l) == 1:
-        yield l
+def lexical_perm(lst: list):
+    if len(lst) == 1:
+        yield lst
         return
-    for fst in sorted(l):
-        rest = l.copy()
+    for fst in sorted(lst):
+        rest = lst.copy()
         rest.remove(fst)
         for rest_perm in lexical_perm(rest):
             rest_perm.insert(0, fst)

@@ -1,6 +1,4 @@
 
-import numba
-
 from funcs import fact
 
 def sum_fact_digits():
