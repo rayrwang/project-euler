@@ -1,21 +1,7 @@
 
-from collections import Counter
-
 import numba
 
-@numba.jit
-def find_prime_factors(n: int) -> list[int]:
-    for i in range(2, int(n**0.5)+1):
-        if n % i == 0:
-            return find_prime_factors(i) + find_prime_factors(n//i)
-    return [n]
-
-def totient(n):
-    prime_factors = find_prime_factors(n)
-    prod = 1
-    for (p, k) in Counter(prime_factors).items():
-        prod *= p**(k-1)*(p-1)
-    return prod
+from funcs import totient
 
 if __name__ == "__main__":
     min_ratio = float("inf")
