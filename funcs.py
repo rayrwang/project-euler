@@ -3,6 +3,8 @@ import numba
 
 @numba.jit
 def is_prime(n: int, /) -> bool:
+    if n <= 1:
+        return False
     if n == 2 or n == 3 or n == 5:
         return True
     if n % 2 == 0 or n % 3 == 0 or n % 5 == 0:
