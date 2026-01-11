@@ -1,4 +1,6 @@
 
+import math
+
 from collections import Counter
 
 import numba
@@ -82,3 +84,18 @@ def totient(n):
     for (p, k) in Counter(prime_factors).items():
         prod *= p**(k-1)*(p-1)
     return prod
+
+@numba.jit
+def reverse(n: int, /) -> int:
+    r = 0
+    place = math.floor(math.log(n) / math.log(10))
+    while n != 0:
+        digit = n % 10
+        r += digit * 10 ** place
+        place -= 1
+        n = n // 10
+    return r
+
+@numba.jit
+def is_palindrome(n: int, /) -> bool:
+    return n == reverse(n)

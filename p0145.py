@@ -3,6 +3,8 @@ import math
 
 import numba
 
+from funcs import reverse
+
 @numba.jit
 def all_odd(n):
     while n != 0:
@@ -10,17 +12,6 @@ def all_odd(n):
             return False
         n = n // 10
     return True
-
-@numba.jit
-def reverse(n):
-    r = 0
-    place = math.floor(math.log(n) / math.log(10))
-    while n != 0:
-        digit = n % 10
-        r += digit * 10 ** place
-        place -= 1
-        n = n // 10
-    return r
 
 @numba.jit
 def count_reversible():
