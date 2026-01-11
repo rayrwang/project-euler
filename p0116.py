@@ -1,7 +1,7 @@
 
-import numba
+from functools import cache
 
-@numba.jit
+@cache
 def count_tiles(n, size):
     """For n contiguous squares"""
     if n < size:
@@ -15,4 +15,3 @@ def count_tiles(n, size):
 
 if __name__ == "__main__":
     print(count_tiles(50, 2) + count_tiles(50, 3) + count_tiles(50, 4))  # 20492570929
-    # TODO inefficient
