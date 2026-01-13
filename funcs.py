@@ -41,6 +41,13 @@ def fact(n: int, /) -> int:
         prod *= i
     return prod
 
+@numba.jit
+def fact_bounded(n: int, /) -> int:
+    prod = 1
+    for i in range(2, n+1):
+        prod *= i
+    return prod
+
 def nCr(n: int, r: int, /) -> int:
     """n! / (r!(n-r)!)"""
     prod = 1
