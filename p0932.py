@@ -1,16 +1,4 @@
 
-"""typst
-= Problem 932: $2025$
-
-Let $d$ be the number of digits in $b$. We have:
-
-$
-10^d a + b = (a+b)^2 \
-b^2 + (2a - 1)b + a^2 - 10^d a = 0 \
-b = (1 - 2a + sqrt(4 dot 10^d a - 4a + 1)) / 2
-$
-"""
-
 import numba
 
 from funcs import is_square

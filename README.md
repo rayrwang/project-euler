@@ -9,4 +9,7 @@ project-euler/
 |-- pXXXX.py  # Solution(s) for Problem XXXX
 |-- ...
 |-- test.py   # Run and check all solutions
+
+|-- explanations.typ
+|-- explanations.pdf
 ```
