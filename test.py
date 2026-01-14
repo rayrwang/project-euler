@@ -6,6 +6,11 @@ import time
 import re
 
 if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        problems = [f"p{n.rjust(4, "0")}.py" for n in sys.argv[1:]]
+    else:
+        problems = sorted(os.listdir())
+
     correct = 0
     incorrect = 0
     unverified = 0
@@ -13,7 +18,7 @@ if __name__ == "__main__":
     timed_out = 0
     timeout_s = 60
     t_start_all = time.perf_counter()
-    for name in sorted(os.listdir()):
+    for name in problems:
         if name.startswith("p"):
             solutions += 1
             print(f"\nProblem {int(name[1:5])}:")
