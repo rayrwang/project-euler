@@ -1,5 +1,4 @@
 
-import numba
 
 from funcs import totient
 

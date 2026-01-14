@@ -2,12 +2,12 @@
 import math
 
 def count_rectangles(w, h):
-    s = min(w, h)
-    l = max(w, h)
+    short = min(w, h)
+    long = max(w, h)
     count = 0
-    for i in range(s):
-        for j in range(l):  # TODO too lazy to factor this out
-            count += (s-i)*(l-j)
+    for i in range(short):
+        for j in range(long):  # TODO too lazy to factor this out
+            count += (short-i)*(long-j)
     return count
 
 def find_closest_area():
