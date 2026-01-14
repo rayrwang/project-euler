@@ -21,16 +21,17 @@ def T(max_digits):
                         if ab == (a+b)**2:
                             s += ab
 
-                # Case 2: (happens to be unnecessary)
-                # n is b (shorter), find a (longer)
-                b = n
-                disc = 10**(2*shorter_len) - 4*10**shorter_len*b - 4*b
-                if is_square(disc):
-                    a = int(((10**shorter_len) - 2*b + disc**0.5) / 2)
-                    if a > 0 and len(str(a)) == longer_len:
-                        ab = a*10**shorter_len + b
-                        if ab == (a+b)**2:
-                            s += ab
+                if shorter_len != longer_len:
+                    # Case 2: (happens to be unnecessary)
+                    # n is b (shorter), find a (longer)
+                    b = n
+                    disc = 10**(2*shorter_len) - 4*10**shorter_len*b + 4*b
+                    if is_square(disc):
+                        a = int(((10**shorter_len) - 2*b + disc**0.5) / 2)
+                        if a > 0 and len(str(a)) == longer_len:
+                            ab = a*10**shorter_len + b
+                            if ab == (a+b)**2:
+                                s += ab
     return s
 
 if __name__ == "__main__":
