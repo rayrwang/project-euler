@@ -17,11 +17,11 @@ triangle_raw = """
 04 62 98 27 23 09 70 98 73 93 38 53 60 04 23
 """
 
-if __name__ == "__main__":
+def triangle_max_path(raw, slice_):
     triangle = []
     triangle_max = []
     # Parse
-    for row_raw in triangle_raw.split("\n")[1:-1]:
+    for row_raw in raw[slice_]:
         row = [int(digit) for digit in row_raw.split(" ")]
         triangle.append(row)
         triangle_max.append([None]*len(row))
@@ -34,4 +34,7 @@ if __name__ == "__main__":
     for i in range(len(triangle)-2, 0-1, -1):  # Second row from bottom, to top
         for j in range(len(triangle[i])):
             triangle_max[i][j] = triangle[i][j] + max(triangle_max[i+1][j], triangle_max[i+1][j+1])
-    print(triangle_max[0][0])  # 1074
+    return triangle_max[0][0]
+
+if __name__ == "__main__":
+    print(triangle_max_path(triangle_raw.split("\n"), slice(1, -1)))  # 1074
