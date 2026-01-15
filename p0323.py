@@ -14,4 +14,4 @@ def expectation(terms):
     return E
 
 if __name__ == "__main__":
-    print(expectation(10000))  # 6.3551758451
+    print(f"{expectation(10000):.10f}")  # 6.3551758451
