@@ -5,7 +5,7 @@ import sys
 import time
 import re
 
-if __name__ == "__main__":
+def test(subtests):
     if len(sys.argv) > 1:
         problems = [f"p{n.rjust(4, "0")}.py" for n in sys.argv[1:]]
     else:
@@ -16,7 +16,7 @@ if __name__ == "__main__":
     unverified = 0
     solutions = 0
     timed_out = 0
-    timeout_s = 60
+    timeout_s = 0.1
     t_start_all = time.perf_counter()
     for name in problems:
         if name.startswith("p"):
@@ -28,6 +28,9 @@ if __name__ == "__main__":
                                     capture_output=True,
                                     timeout=timeout_s)
             except subprocess.TimeoutExpired:
+
+                with subtests.test(msg=f"Problem {int(name[1:5])}"):
+                    assert False, f"Problem {int(name[1:5])} timed out after"
                 timed_out += 1
                 print(f"Timeout after {timeout_s}s.")
                 continue
@@ -44,7 +47,11 @@ if __name__ == "__main__":
                         if split:
                             solution = split[-1].strip()
                             break
+            with subtests.test(msg=f"Problem {int(name[1:5])}"):
+                assert solution, f"Unable to verify Problem {int(name[1:5])}"
             if solution:
+                with subtests.test(msg=f"Problem {int(name[1:5])}"):
+                    assert answer == solution
                 if answer == solution:
                     correct += 1
                     print(f"{answer} ✔️")
