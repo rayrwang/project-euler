@@ -6,7 +6,6 @@ def find_p_most():
     p_most = None
     max_count = 0
     for p in range(1, 1000+1):
-        print(p)
         count = 0
         for a in range(1, 1000+1):
             for b in range(1, a+1):

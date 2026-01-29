@@ -1,8 +1,7 @@
 
 import math
 
-def count_digits(n):
-    return int(math.log(n) / math.log(10)) + 1
+from funcs import count_digits
 
 if __name__ == "__main__":
     # Starting term is 1 + 1/2
