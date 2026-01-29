@@ -59,3 +59,4 @@ if __name__ == "__main__":
             
     print(f"Ran {solutions} solutions in {time.perf_counter()-t_start_all:.1f}s.")
     print(f"({correct} correct, {incorrect} incorrect, {unverified} unverified, {timed_out} timed out)")
+    assert correct == solutions, "Not all solutions are correct."
