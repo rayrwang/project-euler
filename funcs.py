@@ -116,7 +116,7 @@ def totient(n: int, /) -> int:
 @numba.jit
 def reverse(n: int, /) -> int:
     r = 0
-    place = math.floor(math.log(n) / math.log(10))
+    place = count_digits_bounded(n) - 1
     while n != 0:
         digit = n % 10
         r += digit * 10 ** place
