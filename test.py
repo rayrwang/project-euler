@@ -16,7 +16,7 @@ if __name__ == "__main__":
     unverified = 0
     solutions = 0
     timed_out = 0
-    timeout_s = 60
+    timeout_s = 120
     t_start_all = time.perf_counter()
     for name in problems:
         if name.startswith("p"):

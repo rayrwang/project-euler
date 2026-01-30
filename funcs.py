@@ -107,5 +107,10 @@ def reverse(n: int, /) -> int:
 def is_palindrome(n: int, /) -> bool:
     return n == reverse(n)
 
+@numba.jit
 def count_digits(n):
-    return int(math.log(n) / math.log(10)) + 1
+    return int(math.lgo10(n)) + 1
+
+@numba.jit
+def slice_number(n, start, stop):
+    return (n // (10**(count_digits(n) - stop))) % 10**(stop-start)
