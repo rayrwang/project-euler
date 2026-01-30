@@ -1,7 +1,7 @@
 
 import numba
 
-from funcs import count_digits
+from funcs import count_digits_bounded as count_digits
 
 @numba.jit
 def T():

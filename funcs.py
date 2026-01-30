@@ -107,8 +107,11 @@ def reverse(n: int, /) -> int:
 def is_palindrome(n: int, /) -> bool:
     return n == reverse(n)
 
-@numba.jit
 def count_digits(n):
+    return int(math.log10(n)) + 1
+
+@numba.jit
+def count_digits_bounded(n):
     return int(math.log10(n)) + 1
 
 @numba.jit
