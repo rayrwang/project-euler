@@ -18,7 +18,7 @@ def find_prod():
                         b_most = b
                 else:
                     break
-    if a_most * b_most:
+    if a_most and b_most:
         return a_most * b_most
 
 if __name__ == "__main__":
