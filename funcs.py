@@ -109,7 +109,7 @@ def is_palindrome(n: int, /) -> bool:
 
 @numba.jit
 def count_digits(n):
-    return int(math.lgo10(n)) + 1
+    return int(math.log10(n)) + 1
 
 @numba.jit
 def slice_number(n, start, stop):
