@@ -35,6 +35,17 @@ def gcd(x: int, y: int, /) -> int:
         rem = a % b
     return b
 
+@numba.jit
+def lcm(a: int, b: int, /) -> int:
+    return a * (b / gcd(a, b))
+
+@numba.jit
+def lcm_list(xs: list[int], /) -> int:
+    lcm_acc = lcm(xs[0], xs[1])
+    for x in xs[2:]:
+        lcm_acc = lcm(lcm_acc, x)
+    return int(lcm_acc)
+
 def fact(n: int, /) -> int:
     prod = 1
     for i in range(2, n+1):
@@ -54,6 +65,16 @@ def nCr(n: int, r: int, /) -> int:
     for i in range(max(r, n-r)+1, n+1):
         prod *= i
     return int(prod / fact(min(r, n-r)))
+
+@numba.jit
+def divisors(n: int, /) -> list[int]:
+    divisors = []
+    for i in range(1, int(n**0.5)+1):
+        if n % i == 0:
+            divisors.append(i)
+            if i**2 != n:
+                divisors.append(n // i)
+    return divisors
 
 @numba.jit
 def count_divisors(n: int, /) -> int:
