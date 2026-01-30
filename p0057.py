@@ -1,6 +1,4 @@
 
-import math
-
 from funcs import count_digits
 
 if __name__ == "__main__":
