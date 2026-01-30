@@ -17,7 +17,7 @@ triangle_raw = """
 04 62 98 27 23 09 70 98 73 93 38 53 60 04 23
 """
 
-def triangle_max_path(triangle_raw: str):
+def triangle_max_path(triangle_raw):
     triangle = []
     triangle_max = []
     # Parse

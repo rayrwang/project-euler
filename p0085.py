@@ -19,6 +19,7 @@ def find_closest_area():
             count = count_rectangles(w, h)
             if count > 2_000_000:
                 above = count
+                assert below
                 below_error = math.fabs(2_000_000 - below)
                 above_error = math.fabs(2_000_000 - above)
                 if below_error < above_error:
