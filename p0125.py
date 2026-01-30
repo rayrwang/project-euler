@@ -1,7 +1,7 @@
 
 import numba
 
-from funcs import is_palindrome, is_square
+from funcs import is_palindrome_bounded as is_palindrome, is_square
 
 @numba.jit
 def sum_():

@@ -2,7 +2,7 @@
 
 import numba
 
-from funcs import reverse
+from funcs import reverse_bounded as reverse
 
 @numba.jit
 def all_odd(n):

@@ -113,8 +113,11 @@ def totient(n: int, /) -> int:
         prod *= p**(k-1)*(p-1)
     return prod
 
-@numba.jit
 def reverse(n: int, /) -> int:
+    return int("".join(reversed(str(n))))
+
+@numba.jit
+def reverse_bounded(n: int, /) -> int:
     r = 0
     place = count_digits_bounded(n) - 1
     while n != 0:
@@ -124,9 +127,12 @@ def reverse(n: int, /) -> int:
         n = n // 10
     return r
 
-@numba.jit
 def is_palindrome(n: int, /) -> bool:
     return n == reverse(n)
+
+@numba.jit
+def is_palindrome_bounded(n: int, /) -> bool:
+    return n == reverse_bounded(n)
 
 def count_digits(n):
     return int(math.log10(n)) + 1
