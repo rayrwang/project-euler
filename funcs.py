@@ -100,11 +100,18 @@ def sum_proper_divisors(n: int, /) -> int:
     return s - n
 
 @numba.jit
-def find_prime_factors(n: int, /) -> list[int]:
+def find_prime_factors_list(n: int, /) -> list[int]:
     for i in range(2, int(n**0.5)+1):
         if n % i == 0:
-            return find_prime_factors(i) + find_prime_factors(n//i)
+            return find_prime_factors_list(i) + find_prime_factors_list(n//i)
     return [n]
+
+@numba.jit
+def find_prime_factors_set(n: int) -> set[int]:
+    for i in range(2, int(n**0.5)):
+        if n % i == 0:
+            return find_prime_factors_set(i) | find_prime_factors_set(n//i)
+    return {n}
 
 def totient(n: int, /) -> int:
     prime_factors = find_prime_factors(n)

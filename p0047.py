@@ -1,10 +1,10 @@
 
-from funcs import find_prime_factors
+from funcs import find_prime_factors_set as find_prime_factors
 
 if __name__ == "__main__":
     consecutive = 0
     for n in range(1, 1<<62):
-        if len(set(find_prime_factors(n))) == 4:
+        if len(find_prime_factors(n)) == 4:
             consecutive += 1
         else:
             consecutive = 0
