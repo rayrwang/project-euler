@@ -114,7 +114,7 @@ def find_prime_factors_set(n: int) -> set[int]:
     return {n}
 
 def totient(n: int, /) -> int:
-    prime_factors = find_prime_factors(n)
+    prime_factors = find_prime_factors_list(n)
     prod = 1
     for (p, k) in Counter(prime_factors).items():
         prod *= p**(k-1)*(p-1)
