@@ -1,15 +1,7 @@
 
 import numba
 
-@numba.jit
-def mod_exp(a, b, mod):
-    prod = 1
-    while b > 0:
-        if b % 2 == 1:
-            prod = (prod * a) % mod
-        b //= 2
-        a = (a * a) % mod
-    return prod
+from funcs import mod_exp_bounded as mod_exp
 
 @numba.jit
 def mod_tetr(a, b, mod):

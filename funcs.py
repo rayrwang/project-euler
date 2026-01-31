@@ -144,3 +144,22 @@ def count_digits_bounded(n):
 @numba.jit
 def slice_number(n, start, stop):
     return (n // (10**(count_digits(n) - stop))) % 10**(stop-start)
+
+def mod_exp(a, b, mod):
+    prod = 1
+    while b > 0:
+        if b % 2 == 1:
+            prod = (prod * a) % mod
+        b //= 2
+        a = (a * a) % mod
+    return prod
+
+@numba.jit
+def mod_exp_bounded(a, b, mod):
+    prod = 1
+    while b > 0:
+        if b % 2 == 1:
+            prod = (prod * a) % mod
+        b //= 2
+        a = (a * a) % mod
+    return prod
