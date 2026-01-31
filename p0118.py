@@ -8,7 +8,6 @@ def count_sets():
     sets = set()
     for perm in permutations(range(1, 9+1)):
         for split_pattern in range(2**8):
-            original_split_pattern = split_pattern
             # Right to left
             prev_split = 0
             new_set = []  # Set can't be added to set
