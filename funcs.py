@@ -44,10 +44,16 @@ def lcm_list(xs: list[int], /) -> int:
         lcm_acc = lcm(lcm_acc, x)
     return int(lcm_acc)
 
+fact_cache = {}
 def fact(n: int, /) -> int:
     prod = 1
-    for i in range(2, n+1):
-        prod *= i
+    for i in range(n, 1, -1):
+        if i in fact_cache:
+            prod *= fact_cache[i]
+            break
+        else:
+            prod *= i
+    fact_cache[n] = prod
     return prod
 
 @numba.jit
