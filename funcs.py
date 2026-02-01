@@ -1,8 +1,6 @@
 
 import math
 
-from collections import Counter
-
 import numba
 
 @numba.jit
@@ -107,14 +105,14 @@ def find_prime_factors_list(n: int, /) -> list[int]:
     return [n]
 
 @numba.jit
-def find_prime_factors_set(n: int) -> set[int]:
+def find_prime_factors_set(n: int, /) -> set[int]:
     for i in range(2, int(n**0.5)):
         if n % i == 0:
             return find_prime_factors_set(i) | find_prime_factors_set(n//i)
     return {n}
 
 @numba.jit
-def find_prime_factors_dict(n: int) -> dict[int, int]:
+def find_prime_factors_dict(n: int, /) -> dict[int, int]:
     prime_factors = find_prime_factors_list(n)
     occurrences = {}
     for p in prime_factors:
