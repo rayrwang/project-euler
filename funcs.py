@@ -64,7 +64,7 @@ def nCr(n: int, r: int, /) -> int:
     prod = 1
     for i in range(max(r, n-r)+1, n+1):
         prod *= i
-    return int(prod / fact(min(r, n-r)))
+    return prod // fact(min(r, n-r))
 
 @numba.jit
 def divisors(n: int, /) -> list[int]:
@@ -170,3 +170,12 @@ def mod_exp_bounded(a, b, mod):
         b //= 2
         a = (a * a) % mod
     return prod
+
+def mod_add(a: int, b: int, mod: int, /):
+    return ((a % mod) + (b % mod)) % mod
+
+def mod_sub(a: int, b: int, mod: int, /):
+    return ((a % mod) - (b % mod)) % mod
+
+def mod_mul(a: int, b: int, mod: int, /):
+    return ((a % mod) * (b % mod)) % mod
