@@ -113,10 +113,21 @@ def find_prime_factors_set(n: int) -> set[int]:
             return find_prime_factors_set(i) | find_prime_factors_set(n//i)
     return {n}
 
-def totient(n: int, /) -> int:
+@numba.jit
+def find_prime_factors_dict(n: int) -> dict[int, int]:
     prime_factors = find_prime_factors_list(n)
+    occurrences = {}
+    for p in prime_factors:
+        if p in occurrences:
+            occurrences[p] += 1
+        else:
+            occurrences[p] = 1
+    return occurrences
+
+@numba.jit
+def totient(n: int, /) -> int:
     prod = 1
-    for (p, k) in Counter(prime_factors).items():
+    for (p, k) in find_prime_factors_dict(n).items():
         prod *= p**(k-1)*(p-1)
     return prod
 
