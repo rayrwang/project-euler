@@ -1,5 +1,6 @@
 
 import math
+from functools import cache
 
 import numba
 
@@ -63,6 +64,7 @@ def fact_bounded(n: int, /) -> int:
         prod *= i
     return prod
 
+@cache
 def nCr(n: int, r: int, /) -> int:
     """n! / (r!(n-r)!)"""
     prod = 1
