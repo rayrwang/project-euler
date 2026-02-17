@@ -115,7 +115,7 @@ def find_prime_factors_list(n: int, /) -> list[int]:
 
 @numba.jit
 def find_prime_factors_set(n: int, /) -> set[int]:
-    for i in range(2, int(n**0.5)):
+    for i in range(2, int(n**0.5)+1):
         if n % i == 0:
             return find_prime_factors_set(i) | find_prime_factors_set(n//i)
     return {n}
