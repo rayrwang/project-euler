@@ -16,7 +16,6 @@ if __name__ == "__main__":
                     d_reduced = list(str(d))
                     d_reduced.remove(c)
                     d_reduced = int("".join(d_reduced))
-                    # print(n, d, n_reduced, d_reduced)
                     if n_reduced*d == n*d_reduced:
                         n_prod *= n
                         d_prod *= d
