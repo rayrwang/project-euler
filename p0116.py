@@ -7,7 +7,7 @@ def count_tiles(n, size):  # Include empty case
         return 1
     if n == size:
         return 2
-    count = 1
+    count = 1  # Empty case
     for start in range(n-size+1):
         count += count_tiles(n-size-start, size)
     return count

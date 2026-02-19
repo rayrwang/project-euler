@@ -7,7 +7,7 @@ def F(m, n):
         return 1
     if n == m:
         return 2
-    count = 1
+    count = 1  # Empty case
     for start in range(n-m+1):
         for length in range(m, n-start+1):
             count += F(m, n-start-length-1)
