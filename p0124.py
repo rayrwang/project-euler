@@ -10,6 +10,5 @@ if __name__ == "__main__":
     rads = {}
     for n in range(1, 100_000+1):
         rads[n] = rad(n)
-    print(rads[100])
     rads = sorted(rads.items(), key=lambda item: item[1])
     print(rads[10_000-1][0])  # 21417
