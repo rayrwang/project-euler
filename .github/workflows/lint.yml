@@ -1,5 +1,5 @@
 
-name: Check solutions
+name: Lint
 
 on:
   push:
@@ -11,7 +11,7 @@ permissions:
   contents: read
 
 jobs:
-  run:
+  check:
 
     runs-on: ubuntu-latest
 
@@ -24,7 +24,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Run tests
+        pip install ruff
+    - name: Run Ruff
       run: |
-        python test.py
+        ruff check
