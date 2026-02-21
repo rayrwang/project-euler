@@ -37,7 +37,7 @@ def gcd(x: int, y: int, /) -> int:
 
 @numba.jit
 def lcm(a: int, b: int, /) -> int:
-    return a * (b / gcd(a, b))
+    return min(a, b) * (max(a, b) // gcd(a, b))
 
 @numba.jit
 def lcm_list(xs: list[int], /) -> int:
