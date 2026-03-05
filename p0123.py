@@ -1,11 +1,9 @@
 
-import itertools
-
-from funcs import is_prime, mod_exp
+from funcs import inf_range, is_prime, mod_exp
 
 if __name__ == "__main__":
     n = 0
-    for p in itertools.count():
+    for p in inf_range():
         if is_prime(p):
             n += 1
             r = (mod_exp(p-1, n, p**2) + mod_exp(p+1, n, p**2)) % p**2

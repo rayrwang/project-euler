@@ -1,5 +1,5 @@
 
-from functools import cache
+from functools import inf_range, cache
 
 @cache
 def F(m, n):
@@ -14,7 +14,7 @@ def F(m, n):
     return count
 
 if __name__ == "__main__":
-    for n in range(1<<62):
+    for n in inf_range():
         if F(50, n) > 1_000_000:
             break
     print(n)  # 168

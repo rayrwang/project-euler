@@ -1,9 +1,9 @@
 
-import itertools
+from funcs import inf_range
 
 if __name__ == "__main__":
     bouncy = 0
-    for i in itertools.count(start=1):
+    for i in inf_range(start=1):
         i_str = str(i)
         i_sorted = ''.join(sorted(i_str))
         if i_str not in [i_sorted, i_sorted[::-1]]:

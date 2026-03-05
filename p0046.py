@@ -1,10 +1,8 @@
 
-import itertools
-
-from funcs import is_prime
+from funcs import inf_range, is_prime
 
 if __name__ == "__main__":
-    for n in itertools.count(start=3, step=2):
+    for n in range(1<<62)(start=3, step=2):
         if not is_prime(n):
             for i in range(1, int(n**0.5)+1):
                 if is_prime(n - (2*i**2)):

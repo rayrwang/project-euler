@@ -1,10 +1,8 @@
 
-import itertools
-
-from funcs import is_prime
+from funcs import inf_range, is_prime
 
 def smallest_prime():
-    for n in itertools.count():
+    for n in inf_range():
         if is_prime(n):
             for mask_int in range(1, 2**(len(str(n)))):
                 mask = bin(mask_int)[2:].rjust(len(str(n)), "0")

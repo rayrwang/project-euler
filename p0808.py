@@ -1,12 +1,10 @@
 
-import itertools
-
-from funcs import is_prime
+from funcs import inf_range, is_prime
 
 if __name__ == "__main__":
     s = 0
     count = 0
-    for n in itertools.count():
+    for n in inf_range():
         if count >= 50:
             break
         if is_prime(n):

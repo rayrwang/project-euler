@@ -1,6 +1,9 @@
 
+import numba
+
 from funcs import find_prime_factors_set
 
+@numba.jit
 def S(N):
     pq = {}
     for n in range(1, N+1):

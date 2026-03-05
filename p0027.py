@@ -1,7 +1,7 @@
 
 import numba
 
-from funcs import is_prime
+from funcs import inf_range, is_prime
 
 @numba.jit
 def find_prod():
@@ -10,7 +10,7 @@ def find_prod():
     b_most = None
     for a in range(-999, 1000):
         for b in range(-1000, 1000+1):
-            for n in range(1<<62):
+            for n in inf_range():
                 if is_prime(n**2 + a*n + b):
                     if n > most_primes:
                         most_primes = n

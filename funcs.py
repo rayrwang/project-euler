@@ -5,6 +5,9 @@ from functools import cache
 # TODO add arbitrary precision int for numba
 import numba
 
+def inf_range(start: int = 0, step: int = 1):
+    return range(start, 1<<62, step)
+
 @numba.jit
 def is_prime(n: int, /) -> bool:
     if n <= 1:

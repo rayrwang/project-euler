@@ -1,7 +1,9 @@
 
+from funcs import inf_range
+
 if __name__ == "__main__":
     digits = {}
-    for root in range(1<<62):
+    for root in inf_range():
         new_digits = tuple(sorted(str(root**3)))
         if new_digits not in digits:
             digits[new_digits] = (root**3,)
