@@ -5,6 +5,9 @@ from functools import cache
 # TODO add arbitrary precision int for numba
 import numba
 
+def inf_range_py(start: int = 0, step: int = 1):
+    return range(start, 1<<62, step)
+
 @numba.jit
 def inf_range(start: int = 0, step: int = 1):
     return range(start, 1<<62, step)

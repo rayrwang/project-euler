@@ -1,5 +1,5 @@
 
-from funcs import inf_range
+from funcs import inf_range_py as inf_range
 
 def find_ptriplet_prod():
     for a in inf_range():

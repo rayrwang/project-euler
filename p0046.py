@@ -1,5 +1,5 @@
 
-from funcs import inf_range, is_prime
+from funcs import inf_range_py as inf_range, is_prime
 
 if __name__ == "__main__":
     for n in inf_range(start=3, step=2):

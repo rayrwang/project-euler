@@ -1,5 +1,5 @@
 
-from funcs import inf_range, is_prime
+from funcs import inf_range_py as inf_range, is_prime
 
 def smallest_prime():
     for n in inf_range():
