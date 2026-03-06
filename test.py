@@ -21,7 +21,7 @@ if __name__ == "__main__":
     for name in problems:
         if name.startswith("p"):
             solutions += 1
-            print(f"\nProblem {int(name[1:5])}:")
+            print(f"Problem {int(name[1:5])}:", end=" ")
             t_start_solution = time.perf_counter()
             try:
                 proc = subprocess.run([sys.executable or "python", name],
@@ -47,16 +47,16 @@ if __name__ == "__main__":
             if solution:
                 if answer == solution:
                     correct += 1
-                    print(f"{answer} ✔️")
+                    print(f"{answer} ✔️ ", end=" ")
                 else:
                     incorrect += 1
-                    print(f"{answer} ❌ (solution: {solution})")
+                    print(f"{answer} ❌ (solution: {solution})", end=" ")
             else:
                 unverified += 1
-                print(f"{answer} ? (no solution found)")
+                print(f"{answer} ? (no solution found)", end=" ")
 
             print(f"(in {time.perf_counter()-t_start_solution:.1f}s)")
             
-    print(f"Ran {solutions} solutions in {time.perf_counter()-t_start_all:.1f}s.")
+    print(f"\nRan {solutions} solutions in {time.perf_counter()-t_start_all:.1f}s.")
     print(f"({correct} correct, {incorrect} incorrect, {unverified} unverified, {timed_out} timed out)")
     assert correct == solutions, "Not all solutions have been verified as correct."
