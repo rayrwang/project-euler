@@ -1,5 +1,5 @@
 
-from funcs import inf_range
+from funcs import inf_range_py as inf_range
 
 if __name__ == "__main__":
     bouncy = 0

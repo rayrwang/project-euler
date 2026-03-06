@@ -1,7 +1,7 @@
 
 from functools import cache
 
-from funcs import inf_range
+from funcs import inf_range_py as inf_range
 
 @cache
 def F(m, n):

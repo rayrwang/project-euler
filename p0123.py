@@ -1,5 +1,5 @@
 
-from funcs import inf_range, is_prime, mod_exp
+from funcs import inf_range_py as inf_range, is_prime, mod_exp
 
 if __name__ == "__main__":
     n = 0
