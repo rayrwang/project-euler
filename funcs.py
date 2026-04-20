@@ -8,12 +8,12 @@ import numba
 def inf_range_py(start: int = 0, step: int = 1):
     return range(start, 1<<62, step)
 
-@numba.jit
+@numba.jit(cache=True)
 def inf_range(start: int = 0, step: int = 1):
     return range(start, 1<<62, step)
 
 first_primes = (2, 3, 5, 7, 11, 13, 17, 19)  # Optimal number
-@numba.jit
+@numba.jit(cache=True)
 def is_prime(n: int, /) -> bool:
     """
     Deterministic Miller-Rabin test
@@ -66,11 +66,11 @@ def is_prime(n: int, /) -> bool:
             return False
     return True
 
-@numba.jit
+@numba.jit(cache=True)
 def is_square(n: int, /) -> bool:
     return (int(n**0.5))**2 == n
 
-@numba.jit
+@numba.jit(cache=True)
 def gcd(x: int, y: int, /) -> int:
     """Greatest common divisor using Euclid's algorithm"""
     a = max(x, y)
@@ -81,11 +81,11 @@ def gcd(x: int, y: int, /) -> int:
         rem = a % b
     return b
 
-@numba.jit
+@numba.jit(cache=True)
 def lcm(a: int, b: int, /) -> int:
     return min(a, b) * (max(a, b) // gcd(a, b))
 
-@numba.jit
+@numba.jit(cache=True)
 def lcm_list(xs: list[int], /) -> int:
     lcm_acc = lcm(xs[0], xs[1])
     for x in xs[2:]:
@@ -104,7 +104,7 @@ def fact(n: int, /) -> int:
     fact_cache[n] = prod
     return prod
 
-@numba.jit
+@numba.jit(cache=True)
 def fact_bounded(n: int, /) -> int:
     prod = 1
     for i in range(2, n+1):
@@ -119,7 +119,7 @@ def nCr(n: int, r: int, /) -> int:
         prod *= i
     return prod // fact(min(r, n-r))
 
-@numba.jit
+@numba.jit(cache=True)
 def divisors(n: int, /) -> list[int]:
     divisors = []
     for i in range(1, int(n**0.5)+1):
@@ -129,7 +129,7 @@ def divisors(n: int, /) -> list[int]:
                 divisors.append(n // i)
     return divisors
 
-@numba.jit
+@numba.jit(cache=True)
 def count_divisors(n: int, /) -> int:
     divisors = 0
     for i in range(1, int(n**0.5)+1):
@@ -140,7 +140,7 @@ def count_divisors(n: int, /) -> int:
                 divisors += 2
     return divisors
 
-@numba.jit
+@numba.jit(cache=True)
 def sum_proper_divisors(n: int, /) -> int:
     s = 0
     for i in range(1, int(n**0.5)+1):
@@ -152,21 +152,21 @@ def sum_proper_divisors(n: int, /) -> int:
                 s += n // i
     return s - n
 
-@numba.jit
+@numba.jit(cache=True)
 def find_prime_factors_list(n: int, /) -> list[int]:
     for i in range(2, int(n**0.5)+1):
         if n % i == 0:
             return find_prime_factors_list(i) + find_prime_factors_list(n//i)
     return [n]
 
-@numba.jit
+@numba.jit(cache=True)
 def find_prime_factors_set(n: int, /) -> set[int]:
     for i in range(2, int(n**0.5)+1):
         if n % i == 0:
             return find_prime_factors_set(i) | find_prime_factors_set(n//i)
     return {n}
 
-@numba.jit
+@numba.jit(cache=True)
 def find_prime_factors_dict(n: int, /) -> dict[int, int]:
     prime_factors = find_prime_factors_list(n)
     occurrences = {}
@@ -177,7 +177,7 @@ def find_prime_factors_dict(n: int, /) -> dict[int, int]:
             occurrences[p] = 1
     return occurrences
 
-@numba.jit
+@numba.jit(cache=True)
 def totient(n: int, /) -> int:
     prod = 1
     for (p, k) in find_prime_factors_dict(n).items():
@@ -187,7 +187,7 @@ def totient(n: int, /) -> int:
 def reverse(n: int, /) -> int:
     return int("".join(reversed(str(n))))
 
-@numba.jit
+@numba.jit(cache=True)
 def reverse_bounded(n: int, /) -> int:
     r = 0
     place = count_digits_bounded(n) - 1
@@ -201,18 +201,18 @@ def reverse_bounded(n: int, /) -> int:
 def is_palindrome(n: int, /) -> bool:
     return n == reverse(n)
 
-@numba.jit
+@numba.jit(cache=True)
 def is_palindrome_bounded(n: int, /) -> bool:
     return n == reverse_bounded(n)
 
 def count_digits(n):
     return int(math.log10(n)) + 1
 
-@numba.jit
+@numba.jit(cache=True)
 def count_digits_bounded(n):
     return int(math.log10(n)) + 1
 
-@numba.jit
+@numba.jit(cache=True)
 def slice_number(n, start, stop):
     return (n // (10**(count_digits(n) - stop))) % 10**(stop-start)
 
@@ -225,7 +225,7 @@ def mod_exp(a, b, mod):
         a = (a * a) % mod
     return prod
 
-@numba.jit
+@numba.jit(cache=True)
 def mod_exp_bounded(a, b, mod):
     prod = 1
     while b > 0:
