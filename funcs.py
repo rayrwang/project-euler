@@ -14,7 +14,7 @@ def inf_range(start: int = 0, step: int = 1):
 
 first_primes = (2, 3, 5, 7, 11, 13, 17, 19)  # Optimal number
 @numba.jit
-def is_prime(n: int) -> bool:
+def is_prime(n: int, /) -> bool:
     """
     Deterministic Miller-Rabin test
 
