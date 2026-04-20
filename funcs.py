@@ -12,18 +12,57 @@ def inf_range_py(start: int = 0, step: int = 1):
 def inf_range(start: int = 0, step: int = 1):
     return range(start, 1<<62, step)
 
+first_primes = (2, 3, 5, 7, 11, 13, 17, 19)  # Optimal number
 @numba.jit
-def is_prime(n: int, /) -> bool:
+def is_prime(n: int) -> bool:
+    """
+    Deterministic Miller-Rabin test
+
+    https://en.wikipedia.org/wiki/Miller%E2%80%93Rabin_primality_test#Deterministic_variants
+
+    https://miller-rabin.appspot.com/
+    """
     if n <= 1:
         return False
-    if n == 2 or n == 3 or n == 5:
-        return True
-    if n % 2 == 0 or n % 3 == 0 or n % 5 == 0:
-        return False
-    for i in range(7, int(n**0.5)+1, 6):
-        if n % i == 0:  # 6k + 1
+    for p in first_primes:
+        if n == p:
+            return True
+    for p in first_primes:
+        if n % p == 0:
             return False
-        elif n % (i+4) == 0:  # 6k + 5
+
+    # n-1 = 2^s * d
+    d, s = n - 1, 0
+    while d % 2 == 0:
+        d //= 2
+        s += 1
+
+    if n < 38_010_307:
+        bases = [2, 9332593]
+    elif n < 4_759_123_141:
+        bases = [2, 7, 61]
+    elif n < 1_122_004_669_633:
+        bases = [2, 13, 23, 1662803]
+    elif n < 2_152_302_898_747:
+        bases = [2, 3, 5, 7, 11]
+    elif n < 3_474_749_660_383:
+        bases = [2, 3, 5, 7, 11, 13]
+    elif n < 341_550_071_728_321:
+        bases = [2, 3, 5, 7, 11, 13, 17]
+    else:
+        # TODO Fix overflow issues if use the 7 set
+        bases = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37]
+
+    for a in bases:
+        if a % n == 0:
+            return True
+        x = mod_exp_bounded(a, d, n)
+        for _ in range(s):  
+            y = (x*x) % n
+            if y == 1 and x != 1 and x != n-1:
+                return False
+            x = y
+        if y != 1:
             return False
     return True
 
