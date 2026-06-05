@@ -1,4 +1,6 @@
 
+import numpy as np
+
 import math
 from functools import cache
 
@@ -65,6 +67,20 @@ def is_prime(n: int, /) -> bool:
         if y != 1:
             return False
     return True
+
+@numba.jit(cache=True)
+def prime_sieve_bool(n: int, /) -> np.ndarray:
+    is_prime_array = np.full(n, True)
+    is_prime_array[0] = False
+    is_prime_array[1] = False
+    for n in range(2, int(n**0.5)+1):
+        if is_prime_array[n]:  # Not already done by lower numbers
+            is_prime_array[n**2::n] = False
+    return is_prime_array
+
+@numba.jit(cache=True)
+def prime_sieve_int(n: int, /) -> np.ndarray:
+    return np.arange(n, dtype=np.int64)[prime_sieve_bool(n)]
 
 @numba.jit(cache=True)
 def is_square(n: int, /) -> bool:
