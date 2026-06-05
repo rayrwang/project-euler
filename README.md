@@ -3,7 +3,7 @@
 
 [![Lint](https://github.com/rayrwang/project-euler/actions/workflows/lint.yml/badge.svg)](https://github.com/rayrwang/project-euler/actions/workflows/lint.yml) [![Type check](https://github.com/rayrwang/project-euler/actions/workflows/type-check.yml/badge.svg)](https://github.com/rayrwang/project-euler/actions/workflows/type-check.yml)
 
-All solutions only use the Python standard library, and Numba to speed up the code.
+All solutions only use the Python standard library, Numpy, and Numba to speed up the code.
 
 Everything before 2026 Apr 20 is done by hand, after is with Claude help.
 
