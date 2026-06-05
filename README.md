@@ -5,6 +5,8 @@
 
 All solutions only use the Python standard library, and Numba to speed up the code.
 
+Everything before 2026 Apr 20 is done by hand, after is with Claude help.
+
 ## Files
 
 ```
