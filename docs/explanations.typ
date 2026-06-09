@@ -6,7 +6,7 @@
 
 #align(center)[
   #title()
-  Raymond Wang
+  Claude Opus 4.8
 ]
 #outline()
 
