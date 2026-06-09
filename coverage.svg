@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 650 358" width="650" font-family="-apple-system,Segoe UI,Helvetica,Arial,sans-serif">
 <title>Project Euler solution coverage</title>
-<text x="0" y="22" font-size="22" font-weight="600" fill="#1D9E75">397<tspan fill="#8b949e" font-weight="400" font-size="14"> / 1000 solved · 39.7%</tspan></text>
+<text x="0" y="22" font-size="22" font-weight="600" fill="#1D9E75">404<tspan fill="#8b949e" font-weight="400" font-size="14"> / 1000 solved · 40.4%</tspan></text>
 <rect x="0" y="33" width="11" height="11" rx="2" fill="#1D9E75"/>
 <text x="16" y="42" font-size="12" fill="#8b949e">solved</text>
 <rect x="70" y="33" width="11" height="11" rx="2" fill="#808080" fill-opacity="0.2"/>
@@ -243,10 +243,10 @@
 <rect x="454" y="114" width="10" height="10" rx="2" fill="#1D9E75"/>
 <rect x="466" y="114" width="10" height="10" rx="2" fill="#1D9E75"/>
 <rect x="478" y="114" width="10" height="10" rx="2" fill="#1D9E75"/>
-<rect x="490" y="114" width="10" height="10" rx="2" fill="#808080" fill-opacity="0.2"/>
-<rect x="502" y="114" width="10" height="10" rx="2" fill="#808080" fill-opacity="0.2"/>
-<rect x="514" y="114" width="10" height="10" rx="2" fill="#808080" fill-opacity="0.2"/>
-<rect x="526" y="114" width="10" height="10" rx="2" fill="#808080" fill-opacity="0.2"/>
+<rect x="490" y="114" width="10" height="10" rx="2" fill="#1D9E75"/>
+<rect x="502" y="114" width="10" height="10" rx="2" fill="#1D9E75"/>
+<rect x="514" y="114" width="10" height="10" rx="2" fill="#1D9E75"/>
+<rect x="526" y="114" width="10" height="10" rx="2" fill="#1D9E75"/>
 <rect x="538" y="114" width="10" height="10" rx="2" fill="#808080" fill-opacity="0.2"/>
 <rect x="550" y="114" width="10" height="10" rx="2" fill="#808080" fill-opacity="0.2"/>
 <rect x="562" y="114" width="10" height="10" rx="2" fill="#808080" fill-opacity="0.2"/>
@@ -629,7 +629,7 @@
 <rect x="286" y="226" width="10" height="10" rx="2" fill="#808080" fill-opacity="0.2"/>
 <rect x="298" y="226" width="10" height="10" rx="2" fill="#808080" fill-opacity="0.2"/>
 <rect x="310" y="226" width="10" height="10" rx="2" fill="#1D9E75"/>
-<rect x="322" y="226" width="10" height="10" rx="2" fill="#808080" fill-opacity="0.2"/>
+<rect x="322" y="226" width="10" height="10" rx="2" fill="#1D9E75"/>
 <rect x="334" y="226" width="10" height="10" rx="2" fill="#1D9E75"/>
 <rect x="346" y="226" width="10" height="10" rx="2" fill="#1D9E75"/>
 <rect x="358" y="226" width="10" height="10" rx="2" fill="#808080" fill-opacity="0.2"/>
@@ -641,7 +641,7 @@
 <rect x="430" y="226" width="10" height="10" rx="2" fill="#808080" fill-opacity="0.2"/>
 <rect x="442" y="226" width="10" height="10" rx="2" fill="#808080" fill-opacity="0.2"/>
 <rect x="454" y="226" width="10" height="10" rx="2" fill="#808080" fill-opacity="0.2"/>
-<rect x="466" y="226" width="10" height="10" rx="2" fill="#808080" fill-opacity="0.2"/>
+<rect x="466" y="226" width="10" height="10" rx="2" fill="#1D9E75"/>
 <rect x="478" y="226" width="10" height="10" rx="2" fill="#808080" fill-opacity="0.2"/>
 <rect x="490" y="226" width="10" height="10" rx="2" fill="#808080" fill-opacity="0.2"/>
 <rect x="502" y="226" width="10" height="10" rx="2" fill="#808080" fill-opacity="0.2"/>
@@ -655,7 +655,7 @@
 <rect x="598" y="226" width="10" height="10" rx="2" fill="#808080" fill-opacity="0.2"/>
 <rect x="610" y="226" width="10" height="10" rx="2" fill="#808080" fill-opacity="0.2"/>
 <rect x="622" y="226" width="10" height="10" rx="2" fill="#808080" fill-opacity="0.2"/>
-<rect x="634" y="226" width="10" height="10" rx="2" fill="#808080" fill-opacity="0.2"/>
+<rect x="634" y="226" width="10" height="10" rx="2" fill="#1D9E75"/>
 <rect x="46" y="238" width="10" height="10" rx="2" fill="#808080" fill-opacity="0.2"/>
 <rect x="58" y="238" width="10" height="10" rx="2" fill="#808080" fill-opacity="0.2"/>
 <rect x="70" y="238" width="10" height="10" rx="2" fill="#808080" fill-opacity="0.2"/>
