@@ -119,6 +119,16 @@ def prime_sieve_int(n: int, /) -> np.ndarray:
     return np.arange(n, dtype=np.int64)[prime_sieve_bool(n)]
 
 @numba.jit(cache=True)
+def totient_sieve(n: int, /) -> np.ndarray:
+    """Euler's totient phi(i) for all 0 <= i < n. phi[0]=0, phi[1]=1."""
+    phi = np.arange(n, dtype=np.int64)
+    for p in range(2, n):
+        if phi[p] == p:  # p is prime (untouched so far)
+            for k in range(p, n, p):
+                phi[k] -= phi[k] // p
+    return phi
+
+@numba.jit(cache=True)
 def is_square(n: int, /) -> bool:
     if n < 0:
         return False
@@ -313,3 +323,4 @@ def mod_sub(a: int, b: int, mod: int, /):
 
 def mod_mul(a: int, b: int, mod: int, /):
     return ((a % mod) * (b % mod)) % mod
+    
