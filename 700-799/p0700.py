@@ -1,58 +1,54 @@
-"""Project Euler Problem 700: Eulercoin.
+import numba
 
-Consider x_n = A*n mod M with A = 1504170715041707, M = 4503599627370517.  An
-Eulercoin is a term strictly smaller than all earlier terms.  Find their sum.
-
-The record minima of A*n mod M are the best one-sided rational approximations of
-A/M: as we descend the Stern-Brocot tree toward A/M, each mediant denominator b3
-gives a candidate index n = b3, and A*b3 mod M produces the successive minima.  We
-walk the tree (taking mediants of the bounding fractions), record every new minimum,
-and stop at the unavoidable final minimum 1 (gcd(A, M) = 1).
-"""
-
-A = 1504170715041707
+N = 1504170715041707
 M = 4503599627370517
 
+@numba.jit(cache=True)
+def forward_coins(threshold):
+    """Eulercoins found by walking n upward until the value drops below threshold.
 
-def eulercoins() -> list[int]:
-    coins = [A]  # n = 1 gives the first Eulercoin
-    mn = A
-    a1, b1 = 0, 1
-    a2, b2 = 1, 1
-    while True:
-        a3, b3 = a1 + a2, b1 + b2
-        if M * a3 < A * b3:          # mediant a3/b3 < A/M
-            a1, b1 = a3, b3
-        else:
-            a2, b2 = a3, b3
-        t = (A * b3) % M
-        if t < mn:
-            coins.append(t)
-            mn = t
-            if t == 1:
-                break
+    value(n) = N*n mod M, tracked incrementally. Record every strict new minimum
+    (an Eulercoin); these are the large-valued coins, reached at small n.
+    """
+    coins = []
+    v = 0
+    best = M
+    n = 0
+    while best >= threshold:
+        n += 1
+        v += N
+        if v >= M:
+            v -= M
+        if v < best:
+            best = v
+            coins.append(v)
     return coins
 
+@numba.jit(cache=True)
+def reverse_coins(threshold, n_inv):
+    """Eulercoins with value < threshold, via the step at which a value appears.
 
-def _brute(limit_n: int) -> list[int]:
-    out = []
-    mn = M + 1
-    x = 0
-    for _ in range(1, limit_n + 1):
-        x += A
-        if x >= M:
-            x -= M
-        if x < mn:
-            mn = x
-            out.append(x)
-    return out
+    Value c first occurs at step n_c = c * N^{-1} mod M, tracked incrementally as
+    c increases. c is an Eulercoin exactly when n_c beats every earlier n_{c'},
+    i.e. n_c is a strict new minimum. These are the small-valued coins.
+    """
+    coins = []
+    nc = 0
+    best_n = M
+    for c in range(1, threshold):
+        nc += n_inv
+        if nc >= M:
+            nc -= M
+        if nc < best_n:
+            best_n = nc
+            coins.append(c)
+    return coins
 
+def sum_eulercoins():
+    threshold = 20_000_000
+    n_inv = pow(N, -1, M)
+    values = set(forward_coins(threshold)) | set(reverse_coins(threshold, n_inv))
+    return sum(values)
 
 if __name__ == "__main__":
-    coins = eulercoins()
-    assert coins[0] == 1504170715041707
-    assert coins[1] == 8912517754604
-    # cross-check the prefix against a direct scan
-    b = _brute(10**6)
-    assert coins[: len(b)] == b, (coins[: len(b)], b)
-    print(sum(coins))  # 1517926517777556
+    print(sum_eulercoins())  # 1517926517777556
