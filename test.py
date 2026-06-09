@@ -11,7 +11,11 @@ if __name__ == "__main__":
             "0-99", "100-199", "200-299", "300-399", "400-499",
             "500-599", "600-699", "700-799", "800-899", "900-999",
         ]
-        problems = sorted(os.path.join(d, f) for d in ds for f in os.listdir(d))
+        problems = sorted(
+            os.path.join(d, f)
+            for d in ds if os.path.isdir(d)
+            for f in os.listdir(d)
+        )
 
     correct = 0
     incorrect = 0
