@@ -3346,21 +3346,6 @@ A $2025$-number $N$ splits into a leading part $a$ and a trailing part $b$ (with
 A cheap filter cuts the search by more than four-fifths. Since $10^k equiv 1 space (mod 9)$, we have $N = a dot 10^k + b equiv a + b = s space (mod 9)$; combined with $N = s^2$ this forces $s^2 equiv s$, i.e. $s equiv 0$ or $1 space (mod 9)$. Only those $s$ need be examined.
 
 #pagebreak()
-#link("https://projecteuler.net/problem=996")[= Problem 996: Overtakes]
-
-Solution: 137726405
-
-Players are ranked $1$ (top) to $n$. Each day two adjacent-rank players meet; if the lower wins they swap, an *overtake* by the winner. After $k$ days everyone is back to their start, and $F(n,k)$ counts the distinct $n$-tuples of per-player overtake counts. We want $F(123, 4567891) mod 1234567891$, given $F(3,4)=8$ and $F(12,34)=2457178250$.
-
-A non-swap match only spends a day, so a tuple is realizable in $k$ days exactly when it comes from some sequence of $s <= k$ adjacent transpositions composing to the identity. Each swap is one overtake, so the tuple sum equals $s$, and since the identity is even, $s$ is even. Hence $F(n,k)$ counts achievable tuples with sum $<= k$, and as all achievable sums are even, $F(n,k) = sum_(m=0)^(floor(k\/2)) H(n, 2m)$ with $H(n,s)$ the number of achievable tuples of sum $s$.
-
-A player overtaking $0$ times never moves, acting as a wall, so the line splits at the zeros into independent blocks of consecutive positive entries. Pairing each overtake of $p$ over $q$ with the reverse crossing shows a block is achievable iff its sum is even and no entry exceeds half the block sum. A length-$L$ block of sum $2m$ therefore has
-$ "comp"(2m, L) = binom(2m-1, L-1) - L binom(m-1, L-1) $
-contents. Arranging blocks of length $>= 2$ separated by at least one zero is a small transfer DP yielding $H(n, 2m)$, which matches brute force for $n <= 6$ and reproduces both given values.
-
-For fixed $n$, $H(n, 2m)$ is eventually a polynomial in $m$ of degree $<= n-1$, so the cumulative $S(M) = sum_(m <= M) H(n, 2m)$ is a polynomial of degree $<= n$ in $M$. Computing enough seed values modulo the prime $1234567891$ and Lagrange-interpolating to $M = floor(k\/2) = 2283945$ gives $F(123, 4567891) equiv 137726405$.
-
-#pagebreak()
 #link("https://projecteuler.net/problem=997")[= Problem 997: Dice Box]
 
 Solution: 5765993594880
