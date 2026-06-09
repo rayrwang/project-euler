@@ -313,4 +313,3 @@ def mod_sub(a: int, b: int, mod: int, /):
 
 def mod_mul(a: int, b: int, mod: int, /):
     return ((a % mod) * (b % mod)) % mod
-    

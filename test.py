@@ -1,9 +1,7 @@
-
 import os
 import subprocess
 import sys
 import time
-import re
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
@@ -19,7 +17,7 @@ if __name__ == "__main__":
     timeout_s = 600
     t_start_all = time.perf_counter()
     for name in problems:
-        if name.startswith("p"):
+        if name.startswith("p") and name.endswith(".py"):
             solutions += 1
             print(f"Problem {int(name[1:5])}:", end=" ")
             t_start_solution = time.perf_counter()
@@ -32,18 +30,19 @@ if __name__ == "__main__":
                 print(f"Timeout after {timeout_s}s.")
                 continue
             answer = proc.stdout.decode().strip()
+            error = proc.stderr.decode().strip()
 
             # Check answer:
-            # The solution is written as a comment on the line with a print statement
+            # The expected answer is written as a comment on the executable
+            # print line, e.g.  print(s)  # 233168
             solution = None
-            solution_pattern = r"print\(.+#"
             with open(name, "r") as f:
                 for line in f:
-                    if re.search(solution_pattern, line):
-                        split = re.split(solution_pattern, line)
-                        if split:
-                            solution = split[-1].strip()
-                            break
+                    if line.lstrip().startswith("#"):
+                        continue  # skip commented-out code
+                    if "print(" in line and "#" in line:
+                        solution = line.split("#", 1)[1].strip()
+                        break
             if solution:
                 if answer == solution:
                     correct += 1
@@ -54,6 +53,11 @@ if __name__ == "__main__":
             else:
                 unverified += 1
                 print(f"{answer} ? (no solution found)", end=" ")
+
+            # Surface crashes that would otherwise hide behind an empty answer.
+            if proc.returncode != 0 and error:
+                last = error.splitlines()[-1]
+                print(f"[exit {proc.returncode}: {last}]", end=" ")
 
             print(f"(in {time.perf_counter()-t_start_solution:.1f}s)")
             
