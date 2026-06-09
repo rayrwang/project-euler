@@ -1,4 +1,3 @@
-
 triangle_raw = """
 75
 95 64
@@ -24,7 +23,7 @@ def triangle_max_path(triangle_raw):
     for row_raw in triangle_raw:
         row = [int(digit) for digit in row_raw.split(" ")]
         triangle.append(row)
-        triangle_max.append([None]*len(row))
+        triangle_max.append([0]*len(row))
 
     # Init bottom row of triangle_max to triangle
     for i, num in enumerate(triangle[-1]):
