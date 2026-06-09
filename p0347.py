@@ -1,13 +1,36 @@
+import numba
 
-from funcs import find_prime_factors_set
+from funcs import prime_sieve_int
 
-def S(N):
-    pq = {}
-    for n in range(1, N+1):
-        pq_n = tuple(sorted(find_prime_factors_set(n)))
-        if len(pq_n) == 2:
-            pq[pq_n] = n
-    return sum(pq.values())
+@numba.jit(cache=True)
+def S(N, primes):
+    """Sum over prime pairs p < q (with p*q <= N) of the largest p^a * q^b <= N."""
+    total = 0
+    n = len(primes)
+    for i in range(n):
+        p = primes[i]
+        if p * p > N:          # then p*q > p^2 > N for every q > p
+            break
+        for j in range(i + 1, n):
+            q = primes[j]
+            if p * q > N:       # primes increase, so no further q works
+                break
+            # Largest p^a * q^b <= N with a, b >= 1.
+            best = 0
+            pa = p
+            while pa * q <= N:
+                rem = N // pa
+                qb = q
+                while qb * q <= rem:
+                    qb *= q
+                prod = pa * qb
+                if prod > best:
+                    best = prod
+                pa *= p
+            total += best
+    return total
 
 if __name__ == "__main__":
-    print(S(10_000_000))  # 11109800204052
+    N = 10_000_000
+    primes = prime_sieve_int(N // 2 + 1)
+    print(S(N, primes))  # 11109800204052
