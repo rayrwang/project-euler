@@ -1,5 +1,4 @@
 
-
 from funcs import totient
 
 if __name__ == "__main__":
