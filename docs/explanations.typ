@@ -8,7 +8,44 @@
   #title()
   Claude Opus 4.8
 ]
-#outline()
+#outline(depth: 1)
+
+#pagebreak()
+#link("https://projecteuler.net/problem=70")[= Problem 70: Totient Permutation]
+
+Solution: 8319823
+
+We want the $n$ with $1 < n < N$, where $N = 10^7$, that minimises the ratio $n / phi(n)$ subject to $phi(n)$ being a digit permutation of $n$.
+
+== Computing every totient at once
+
+Factorising each $n$ on its own is the slow part. Instead we compute $phi$ for every value below $N$ in a single sieve, using the product formula
+$
+phi(n) = n product_(p divides n) (1 - 1/p).
+$
+Start with $phi[i] = i$ for all $i$. Sweep $p = 2, 3, 4, dots$; whenever $phi[p]$ is still equal to $p$ its entry has never been modified, so $p$ must be prime. For each such $p$ we fold in the factor $(1 - 1/p)$ across all of its multiples:
+$
+phi[k] <- phi[k] - phi[k] / p, quad k = p, 2p, 3p, dots
+$
+After the sweep $phi[i]$ holds $phi(i)$ for every $i < N$. The cost is $O(N log log N)$, versus factorising $N$ numbers separately.
+
+== Searching for the minimum ratio
+
+Two observations keep the search cheap.
+
+First, a digit permutation leaves the digit sum unchanged, and every integer is congruent to its digit sum modulo $9$. So a necessary condition for $phi(n)$ to be a permutation of $n$ is
+$
+n equiv phi(n) quad ("mod" 9),
+$
+which rejects roughly $8/9$ of all candidates before any further work. For the survivors we confirm a genuine permutation by tallying digits: increment a length-$10$ array once per digit of $n$, decrement it once per digit of $phi(n)$, and accept only if every entry is back to zero.
+
+Second, the ratios are compared exactly, without floating point. The best ratio so far is kept as a fraction $n_"best" \/ d_"best"$, and a new candidate $n \/ phi(n)$ improves on it precisely when
+$
+n dot d_"best" < n_"best" dot phi(n),
+$
+a comparison of two integer products.
+
+The search itself assumes nothing about the form of the answer, but the winner turns out to be $8319823 = 2339 times 3557$, a product of two primes straddling $sqrt(N) approx 3162$. That is exactly where $n / phi(n) = product_(p divides n) p \/ (p-1)$ is smallest: few prime factors, each as large as possible, while still leaving room for $phi(n)$ to be a permutation of $n$.
 
 #pagebreak()
 #link("https://projecteuler.net/problem=587")[= Problem 587: Concave Triangle]
