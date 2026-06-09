@@ -11,6 +11,160 @@
 #outline(depth: 1)
 
 #pagebreak()
+#link("https://projecteuler.net/problem=1")[= Problem 1: Multiples of 3 or 5]
+
+Solution: 233168
+
+Add the integers below $1000$ that are divisible by $3$ or by $5$, looping once and testing each.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=2")[= Problem 2: Even Fibonacci Numbers]
+
+Solution: 4613732
+
+Generate Fibonacci numbers up to four million and sum the even ones.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=3")[= Problem 3: Largest Prime Factor]
+
+Solution: 6857
+
+Factorise $600851475143$ by trial division and take the largest prime factor.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=4")[= Problem 4: Largest Palindrome Product]
+
+Solution: 906609
+
+Check every product of two three-digit numbers and keep the largest that reads the same in reverse.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=5")[= Problem 5: Smallest Multiple]
+
+Solution: 232792560
+
+Scan upward for the first number divisible by every integer from $2$ to $20$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=6")[= Problem 6: Sum Square Difference]
+
+Solution: 25164150
+
+Subtract the sum of the squares of $1$ to $100$ from the square of their sum, using $5050$ for the latter.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=7")[= Problem 7: 10001st Prime]
+
+Solution: 104743
+
+Step through the odd numbers, testing primality, until the $10001$st prime is reached.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=8")[= Problem 8: Largest Product in a Series]
+
+Solution: 23514624000
+
+Slide a window of thirteen digits across the given $1000$-digit number and take the largest product.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=9")[= Problem 9: Special Pythagorean Triplet]
+
+Solution: 31875000
+
+Search for $a + b + c = 1000$ with $a^2 + b^2 = c^2$ and return the product $a b c$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=10")[= Problem 10: Summation of Primes]
+
+Solution: 142913828922
+
+Sum every prime below two million using a sieve.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=11")[= Problem 11: Largest Product in a Grid]
+
+Solution: 70600674
+
+For each cell and each of the eight directions, multiply four adjacent entries and keep the maximum.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=12")[= Problem 12: Highly Divisible Triangular Number]
+
+Solution: 76576500
+
+Generate triangular numbers until one has more than $500$ divisors.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=13")[= Problem 13: Large Sum]
+
+Solution: 5537376230
+
+Add the fifty fifty-digit numbers and report the first ten digits.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=14")[= Problem 14: Longest Collatz Sequence]
+
+Solution: 837799
+
+Compute the Collatz chain length for every start below one million and report the longest.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=15")[= Problem 15: Lattice Paths]
+
+Solution: 137846528820
+
+The monotonic routes through a $20 times 20$ grid number $binom(40, 20)$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=16")[= Problem 16: Power Digit Sum]
+
+Solution: 1366
+
+Sum the decimal digits of $2^1000$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=17")[= Problem 17: Number Letter Counts]
+
+Solution: 21124
+
+Count the letters used to spell every number from $1$ to $1000$, using small per-range letter tables (with the British "and").
+
+#pagebreak()
+#link("https://projecteuler.net/problem=18")[= Problem 18: Maximum Path Sum I]
+
+Solution: 1074
+
+Work up the triangle from the bottom: each cell takes its value plus the larger of the two cells below, leaving the answer at the apex.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=19")[= Problem 19: Counting Sundays]
+
+Solution: 171
+
+Walk a running day count month by month from $1901$ to $2000$, counting the months that begin on a Sunday.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=20")[= Problem 20: Factorial Digit Sum]
+
+Solution: 648
+
+Sum the decimal digits of $100!$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=21")[= Problem 21: Amicable Numbers]
+
+Solution: 31626
+
+Sum the amicable numbers below $10000$, where $d(a)$ is the proper-divisor sum and $a != d(a) = b$ with $d(b) = a$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=22")[= Problem 22: Names Scores]
+
+Solution: 871198282
+
+Sort the names alphabetically, then sum each name's position times its alphabetical letter value.
+
+#pagebreak()
 #link("https://projecteuler.net/problem=23")[= Problem 23: Non-Abundant Sums]
 
 Solution: 4179871
@@ -20,11 +174,130 @@ Sum the positive integers that cannot be written as the sum of two abundant numb
 Sieve the proper-divisor sums for all $i <= 28123$ (walk each $i$ across its multiples, adding $i$ to each). The abundant numbers are those with divisor-sum exceeding themselves. Mark every $a + b$ for abundant $a <= b$, then add up the integers left unmarked.
 
 #pagebreak()
+#link("https://projecteuler.net/problem=24")[= Problem 24: Lexicographic Permutations]
+
+Solution: 2783915460
+
+Generate the permutations of the digits $0$ to $9$ in lexicographic order and take the millionth.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=25")[= Problem 25: 1000-digit Fibonacci Number]
+
+Solution: 4782
+
+Find the index of the first Fibonacci number with one thousand digits.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=26")[= Problem 26: Reciprocal Cycles]
+
+Solution: 983
+
+For each denominator below $1000$, run long division while tracking remainders; the recurring cycle length is found by the first repeated remainder. Report the longest.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=27")[= Problem 27: Quadratic Primes]
+
+Solution: -59231
+
+Search coefficients $a, b in (-1000, 1000)$ for the quadratic $n^2 + a n + b$ that produces the longest run of primes from $n = 0$, returning $a b$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=28")[= Problem 28: Number Spiral Diagonals]
+
+Solution: 669171001
+
+Sum the diagonals of a $1001 times 1001$ spiral using the closed form for each ring's four corners.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=29")[= Problem 29: Distinct Powers]
+
+Solution: 9183
+
+Count the distinct values $a^b$ for $2 <= a, b <= 100$ with a set.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=30")[= Problem 30: Digit Fifth Powers]
+
+Solution: 443839
+
+Sum the numbers equal to the sum of the fifth powers of their digits (the search bound is $6 dot 9^5$).
+
+#pagebreak()
+#link("https://projecteuler.net/problem=31")[= Problem 31: Coin Sums]
+
+Solution: 73682
+
+Count the ways to make two pounds from the coin denominations by recursing over the coin list.
+
+#pagebreak()
 #link("https://projecteuler.net/problem=32")[= Problem 32: Pandigital Products]
 
 Solution: 45228
 
 Sum the distinct products $c$ for which $a times b = c$ and the three numbers together use each digit $1$–$9$ exactly once. The digit counts can only split as $1 times 4 = 4$ or $2 times 3 = 4$, so the smaller factor is below $100$. Iterate $a$ and $b$, concatenate $a$, $b$ and $a b$, and keep the product whenever those nine characters are exactly ${1, dots, 9}$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=33")[= Problem 33: Digit Cancelling Fractions]
+
+Solution: 100
+
+Find the non-trivial two-digit fractions whose value is unchanged by cancelling a shared digit, and reduce the product of the four.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=34")[= Problem 34: Digit Factorials]
+
+Solution: 40730
+
+Sum the numbers equal to the sum of the factorials of their digits.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=35")[= Problem 35: Circular Primes]
+
+Solution: 55
+
+Count the primes below one million for which every digit rotation is also prime.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=36")[= Problem 36: Double-base Palindromes]
+
+Solution: 872187
+
+Sum the numbers below one million that are palindromic in both base ten and base two.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=37")[= Problem 37: Truncatable Primes]
+
+Solution: 748317
+
+Find the eleven primes that remain prime as digits are stripped from the left and from the right.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=38")[= Problem 38: Pandigital Multiples]
+
+Solution: 932718654
+
+Search for the largest $1$ to $9$ pandigital formed by concatenating $n, 2n, dots$ for some integer.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=39")[= Problem 39: Integer Right Triangles]
+
+Solution: 840
+
+For perimeters up to $1000$, count integer right-triangle solutions and report the perimeter with the most.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=41")[= Problem 41: Pandigital Prime]
+
+Solution: 7652413
+
+Test the permutations using digits $1$ to $n$ for primality and keep the largest prime.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=42")[= Problem 42: Coded Triangle Numbers]
+
+Solution: 162
+
+A word's letter value is triangular exactly when $1 + 8 v$ is a perfect square (for value $v$); count the words that qualify.
 
 #pagebreak()
 #link("https://projecteuler.net/problem=43")[= Problem 43: Sub-string Divisibility]
@@ -34,11 +307,130 @@ Solution: 16695334890
 Sum the $0$-to-$9$ pandigital numbers whose sliding three-digit windows $d_2 d_3 d_4, d_3 d_4 d_5, dots, d_8 d_9 d_10$ are divisible by $2, 3, 5, 7, 11, 13, 17$ respectively. Instead of testing all $10!$ permutations, build from the right: start with the three-digit multiples of $17$ that have distinct digits, then repeatedly prepend a digit so each new leading window is divisible by the next prime down the list. Finally prepend the one unused digit and sum the results.
 
 #pagebreak()
+#link("https://projecteuler.net/problem=44")[= Problem 44: Pentagon Numbers]
+
+Solution: 5482660
+
+Search pairs of pentagonal numbers whose sum and difference are both pentagonal, minimising the difference, using the inverse formula to test pentagonality.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=46")[= Problem 46: Goldbach's Other Conjecture]
+
+Solution: 5777
+
+Find the smallest odd composite that cannot be written as a prime plus twice a square.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=47")[= Problem 47: Distinct Primes Factors]
+
+Solution: 134043
+
+Find the first run of four consecutive integers each having exactly four distinct prime factors.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=48")[= Problem 48: Self Powers]
+
+Solution: 9110846700
+
+Sum $1^1 + 2^2 + dots + 1000^1000$ and report the last ten digits.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=49")[= Problem 49: Prime Permutations]
+
+Solution: 296962999629
+
+Find the arithmetic progression of three four-digit primes that are digit permutations of one another, other than the given $1487$ case.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=50")[= Problem 50: Consecutive Prime Sum]
+
+Solution: 997651
+
+Track running sums of consecutive primes below one million and report the prime that is the longest such sum.
+
+#pagebreak()
 #link("https://projecteuler.net/problem=51")[= Problem 51: Prime Digit Replacements]
 
 Solution: 121313
 
 Find the smallest prime belonging to an eight-member family formed by replacing one fixed set of digit positions with each value $0$–$9$. Sieve the primes for constant-time tests and, for each prime, try the position masks. Only a mask replacing a number of positions divisible by $3$ can produce eight primes: otherwise, as the replacement digit runs $0$–$9$, the digit sum modulo $3$ cycles and culls too many candidates as multiples of $3$. Return the smallest member of the first eight-family found.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=52")[= Problem 52: Permuted Multiples]
+
+Solution: 142857
+
+Find the smallest $x$ whose multiples $2x$ through $6x$ are all digit permutations of $x$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=53")[= Problem 53: Combinatoric Selections]
+
+Solution: 4075
+
+Count the binomial coefficients $binom(n, r)$ with $n <= 100$ that exceed one million.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=55")[= Problem 55: Lychrel Numbers]
+
+Solution: 249
+
+Count the numbers below $10000$ that fail to produce a palindrome within fifty reverse-and-add steps.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=56")[= Problem 56: Powerful Digit Sum]
+
+Solution: 972
+
+Maximise the digit sum of $a^b$ over $a, b < 100$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=57")[= Problem 57: Square Root Convergents]
+
+Solution: 153
+
+Iterate the continued-fraction convergents of $sqrt(2)$ and count those whose numerator has more digits than the denominator.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=58")[= Problem 58: Spiral Primes]
+
+Solution: 26241
+
+Grow the diagonals of a number spiral until the proportion of prime diagonal entries falls below ten percent.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=62")[= Problem 62: Cubic Permutations]
+
+Solution: 127035954683
+
+Group cubes by their sorted digits and find the smallest cube belonging to a group of exactly five digit-permutation cubes.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=63")[= Problem 63: Powerful Digit Counts]
+
+Solution: 49
+
+Count the $n$-digit positive integers that are also $n$th powers.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=65")[= Problem 65: Convergents of e]
+
+Solution: 272
+
+Build the hundredth convergent of the continued fraction for $e$ and sum the digits of its numerator.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=67")[= Problem 67: Maximum Path Sum II]
+
+Solution: 7273
+
+The same bottom-up dynamic programming as Problem 18, applied to the hundred-row triangle read from file.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=69")[= Problem 69: Totient Maximum]
+
+Solution: 510510
+
+Maximise $n\/phi(n)$ for $n <= 10^6$; the optimum is the primorial $510510$.
 
 #pagebreak()
 #link("https://projecteuler.net/problem=70")[= Problem 70: Totient Permutation]
@@ -78,6 +470,13 @@ a comparison of two integer products.
 The search itself assumes nothing about the form of the answer, but the winner turns out to be $8319823 = 2339 times 3557$, a product of two primes straddling $sqrt(N) approx 3162$. That is exactly where $n / phi(n) = product_(p divides n) p \/ (p-1)$ is smallest: few prime factors, each as large as possible, while still leaving room for $phi(n)$ to be a permutation of $n$.
 
 #pagebreak()
+#link("https://projecteuler.net/problem=71")[= Problem 71: Ordered Fractions]
+
+Solution: 428570
+
+Scan denominators up to one million for the reduced fraction immediately below $3\/7$.
+
+#pagebreak()
 #link("https://projecteuler.net/problem=72")[= Problem 72: Counting Fractions]
 
 Solution: 303963552391
@@ -93,11 +492,60 @@ $
 So the whole problem reduces to one totient sieve: build $phi(d)$ for all $d <= N$ with the same $O(N log log N)$ sieve used in Problem 70, then add up the entries from $2$ to $N$.
 
 #pagebreak()
+#link("https://projecteuler.net/problem=73")[= Problem 73: Counting Fractions in a Range]
+
+Solution: 7295372
+
+Count the reduced fractions strictly between $1\/3$ and $1\/2$ with denominator at most $12000$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=74")[= Problem 74: Digit Factorial Chains]
+
+Solution: 402
+
+Count the starting numbers below one million whose digit-factorial chain has exactly sixty non-repeating terms.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=76")[= Problem 76: Counting Summations]
+
+Solution: 190569291
+
+Count the ways to write $100$ as a sum of two or more positive integers, via memoised recursion over the largest part.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=77")[= Problem 77: Prime Summations]
+
+Solution: 71
+
+Find the first value expressible as a sum of primes in more than five thousand ways.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=80")[= Problem 80: Square Root Digital Expansion]
+
+Solution: 40886
+
+For each non-square up to $100$, compute one hundred digits of its square root with integer arithmetic and sum them.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=85")[= Problem 85: Counting Rectangles]
+
+Solution: 2772
+
+Search grid dimensions for the rectangle count nearest two million; a $w times h$ grid contains $sum (w - i)(h - j)$ sub-rectangles.
+
+#pagebreak()
 #link("https://projecteuler.net/problem=87")[= Problem 87: Prime Power Triples]
 
 Solution: 1097343
 
 Count the numbers below $5 times 10^7$ expressible as $p^2 + q^3 + r^4$ for primes $p, q, r$. The roots are small ($r <= 84$, $q <= 368$, $p <= 7071$), so sieve the primes once and mark every reachable sum in a boolean array, breaking each loop as soon as the partial sum passes the limit. The answer is the number of distinct marked sums.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=92")[= Problem 92: Square Digit Chains]
+
+Solution: 8581146
+
+Every chain under repeated squared-digit-sum ends at $1$ or $89$; count the starts below ten million that reach $89$.
 
 #pagebreak()
 #link("https://projecteuler.net/problem=95")[= Problem 95: Amicable Chains]
@@ -107,6 +555,27 @@ Solution: 14316
 Find the smallest member of the longest amicable chain whose every element stays at or below $10^6$ (a chain is $n -> s(n) -> s(s(n)) -> dots -> n$, where $s$ sums proper divisors).
 
 Sieve $s(i)$ for all $i <= 10^6$, then from each start follow the sequence. A walk that drops below the start (its true minimum was already handled) or climbs above $10^6$ is discarded; one that returns to the start is a chain. A generous length cap stops the walk from spinning forever inside a foreign cycle whose minimum exceeds the start. Track the longest.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=97")[= Problem 97: Large Non-Mersenne Prime]
+
+Solution: 8739992577
+
+Report the last ten digits of $28433 dot 2^7830457 + 1$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=99")[= Problem 99: Largest Exponential]
+
+Solution: 709
+
+Compare the base-exponent pairs from file by exponent times $ln$ of base and report the line of the largest.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=104")[= Problem 104: Pandigital Fibonacci Ends]
+
+Solution: 329468
+
+Find the Fibonacci index whose first nine and last nine digits are each $1$ to $9$ pandigital, keeping the tail modulo $10^9$ to stay fast.
 
 #pagebreak()
 #link("https://projecteuler.net/problem=108")[= Problem 108: Diophantine Reciprocals I]
@@ -145,6 +614,34 @@ $
 giving $(2025 + 1)\/2 = 1013$ solutions.
 
 #pagebreak()
+#link("https://projecteuler.net/problem=112")[= Problem 112: Bouncy Numbers]
+
+Solution: 1587000
+
+Count bouncy numbers (digits neither wholly non-decreasing nor non-increasing) until they make up ninety-nine percent of all numbers seen.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=114")[= Problem 114: Counting Block Combinations I]
+
+Solution: 16475640049
+
+A special case of Problem 115 with minimum block length three.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=115")[= Problem 115: Counting Block Combinations II]
+
+Solution: 168
+
+Count the arrangements of red blocks of length at least $m$ separated by single gaps via memoised recursion, then find the row length where the count first passes one million.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=116")[= Problem 116: Red, Green or Blue Tiles]
+
+Solution: 20492570929
+
+Count the ways to lay tiles of a single length ($2$, $3$ or $4$) on a row of fifty squares, summed over the three colours, excluding the empty arrangement.
+
+#pagebreak()
 #link("https://projecteuler.net/problem=118")[= Problem 118: Pandigital Prime Sets]
 
 Solution: 44680
@@ -174,6 +671,20 @@ $
 g(M) = sum_(B subset.eq M, ell in B) f(B) dot g(M without B), quad g(0) = 1,
 $
 where $ell$ is the lowest set bit of $M$ and $B$ ranges over sub-masks containing it. Enumerating sub-masks costs $O(3^9)$ overall. The answer is $g$ of the full mask, $g(111111111_2) = 44680$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=123")[= Problem 123: Prime Square Remainders]
+
+Solution: 21035
+
+Using $(p - 1)^n + (p + 1)^n mod p^2$, find the first prime index whose remainder exceeds $10^10$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=124")[= Problem 124: Ordered Radicals]
+
+Solution: 21417
+
+Sort $1$ to $100000$ by radical (the product of distinct prime factors), breaking ties by value, and read off the $10000$th.
 
 #pagebreak()
 #link("https://projecteuler.net/problem=125")[= Problem 125: Palindromic Sums]
@@ -245,11 +756,25 @@ Writing each such $n$ with its smaller factor first makes the count a sum over $
 The largest partner occurs at $p = 2$, where $q$ can reach $(N-1)\/2$, so we sieve every prime up to $N\/2$ once. For each small prime $p$ a binary search in that sorted list returns the number of primes up to $floor((N-1)\/p)$; subtracting the primes below $p$ leaves the count of valid $q$. Summing gives $17427258$ (and $10$ below $30$, matching the example).
 
 #pagebreak()
+#link("https://projecteuler.net/problem=188")[= Problem 188: Hyperexponentiation]
+
+Solution: 95962097
+
+Compute the tetration $1777 arrow.t arrow.t 1855$ modulo $10^8$ by repeated modular exponentiation from the top down.
+
+#pagebreak()
 #link("https://projecteuler.net/problem=203")[= Problem 203: Squarefree Binomial Coefficients]
 
 Solution: 34029210557338
 
 Sum the distinct squarefree entries in the first $51$ rows of Pascal's triangle. The key fact is that every prime factor of $binom(n, k)$ with $n <= 50$ is at most $n$, so squarefreeness only needs testing against the primes up to $47$ — the large binomials themselves never have to be factored. Collect the distinct values from the left half of each row (using $binom(n, k) = binom(n, n - k)$) and add those divisible by no $p^2$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=301")[= Problem 301: Nim]
+
+Solution: 2178309
+
+Count the $n <= 2^30$ with $n xor 2n xor 3n = 0$, the losing positions of this three-heap Nim.
 
 #pagebreak()
 #link("https://projecteuler.net/problem=315")[= Problem 315: Digital Root Clocks]
@@ -259,6 +784,20 @@ Solution: 13625242
 Two seven-segment clocks each display a number, then repeatedly its digit sum down to a single digit, beginning and ending blank. Sam's clock clears and relights every segment at each step; Max's only toggles the segments that change. The answer is Sam's total segment transitions minus Max's, summed over the primes in $[10^7, 2 dot 10^7)$.
 
 Sieve that prime range rather than testing each number for primality, and compute both transition counts per prime with integer digit arithmetic. For a step $a -> b$, Sam's cost is the total lit-segment count of $a$ plus that of $b$, while Max's cost is the sum over aligned digit positions of the population count of the segment-pattern XOR (a blank screen contributing the all-off pattern).
+
+#pagebreak()
+#link("https://projecteuler.net/problem=323")[= Problem 323: Bitwise-OR Operations on Random Integers]
+
+Solution: 6.3551758451
+
+Each step ORs in a random $32$-bit integer; the expected number of steps is $sum i dot p(i)$, where $p(i)$ comes from differencing the closed-form chance that all bits are set by step $i$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=346")[= Problem 346: Strong Repunits]
+
+Solution: 336108797689259276
+
+Collect every number that is a repunit of length at least three in some base up to $sqrt(n)$, together with all values that are length-two repunits, and sum the distinct ones below $10^12$.
 
 #pagebreak()
 #link("https://projecteuler.net/problem=347")[= Problem 347: Largest Integer Divisible by Two Primes]
@@ -325,6 +864,20 @@ $
 $
 
 #pagebreak()
+#link("https://projecteuler.net/problem=607")[= Problem 607: Marsh Crossing]
+
+Solution: 13.1265108586
+
+Minimise the crossing time over a diagonal marsh of banded speeds by binary-searching the entry angle and applying Snell's law at each band boundary.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=686")[= Problem 686: Powers of Two with Leading Digits]
+
+Solution: 193060223
+
+Using the fractional part of $j dot log_10 2$ to detect a leading block of $123$, count the powers of two that start with $123$ until the $678910$th.
+
+#pagebreak()
 #link("https://projecteuler.net/problem=719")[= Problem 719: Number Splitting]
 
 Solution: 128088830547982
@@ -367,20 +920,17 @@ Solution: 3807504276997394
 A reversible prime square is the square of a prime that is not a palindrome and whose digit reversal is also the square of a prime. Because squares grow with their root, iterating primes in increasing order yields these in increasing order too. Sieve primes up to about $3.2 dot 10^7$ (where the fiftieth occurs); for each prime $p$, reverse $p^2$, and if the reversal is a perfect square whose root is prime, count $p^2$. Stop at the fiftieth and sum.
 
 #pagebreak()
+#link("https://projecteuler.net/problem=836")[= Problem 836: A Bold Proposition]
+
+Solution: aprilfoolsjoke
+
+An April Fools' problem; the answer is the literal string hidden in the prompt.
+
+#pagebreak()
 #link("https://projecteuler.net/problem=932")[= Problem 932: $2025$]
 
 Solution: 72673459417881349
 
-Let $d$ be the number of digits in $b$. We have:
-$
-10^d a + b = (a+b)^2 \
-b^2 + (2a - 1)b + a^2 - 10^d a = 0 \
-b = (1 - 2a + sqrt(4 dot 10^d a - 4a + 1)) / 2
-$
+A $2025$-number $N$ splits into a leading part $a$ and a trailing part $b$ (with $b$ having a fixed digit length and no leading zero) such that $N = (a + b)^2$. Writing $s = a + b$, every such $N$ is simply $s^2$, so iterate over $s$ rather than over the parts: for each split position $k$, set $a = floor(N \/ 10^k)$ and $b = N mod 10^k$, and accept when $a + b = s$ and $b$ has exactly $k$ digits.
 
-Similarly:
-$
-a = ((10^d - 2b) + sqrt(10^(2d) - 4 dot 10^d b + 4b)) / 2
-$
-
-Then search through the numbers up to half of the required length, where the corresponding other number is obtained using the formulas.
+A cheap filter cuts the search by more than four-fifths. Since $10^k equiv 1 space (mod 9)$, we have $N = a dot 10^k + b equiv a + b = s space (mod 9)$; combined with $N = s^2$ this forces $s^2 equiv s$, i.e. $s equiv 0$ or $1 space (mod 9)$. Only those $s$ need be examined.
