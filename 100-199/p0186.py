@@ -1,28 +1,43 @@
-from math import e as _E
-from math import floor, gcd, log
+def solve(pm: int = 524287, target: int = 990000, users: int = 10**6) -> int:
+    # Lagged-Fibonacci call generator + union-find; return the count of
+    # successful calls when the prime minister's component first reaches 99%.
+    parent = list(range(users))
+    size = [1] * users
 
+    def find(x: int) -> int:
+        root = x
+        while parent[root] != root:
+            root = parent[root]
+        while parent[x] != root:
+            parent[x], x = root, parent[x]
+        return root
 
-def solve(lo: int = 5, hi: int = 10000) -> int:
-    # M(N) = max over k of (N/k)^k, maximised near k = N/e. (N/k)^k terminates
-    # iff the reduced denominator k/gcd(N,k) has only the prime factors 2 and 5.
-    total = 0
-    for n in range(lo, hi + 1):
-        base = floor(n / _E)
-        best_val, best_k = None, base
-        for k in (base, base + 1):
-            if k < 1:
-                continue
-            val = k * log(n / k)
-            if best_val is None or val > best_val:
-                best_val, best_k = val, k
-        d = best_k // gcd(n, best_k)
-        while d % 2 == 0:
-            d //= 2
-        while d % 5 == 0:
-            d //= 5
-        total += -n if d == 1 else n
-    return total
+    hist = [(100003 - 200003 * k + 300007 * k**3) % 1000000 for k in range(1, 56)]
+
+    def value(k: int) -> int:  # 1-indexed
+        if k <= 55:
+            return hist[k - 1]
+        v = (hist[k - 1 - 24] + hist[k - 1 - 55]) % 1000000
+        hist.append(v)
+        return v
+
+    k = 1
+    successful = 0
+    while True:
+        caller, called = value(k), value(k + 1)
+        k += 2
+        if caller == called:
+            continue
+        successful += 1
+        ra, rb = find(caller), find(called)
+        if ra != rb:
+            if size[ra] < size[rb]:
+                ra, rb = rb, ra
+            parent[rb] = ra
+            size[ra] += size[rb]
+        if size[find(pm)] >= target:
+            return successful
 
 
 if __name__ == "__main__":
-    print(solve())  # 48861552
+    print(solve())  # 2325629
