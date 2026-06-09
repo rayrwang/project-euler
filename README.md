@@ -13,8 +13,10 @@ Everything on or before 2026 Apr 20 is done by me, after is done by Claude.
 
 ```
 project-euler/
-|-- funcs.py  # Functions used across solutions
-|-- pXXXX.py  # Solution(s) for Problem XXXX
-|-- ...
-|-- test.py   # Run and check all solutions
+├── explanations/  # Written solutions
+├── X00-X99/
+	├── pXXXX.py  # Solution for Problem XXXX
+	├── ...
+├── funcs.py  # Functions used across solutions
+└── test.py   # Run and check all solutions
 ```
