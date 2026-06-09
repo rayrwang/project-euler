@@ -42,4 +42,3 @@ if __name__ == "__main__":
     N = 10**7
     phi = totient_sieve(N)
     print(search(phi))  # 8319823
-    

@@ -1,77 +1,83 @@
-
 import numba
+import numpy as np
 
-from funcs import is_prime
+from funcs import prime_sieve_bool
 
-segments = (
-    (1, 1, 1, 0, 1, 1, 1),  # 0
-    (0, 0, 1, 0, 0, 1, 0),  # 1
-    (1, 0, 1, 1, 1, 0, 1),  # 2
-    (1, 0, 1, 1, 0, 1, 1),  # 3
-    (0, 1, 1, 1, 0, 1, 0),  # 4
-    (1, 1, 0, 1, 0, 1, 1),  # 5
-    (1, 1, 0, 1, 1, 1, 1),  # 6
-    (1, 1, 1, 0, 0, 1, 0),  # 7
-    (1, 1, 1, 1, 1, 1, 1),  # 8
-    (1, 1, 1, 1, 0, 1, 1)   # 9
+# Seven-segment patterns (as 7-bit masks) and their lit-segment counts.
+_SEG = (
+    (1, 1, 1, 0, 1, 1, 1), (0, 0, 1, 0, 0, 1, 0), (1, 0, 1, 1, 1, 0, 1),
+    (1, 0, 1, 1, 0, 1, 1), (0, 1, 1, 1, 0, 1, 0), (1, 1, 0, 1, 0, 1, 1),
+    (1, 1, 0, 1, 1, 1, 1), (1, 1, 1, 0, 0, 1, 0), (1, 1, 1, 1, 1, 1, 1),
+    (1, 1, 1, 1, 0, 1, 1),
 )
+SEG_COUNT = np.array([sum(t) for t in _SEG], dtype=np.int64)
+SEG_BITS = np.array([sum(b << i for i, b in enumerate(t)) for t in _SEG], dtype=np.int64)
 
-empty = (0,)*10
+@numba.jit(cache=True)
+def _popcount(x):
+    c = 0
+    while x:
+        c += x & 1
+        x >>= 1
+    return c
 
-@numba.jit
-def digital_root(n):
-    while n >= 10:
-        digital_sum = 0
-        while n != 0:
-            digital_sum += n % 10
-            n = n // 10
-        n = digital_sum
-        yield digital_sum
+@numba.jit(cache=True)
+def _sam(a, b, seg_count):
+    # Clear every lit segment of a, then light every segment of b. 0 == blank.
+    s = 0
+    while a > 0:
+        s += seg_count[a % 10]
+        a //= 10
+    while b > 0:
+        s += seg_count[b % 10]
+        b //= 10
+    return s
 
-@numba.jit
-def sam_transitions(n1, n2):
-    transitions = 0
-    while n1 != 0:
-        digit = n1 % 10
-        transitions += sum(segments[digit])
-        n1 //= 10
-    while n2 != 0:
-        digit = n2 % 10
-        transitions += sum(segments[digit])
-        n2 //= 10
-    return transitions
+@numba.jit(cache=True)
+def _max(a, b, seg_bits):
+    # Only toggle the segments that differ, digit by digit (right aligned).
+    s = 0
+    while a > 0 or b > 0:
+        ba = seg_bits[a % 10] if a > 0 else 0
+        bb = seg_bits[b % 10] if b > 0 else 0
+        s += _popcount(ba ^ bb)
+        a //= 10
+        b //= 10
+    return s
 
-def max_transitions(n1, n2):
-    transitions = 0
-    while n1 != 0 or n2 != 0:
-        if n1 == 0:
-            segs1 = empty
-        else:
-            segs1 = segments[n1 % 10]
-        if n2 == 0:
-            segs2 = empty
-        else:
-            segs2 = segments[n2 % 10]
-        transitions += sum([s1 ^ s2 for s1, s2 in zip(segs1, segs2)])
-        n1 //= 10
-        n2 //= 10
-    return transitions
+@numba.jit(cache=True)
+def _digit_sum(n):
+    t = 0
+    while n > 0:
+        t += n % 10
+        n //= 10
+    return t
 
-def dr_transitions(n, f):
-    transitions = 0
-    transitions += f(0, n)
-    curr = n
-    for nxt in digital_root(n):
-        transitions += f(curr, nxt)
-        curr = nxt
-    transitions += f(nxt, 0)
-    return transitions
+@numba.jit(cache=True)
+def saving(p, seg_count, seg_bits):
+    # Display p, then its repeated digit sums down to one digit, starting and
+    # ending from a blank screen. Return Sam's transitions minus Max's.
+    sam = _sam(0, p, seg_count)
+    mx = _max(0, p, seg_bits)
+    cur = p
+    while cur >= 10:
+        nxt = _digit_sum(cur)
+        sam += _sam(cur, nxt, seg_count)
+        mx += _max(cur, nxt, seg_bits)
+        cur = nxt
+    sam += _sam(cur, 0, seg_count)
+    mx += _max(cur, 0, seg_bits)
+    return sam - mx
+
+@numba.jit(cache=True)
+def solve(lo, hi, is_pr, seg_count, seg_bits):
+    diff = 0
+    for p in range(lo, hi):
+        if is_pr[p]:
+            diff += saving(p, seg_count, seg_bits)
+    return diff
 
 if __name__ == "__main__":
-    sam_total = 0
-    max_total = 0
-    for n in range(int(1e7), int(2e7)):
-        if is_prime(n):
-            sam_total += dr_transitions(n, sam_transitions)
-            max_total += dr_transitions(n, max_transitions)
-    print(sam_total-max_total)  # 13625242
+    LO, HI = 10_000_000, 20_000_000
+    is_pr = prime_sieve_bool(HI)
+    print(solve(LO, HI, is_pr, SEG_COUNT, SEG_BITS))  # 13625242

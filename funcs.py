@@ -129,6 +129,15 @@ def totient_sieve(n: int, /) -> np.ndarray:
     return phi
 
 @numba.jit(cache=True)
+def proper_divisor_sum_sieve(n: int, /) -> np.ndarray:
+    """Sum of proper divisors (all divisors except i) for every 0 <= i < n."""
+    s = np.zeros(n, dtype=np.int64)
+    for i in range(1, n):
+        for j in range(2 * i, n, i):
+            s[j] += i
+    return s
+
+@numba.jit(cache=True)
 def divisor_count_sieve(n: int, /) -> np.ndarray:
     """Number of divisors d(i) for all 0 <= i < n. d[0]=0, d[1]=1.
 

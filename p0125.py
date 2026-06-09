@@ -1,27 +1,18 @@
-
-import numba
-
-from funcs import is_palindrome_bounded as is_palindrome, is_square
-
-@numba.jit
-def sum_():
-    s = 0
-    for n in range(1, 100_000_000):
-        if is_palindrome(n) and not is_square(n):
-            is_sum = False
-            for root in range(1, int(n**0.5)+1):
-                sum_squares = root**2
-                while sum_squares <= n:
-                    if sum_squares == n:
-                        is_sum = True
-                        break
-                    root += 1
-                    sum_squares += root**2
-                if is_sum:
-                    break
-            if is_sum:
-                s += n
-    return s
+from funcs import is_palindrome
 
 if __name__ == "__main__":
-    print(sum_())  # 2906969179
+    LIMIT = 100_000_000
+    found = set()
+    a = 1
+    while a * a + (a + 1) * (a + 1) < LIMIT:   # need at least two terms
+        total = a * a
+        b = a + 1
+        while True:
+            total += b * b
+            if total >= LIMIT:
+                break
+            if is_palindrome(total):
+                found.add(total)
+            b += 1
+        a += 1
+    print(sum(found))  # 2906969179

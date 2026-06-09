@@ -1,27 +1,37 @@
-
 import numba
 
-from funcs import sum_proper_divisors
+from funcs import proper_divisor_sum_sieve
 
-@numba.jit
-def find_longest_smallest():
-    longest = 0
-    longest_smallest_member = None
-    for n in range(1_000_000):
+@numba.jit(cache=True)
+def longest_chain_min(sds, N):
+    """Smallest member of the longest amicable chain with no element > N.
+
+    Walk the aliquot sequence from each start. A walk that drops below start
+    (its true minimum was handled earlier), exceeds N, or fails to return
+    within a safe bound is not a valid chain rooted at start. The cap also
+    prevents spinning forever inside a foreign cycle whose minimum exceeds
+    start; no amicable chain in range is anywhere near this long.
+    """
+    best_len = 0
+    best_min = 0
+    for start in range(2, N + 1):
+        x = start
         length = 0
-        chain = []
-        while True:
+        ok = False
+        while length < 1000:
+            x = sds[x]
             length += 1
-            chain.append(n)
-            n = sum_proper_divisors(n)
-            if (n in chain and n != chain[0]) or n > 1_000_000:
+            if x > N or x < start:
                 break
-            if n == chain[0]:
-                if length > longest:
-                    longest = length
-                    longest_smallest_member = min(chain)
+            if x == start:
+                ok = True
                 break
-    return longest_smallest_member
+        if ok and length > best_len:
+            best_len = length
+            best_min = start
+    return best_min
 
 if __name__ == "__main__":
-    print(find_longest_smallest())  # 14316
+    N = 1_000_000
+    sds = proper_divisor_sum_sieve(N + 1)
+    print(longest_chain_min(sds, N))  # 14316
