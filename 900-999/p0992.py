@@ -34,30 +34,30 @@ def solve():
         invf[i - 1] = invf[i] * i % P
 
     def W(k, E):
-        l = [0] * n
+        left = [0] * n
         r = [0] * n
-        l[0] = k - 1
-        if l[0] < 0:
+        left[0] = k - 1
+        if left[0] < 0:
             return 0
-        r[0] = l[0] + (1 if E > 0 else 0)
+        r[0] = left[0] + (1 if E > 0 else 0)
         for i in range(1, n):
-            l[i] = (k + i) - r[i - 1]
-            if l[i] < 0:
+            left[i] = (k + i) - r[i - 1]
+            if left[i] < 0:
                 return 0
-            r[i] = l[i] + (1 if E > i else 0)
+            r[i] = left[i] + (1 if E > i else 0)
         # top vertex actually visited
-        M = n if (r[n - 1] > 0 or l[n - 1] > 0) else n - 1
+        M = n if (r[n - 1] > 0 or left[n - 1] > 0) else n - 1
         dout = [0] * (M + 1)
         dout[0] = r[0]
         for v in range(1, M):
-            dout[v] = r[v] + l[v - 1]
-        dout[M] = (l[n - 1] if M == n else r[M] + l[M - 1])
+            dout[v] = r[v] + left[v - 1]
+        dout[M] = (left[n - 1] if M == n else r[M] + left[M - 1])
         dout[E] += 1                                   # dummy edge E -> 0
         t = 1
         for v in range(0, E):
             t = t * r[v] % P
         for v in range(E + 1, M + 1):
-            t = t * l[v - 1] % P
+            t = t * left[v - 1] % P
         if t == 0:
             return 0
         res = t
@@ -66,7 +66,7 @@ def solve():
                 return 0
             res = res * fact[dout[v] - 1] % P
         for i in range(M):
-            res = res * invf[r[i]] % P * invf[l[i]] % P
+            res = res * invf[r[i]] % P * invf[left[i]] % P
         return res
 
     def J(k):
