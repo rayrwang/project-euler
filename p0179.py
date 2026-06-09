@@ -1,18 +1,10 @@
+import numpy as np
 
-import numba
-
-from funcs import count_divisors
-
-@numba.jit
-def count_same_divisors():
-    count = 0
-    prev_divisors = count_divisors(1)
-    for n_plus_one in range(2, int(1e7)+1):
-        divisors = count_divisors(n_plus_one)
-        if prev_divisors == divisors:
-            count += 1
-        prev_divisors = divisors
-    return count
+from funcs import divisor_count_sieve
 
 if __name__ == "__main__":
-    print(count_same_divisors())  # 986262
+    N = 10**7
+    # d[k] = number of divisors of k, sieved in O(N log N).
+    d = divisor_count_sieve(N + 1)
+    # Count n with 1 < n < N where d(n) == d(n + 1); n ranges over 2..N-1.
+    print(int(np.count_nonzero(d[2:N] == d[3:N + 1])))  # 986262

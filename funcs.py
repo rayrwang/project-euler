@@ -129,6 +129,19 @@ def totient_sieve(n: int, /) -> np.ndarray:
     return phi
 
 @numba.jit(cache=True)
+def divisor_count_sieve(n: int, /) -> np.ndarray:
+    """Number of divisors d(i) for all 0 <= i < n. d[0]=0, d[1]=1.
+
+    int32 keeps the array compact (better cache behaviour for the strided
+    writes); d(i) stays far below the int32 limit for any sievable n.
+    """
+    counts = np.zeros(n, dtype=np.int32)
+    for i in range(1, n):
+        for j in range(i, n, i):
+            counts[j] += 1
+    return counts
+
+@numba.jit(cache=True)
 def is_square(n: int, /) -> bool:
     if n < 0:
         return False
@@ -323,4 +336,3 @@ def mod_sub(a: int, b: int, mod: int, /):
 
 def mod_mul(a: int, b: int, mod: int, /):
     return ((a % mod) * (b % mod)) % mod
-    
