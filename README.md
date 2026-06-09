@@ -16,7 +16,7 @@ Everything on or before 2026 Apr 20 is done by me, after is done by Claude.
 ```
 project-euler/
 ├── explanations.{typ,pdf}  # Written solutions
-├── X00-X99/
+├── XX00-XX99/
 	├── pXXXX.py  # Solution for Problem XXXX
 	├── ...
 ├── funcs.py  # Functions used across solutions
