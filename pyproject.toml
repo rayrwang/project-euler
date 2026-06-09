@@ -9,5 +9,11 @@ dependencies = [
     "numba"
 ]
 
+[project.optional-dependencies]
+dev = [
+    "ruff",
+    "ty",
+]
+
 [tool.setuptools]
 py-modules = ["funcs"]
