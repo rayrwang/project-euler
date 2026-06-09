@@ -7,7 +7,11 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         problems = [f"p{n.rjust(4, "0")}.py" for n in sys.argv[1:]]
     else:
-        problems = sorted(os.path.join(d, f) for d in ["0-99"] for f in os.listdir(d))
+        ds = [
+            "0-99", "100-199", "200-299", "300-399", "400-499",
+            "500-599", "600-699", "700-799", "800-899", "900-999",
+        ]
+        problems = sorted(os.path.join(d, f) for d in ds for f in os.listdir(d))
 
     correct = 0
     incorrect = 0
