@@ -4,6 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "project-euler"
+version = "2026.6.9"
 dependencies = [
     "numpy",
     "numba"
