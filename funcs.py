@@ -1,7 +1,5 @@
-
 import numpy as np
 
-import math
 from functools import cache
 
 # TODO add arbitrary precision int for numba
@@ -15,6 +13,31 @@ def inf_range(start: int = 0, step: int = 1):
     return range(start, 1<<62, step)
 
 first_primes = (2, 3, 5, 7, 11, 13, 17, 19)  # Optimal number
+
+@numba.jit(cache=True)
+def mul_mod_bounded(a: int, b: int, mod: int, /) -> int:
+    """(a * b) % mod without 64-bit overflow. Valid for mod < 2**62."""
+    result = 0
+    a %= mod
+    while b > 0:
+        if b & 1:
+            result = (result + a) % mod
+        a = (a + a) % mod
+        b >>= 1
+    return result
+
+@numba.jit(cache=True)
+def mod_exp_mulmod_bounded(a: int, b: int, mod: int, /) -> int:
+    """(a ** b) % mod using overflow-safe mulmod. Valid for mod < 2**62."""
+    prod = 1
+    a %= mod
+    while b > 0:
+        if b & 1:
+            prod = mul_mod_bounded(prod, a, mod)
+        b //= 2
+        a = mul_mod_bounded(a, a, mod)
+    return prod
+
 @numba.jit(cache=True)
 def is_prime(n: int, /) -> bool:
     """
@@ -52,15 +75,28 @@ def is_prime(n: int, /) -> bool:
     elif n < 341_550_071_728_321:
         bases = [2, 3, 5, 7, 11, 13, 17]
     else:
-        # TODO Fix overflow issues if use the 7 set
+        # Deterministic up to 3.3e24, far beyond the 2**62 mulmod limit below.
         bases = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37]
+
+    # Direct int64 squaring overflows once x*x can exceed 2**63 (n >= ~3.04e9),
+    # which silently breaks the test. For larger n use overflow-safe mulmod,
+    # which is correct as long as n < 2**62.
+    assert n < (1 << 62), "is_prime is only valid for n < 2**62 in int64"
+    use_mulmod = n >= 3_037_000_500
 
     for a in bases:
         if a % n == 0:
             return True
-        x = mod_exp_bounded(a, d, n)
-        for _ in range(s):  
-            y = (x*x) % n
+        if use_mulmod:
+            x = mod_exp_mulmod_bounded(a, d, n)
+        else:
+            x = mod_exp_bounded(a, d, n)
+        y = x
+        for _ in range(s):
+            if use_mulmod:
+                y = mul_mod_bounded(x, x, n)
+            else:
+                y = (x*x) % n
             if y == 1 and x != 1 and x != n-1:
                 return False
             x = y
@@ -84,18 +120,23 @@ def prime_sieve_int(n: int, /) -> np.ndarray:
 
 @numba.jit(cache=True)
 def is_square(n: int, /) -> bool:
-    return (int(n**0.5))**2 == n
+    if n < 0:
+        return False
+    r = int(n**0.5)
+    # int(n**0.5) can be off by one from float error; check neighbours.
+    for c in (r - 1, r, r + 1):
+        if c >= 0 and c*c == n:
+            return True
+    return False
 
 @numba.jit(cache=True)
 def gcd(x: int, y: int, /) -> int:
     """Greatest common divisor using Euclid's algorithm"""
-    a = max(x, y)
-    b = min(x, y)
-    rem = a % b
-    while rem != 0:
-        a, b = b, rem
-        rem = a % b
-    return b
+    a = max(abs(x), abs(y))
+    b = min(abs(x), abs(y))
+    while b != 0:
+        a, b = b, a % b
+    return a
 
 @numba.jit(cache=True)
 def lcm(a: int, b: int, /) -> int:
@@ -103,8 +144,8 @@ def lcm(a: int, b: int, /) -> int:
 
 @numba.jit(cache=True)
 def lcm_list(xs: list[int], /) -> int:
-    lcm_acc = lcm(xs[0], xs[1])
-    for x in xs[2:]:
+    lcm_acc = xs[0]
+    for x in xs[1:]:
         lcm_acc = lcm(lcm_acc, x)
     return int(lcm_acc)
 
@@ -170,6 +211,8 @@ def sum_proper_divisors(n: int, /) -> int:
 
 @numba.jit(cache=True)
 def find_prime_factors_list(n: int, /) -> list[int]:
+    if n <= 1:
+        return [n][:0]  # empty list[int]
     for i in range(2, int(n**0.5)+1):
         if n % i == 0:
             return find_prime_factors_list(i) + find_prime_factors_list(n//i)
@@ -177,6 +220,10 @@ def find_prime_factors_list(n: int, /) -> list[int]:
 
 @numba.jit(cache=True)
 def find_prime_factors_set(n: int, /) -> set[int]:
+    if n <= 1:
+        s = {n}
+        s.discard(n)  # empty set[int]
+        return s
     for i in range(2, int(n**0.5)+1):
         if n % i == 0:
             return find_prime_factors_set(i) | find_prime_factors_set(n//i)
@@ -222,15 +269,22 @@ def is_palindrome_bounded(n: int, /) -> bool:
     return n == reverse_bounded(n)
 
 def count_digits(n):
-    return int(math.log10(n)) + 1
+    return len(str(abs(n)))
 
 @numba.jit(cache=True)
 def count_digits_bounded(n):
-    return int(math.log10(n)) + 1
+    if n == 0:
+        return 1
+    n = abs(n)
+    count = 0
+    while n > 0:
+        n //= 10
+        count += 1
+    return count
 
 @numba.jit(cache=True)
 def slice_number(n, start, stop):
-    return (n // (10**(count_digits(n) - stop))) % 10**(stop-start)
+    return (n // (10**(count_digits_bounded(n) - stop))) % 10**(stop-start)
 
 def mod_exp(a, b, mod):
     prod = 1
@@ -259,3 +313,4 @@ def mod_sub(a: int, b: int, mod: int, /):
 
 def mod_mul(a: int, b: int, mod: int, /):
     return ((a % mod) * (b % mod)) % mod
+    
