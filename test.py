@@ -7,7 +7,7 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         problems = [f"p{n.rjust(4, "0")}.py" for n in sys.argv[1:]]
     else:
-        problems = sorted(os.listdir())
+        problems = sorted(os.path.join(d, f) for d in ["0-99"] for f in os.listdir(d))
 
     correct = 0
     incorrect = 0
@@ -17,9 +17,10 @@ if __name__ == "__main__":
     timeout_s = 600
     t_start_all = time.perf_counter()
     for name in problems:
-        if name.startswith("p") and name.endswith(".py"):
+        file_name = os.path.basename(name)
+        if file_name.startswith("p") and file_name.endswith(".py"):
             solutions += 1
-            print(f"Problem {int(name[1:5])}:", end=" ")
+            print(f"Problem {int(file_name[1:5])}:", end=" ")
             t_start_solution = time.perf_counter()
             try:
                 proc = subprocess.run([sys.executable or "python", name],
