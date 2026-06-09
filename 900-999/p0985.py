@@ -44,10 +44,14 @@ def cos_60(eps):
     """cos(pi/3 + eps) for tiny eps, via series for cos/sin."""
     cs, t, k = D(0), D(1), 0
     while abs(t) > D(10) ** -72:
-        cs += t; k += 1; t = -t * eps * eps / ((2 * k - 1) * (2 * k))
+        cs += t
+        k += 1
+        t = -t * eps * eps / ((2 * k - 1) * (2 * k))
     sn, t, k = D(0), eps, 0
     while abs(t) > D(10) ** -72:
-        sn += t; k += 1; t = -t * eps * eps / ((2 * k) * (2 * k + 1))
+        sn += t
+        k += 1
+        t = -t * eps * eps / ((2 * k) * (2 * k + 1))
     return D("0.5") * cs - (SQRT3 / 2) * sn
 
 base = PI / 6
