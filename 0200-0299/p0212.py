@@ -18,7 +18,7 @@ def _gen_boxes(n: int) -> np.ndarray:
     return boxes
 
 
-@njit(cache=True)
+@njit
 def _seg_update(cnt, cov, ys, node, lo, hi, ql, qr, val):
     # Klee segment tree over compressed y-intervals: range add, cov[1] = covered length.
     if qr < lo or hi < ql:
@@ -37,7 +37,7 @@ def _seg_update(cnt, cov, ys, node, lo, hi, ql, qr, val):
         cov[node] = cov[2 * node] + cov[2 * node + 1]
 
 
-@njit(cache=True)
+@njit
 def _volume(boxes: np.ndarray, ys: np.ndarray, yindex: np.ndarray) -> int:
     # Sweep z over distinct boundaries; per slab take the 2D union area of the
     # active boxes (an x-sweep with the y segment tree, which self-clears since
