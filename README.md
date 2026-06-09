@@ -1,4 +1,6 @@
 
+![Solution coverage](coverage.svg)
+
 [![Check solutions](https://github.com/rayrwang/project-euler/actions/workflows/check-solutions.yml/badge.svg)](https://github.com/rayrwang/project-euler/actions/workflows/check-solutions.yml)
 
 [![Lint](https://github.com/rayrwang/project-euler/actions/workflows/lint.yml/badge.svg)](https://github.com/rayrwang/project-euler/actions/workflows/lint.yml) [![Type check](https://github.com/rayrwang/project-euler/actions/workflows/type-check.yml/badge.svg)](https://github.com/rayrwang/project-euler/actions/workflows/type-check.yml)
