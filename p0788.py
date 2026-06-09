@@ -1,29 +1,35 @@
+MOD = 1_000_000_007
 
-from funcs import nCr, mod_add
+def count_dominating_below(N):
+    """D(N): dominating numbers below 10^N, modulo MOD.
 
-modulus = 1_000_000_007
+    A d-digit number is dominating when one digit value occupies more than half
+    the d places. At most one value can do so, so summing over the count k of
+    that value (k > d/2) avoids double counting. After cancelling the
+    leading-zero corrections, the number of d-digit dominating numbers is
+        A(d) = sum_{k > d/2} C(d, k) * 9^(d - k + 1),
+    and D(N) = sum_{d=1}^{N} A(d).
+    """
+    fact = [1] * (N + 1)
+    for i in range(1, N + 1):
+        fact[i] = fact[i - 1] * i % MOD
+    inv_fact = [1] * (N + 1)
+    inv_fact[N] = pow(fact[N], MOD - 2, MOD)
+    for i in range(N, 0, -1):
+        inv_fact[i - 1] = inv_fact[i] * i % MOD
+
+    pow9 = [1] * (N + 2)
+    for i in range(1, N + 2):
+        pow9[i] = pow9[i - 1] * 9 % MOD
+
+    def comb(n, r):
+        return fact[n] * inv_fact[r] % MOD * inv_fact[n - r] % MOD
+
+    total = 0
+    for d in range(1, N + 1):
+        for k in range(d // 2 + 1, d + 1):
+            total = (total + comb(d, k) * pow9[d - k + 1]) % MOD
+    return total
 
 if __name__ == "__main__":
-    count = 0
-    for n_digits in range(1, 2022+1):
-        for repeat in range(n_digits//2 + 1, n_digits + 1):
-            # Not replacing first digit
-            if repeat < n_digits:
-                count = mod_add(
-                    count,
-                    9 * 9 * nCr(n_digits-1, repeat) * 9**(n_digits-1-repeat),
-                    modulus)
-                #   ^ first digit can be 1 to 9   
-                #       ^ repeating digits can't be same as first digit
-                #           ^ possibilities for where repeating digits are
-                #                                     ^ remaining digits
-
-            # Replacing first digit
-            count = mod_add(
-                count,
-                9 * nCr(n_digits-1, repeat-1) * 9**((n_digits-1) - (repeat-1)),
-                modulus)
-            #   ^ repeating digits can be 1 to 9
-            #       ^ possibilities for repeating digits, given one of them is first digit
-            #                                   ^ remaining digits
-    print(count)  # 471745499
+    print(count_dominating_below(2022))  # 471745499
