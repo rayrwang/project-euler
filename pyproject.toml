@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "project-euler"
+dependencies = [
+    "numpy",
+    "numba"
+]
+
+[tool.setuptools]
+py-modules = ["funcs"]
