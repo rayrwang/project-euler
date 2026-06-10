@@ -1,150 +1,110 @@
-"""Project Euler Problem 987: Straight Eight.
+"""Project Euler Problem 988: Non-attacking Frogs.
 
-A straight is five cards of sequential rank, not all of one suit, with the
-ace ranking low (A-2-3-4-5) or high (10-J-Q-K-A) but never wrapping.  There
-are 10200 straights and 31832952 ways to choose two disjoint straights from
-one 52-card deck.  Count the ways to choose *eight* pairwise-disjoint
-straights (unordered).
+Frogs sit at integer points and jump forward by ``a`` or ``b``
+(``gcd(a, b) = 1``); a frog at ``m`` attacks one at ``n > m`` iff ``n - m``
+lies in the numerical semigroup ``S = <a, b> = {ax + by : x, y >= 0}``.
+``F(a, b)`` sums the locations of all frogs over all non-attacking
+configurations containing a frog at 0.  Given ``F(3,5) = 23`` and
+``F(5,13) = 16336``, find ``F(19, 53)``.
 
-Setup
------
-A straight is a rank window ``w in 1..10`` (window ``w`` covering rank
-positions ``w .. w+4``, where positions 1 and 14 are the *same* four
-physical aces) plus a suit for each of its five ranks.  Disjointness means
-every (rank, suit) card is used at most once; per rank at most four
-straights can overlap, in distinct suits.
+Gaps and the staircase poset
+----------------------------
+Every positive frog position ``g`` satisfies ``g - 0 not in S``, so all
+frogs sit on the *gaps* of ``S`` (the ``(a-1)(b-1)/2`` non-representable
+integers).  Classically each gap has a unique representation
 
-Inclusion-exclusion on flushes
-------------------------------
-Dropping the "not all one suit" rule makes counting easy, because then a
-straight's suits are chosen *independently per rank position*.  By
-inclusion-exclusion over a designated subset of flush straights,
+    g = ab - ax - by,    1 <= x <= b - 1,  y >= 1,
 
-    answer = sum_j (-1)^j  sum_{flush sets of size j}  P(8 - j; free suits),
+so gaps are the lattice points strictly inside the triangle
+``ax + by < ab`` in the positive quadrant.  For two gaps,
+``g(x', y') - g(x, y) = a(x - x') + b(y - y')`` lies in ``S`` exactly when
+``x >= x'`` and ``y >= y'`` componentwise (the alternative
+representations would need ``|x - x'| >= b`` or ``|y - y'| >= a``, which
+the triangle forbids).  Hence "non-attacking" is precisely
+"pairwise incomparable in the componentwise order": configurations are
+the *antichains* of a staircase (Young-diagram) poset.
 
-where ``P(k; .)`` counts unordered sets of ``k`` disjoint *generalised*
-straights (arbitrary suit tuples) in the deck minus the flush cards.
+An antichain picks at most one point per column, with strictly decreasing
+heights left to right: columns ``x_1 < ... < x_k``, ``y_1 > ... > y_k``.
+Then
 
-* Flush sets: a flush is (window, suit); flushes in windows within distance
-  4 -- or in windows 1 and 10, which share the aces -- overlap and need
-  distinct suits.  A depth-first enumeration over per-window suit subsets
-  (any five consecutive windows hold at most 4 flushes in total) lists all
-  configurations; only the per-window *counts* matter downstream, since the
-  generalised count depends just on how many free suits remain per rank.
+    F(a, b) = sum_{points p} g(p) * L(p) * R(p),
 
-* Generalised packings: scan rank positions 2..13; the state is the
-  expiry profile of active straights.  At each position the active
-  straights take an ordered injection into the free suits
-  (``perm(free, active)``), with ``1/s!`` per group of ``s`` straights
-  starting together to count unordered sets (exact via fractions).  The
-  shared aces are handled by conditioning on how many straights use window
-  1 and window 10 and charging one joint injection ``perm(free_ace, g1 +
-  g10)`` for the ace column.
-
-The same routine reproduces both given values (10200 for one straight,
-31832952 for two), and the full computation takes a few seconds.
+where ``L(p)`` counts antichains using only columns left of ``p`` with all
+heights above ``p``'s, and ``R(p)`` counts antichains right of ``p`` below
+``p``'s height; both satisfy simple column-sweep recurrences with prefix
+sums.  For ``(19, 53)`` the staircase has only 468 points, so everything
+is exact integer arithmetic in well under a second.  The reduction is
+validated against a direct subset enumeration over the gaps for small
+parameter pairs, alongside both given values.
 """
 
 from __future__ import annotations
 
-from collections import defaultdict
-from fractions import Fraction
-from math import factorial, perm
+from itertools import combinations
 
 
-def _gen_count(k: int, caps: dict[int, int], cap_ace: int) -> Fraction:
-    """Unordered sets of k disjoint generalised straights.
+def frog_sum(a: int, b: int) -> int:
+    """F(a, b) via the antichain decomposition."""
+    h = [0] * b  # column heights, index x = 1..b-1
+    for x in range(1, b):
+        h[x] = max(0, (a * b - a * x - 1) // b)  # max y with ab - ax - by >= 1
+    maxy = a  # heights are < a
 
-    ``caps[p]`` is the number of free suits at rank position ``p`` (2..13);
-    ``cap_ace`` is the shared free-suit count of the ace column."""
-    total = Fraction(0)
-    for g1 in range(5):
-        for g10 in range(5):
-            if g1 + g10 > cap_ace or g1 + g10 > k:
-                continue
-            ace_factor = perm(cap_ace, g1 + g10)
-            # state entering position p: (expiry profile a[0..3], #started);
-            # a[i] straights stop covering after position p + i.
-            cur: dict[tuple[tuple[int, int, int, int], int], Fraction] = defaultdict(
-                Fraction
-            )
-            cur[((0, 0, 0, g1), g1)] = Fraction(1, factorial(g1))
-            for p in range(2, 14):
-                nxt: dict[tuple[tuple[int, int, int, int], int], Fraction] = (
-                    defaultdict(Fraction)
-                )
-                capp = caps[p]
-                for (act, started), val in cur.items():
-                    if 2 <= p <= 9:
-                        s_choices = range(k - started + 1)
-                    elif p == 10:
-                        s_choices = (g10,)
-                    else:
-                        s_choices = (0,)
-                    for s in s_choices:
-                        if started + s > k:
-                            continue
-                        active = act[0] + act[1] + act[2] + act[3] + s
-                        if active > capp:
-                            continue
-                        f = (
-                            Fraction(perm(capp, active), factorial(s))
-                            if s
-                            else Fraction(perm(capp, active))
-                        )
-                        nxt[((act[1], act[2], act[3], s), started + s)] += val * f
-                cur = nxt
-            for (act, started), val in cur.items():
-                if started == k and act == (g10, 0, 0, 0):
-                    total += val * ace_factor
+    # right[x][y]: antichains within columns > x using only heights < y
+    right = [[0] * (maxy + 2) for _ in range(b + 1)]
+    nxt = [1] * (maxy + 2)
+    for x in range(b - 1, 0, -1):
+        right[x] = nxt
+        cur = [0] * (maxy + 2)
+        pref = [0] * (maxy + 2)
+        for y0 in range(1, maxy + 1):
+            pref[y0] = pref[y0 - 1] + (nxt[y0] if y0 <= h[x] else 0)
+        for y in range(maxy + 2):
+            cur[y] = nxt[y] + pref[min(max(y - 1, 0), maxy)]
+        nxt = cur
+
+    # left[x][y]: antichains within columns < x using only heights > y
+    left = [[0] * (maxy + 2) for _ in range(b + 1)]
+    prev = [1] * (maxy + 2)
+    for x in range(1, b):
+        left[x] = prev
+        cur = [0] * (maxy + 2)
+        suf = [0] * (maxy + 3)
+        for y0 in range(maxy, 0, -1):
+            suf[y0] = suf[y0 + 1] + (prev[y0] if y0 <= h[x] else 0)
+        for y in range(maxy + 1):
+            cur[y] = prev[y] + suf[y + 1]
+        cur[maxy + 1] = prev[maxy + 1]
+        prev = cur
+
+    total = 0
+    for x in range(1, b):
+        for y in range(1, h[x] + 1):
+            g = a * b - a * x - b * y
+            total += g * left[x][y] * right[x][y]
     return total
 
 
-def _flush_configs() -> dict[tuple[int, ...], int]:
-    """Count suit-set assignments per per-window flush-count vector.
-
-    Windows within distance 4 (and the ace-sharing pair {1, 10}) must use
-    disjoint suit sets."""
-    results: dict[tuple[int, ...], int] = defaultdict(int)
-
-    def rec(w: int, last4: list[int], s1: int, m: list[int]) -> None:
-        if w == 11:
-            results[tuple(m)] += 1
-            return
-        used = last4[0] | last4[1] | last4[2] | last4[3]
-        if w == 10:
-            used |= s1
-        for mask in range(16):
-            if mask & used:
-                continue
-            m.append(mask.bit_count())
-            rec(w + 1, last4[1:] + [mask], s1 if w > 1 else mask, m)
-            m.pop()
-
-    rec(1, [0, 0, 0, 0], 0, [])
-    return dict(results)
-
-
-def straights(k: int) -> int:
-    """Number of unordered sets of k pairwise-disjoint straights."""
-    answer = Fraction(0)
-    for m, weight in _flush_configs().items():
-        j = sum(m)
-        if j > k:
-            continue
-        caps = {
-            p: 4 - sum(m[wi - 1] for wi in range(max(1, p - 4), min(10, p) + 1))
-            for p in range(2, 14)
-        }
-        cap_ace = 4 - m[0] - m[9]
-        if cap_ace < 0 or min(caps.values()) < 0:
-            continue
-        answer += (-1) ** j * weight * _gen_count(k - j, caps, cap_ace)
-    assert answer.denominator == 1
-    return int(answer)
+def frog_sum_brute(a: int, b: int) -> int:
+    """Direct enumeration over subsets of gaps, for validation."""
+    frob = a * b - a - b
+    rep = [False] * (frob + a + b + 1)
+    rep[0] = True
+    for n in range(1, len(rep)):
+        rep[n] = (n >= a and rep[n - a]) or (n >= b and rep[n - b])
+    gaps = [g for g in range(1, frob + 1) if not rep[g]]
+    total = 0
+    for k in range(1, len(gaps) + 1):
+        for combo in combinations(gaps, k):
+            if all(not rep[q - p] for p, q in combinations(combo, 2)):
+                total += sum(combo)
+    return total
 
 
 if __name__ == "__main__":
-    assert straights(1) == 10200, "checkpoint: one straight"
-    assert straights(2) == 31832952, "checkpoint: two disjoint straights"
-    print(straights(8))  # 11044580082199135512
+    for a, b in ((3, 5), (3, 7), (5, 7), (4, 9)):
+        assert frog_sum(a, b) == frog_sum_brute(a, b), f"brute check ({a},{b})"
+    assert frog_sum(3, 5) == 23, "checkpoint F(3,5)"
+    assert frog_sum(5, 13) == 16336, "checkpoint F(5,13)"
+    print(frog_sum(19, 53))  # 2727531976556215755
