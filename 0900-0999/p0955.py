@@ -97,4 +97,5 @@ def solve(target: int) -> int:
     return idx
 
 
-print(solve(70))  # 6795261671274
+if __name__ == "__main__":
+    print(solve(70))  # 6795261671274

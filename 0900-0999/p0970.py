@@ -44,4 +44,5 @@ def solve(t: int, num: int = 8, nroots: int = 2, extra: int = 40) -> str:
     return "".join(ch for ch in s if ch != "6")[:num]
 
 
-print(solve(10**6))  # 44754029
+if __name__ == "__main__":
+    print(solve(10**6))  # 44754029
