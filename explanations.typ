@@ -3084,6 +3084,17 @@ $
 Now $g$ is periodic in $n$ with period $30$, and $L_(n+30) = L_n + 12$. Hence $S(N) = Sigma_1 - Sigma_2$ where $Sigma_1 = sum g(n)$ collapses to a $30$-term block sum, and $Sigma_2 = sum g(n-1) 10^(L_n)$ splits into $30$ geometric series of common ratio $10^12$ (whose denominator $10^12 - 1$ is invertible mod $M$). Everything is $O(1)$ after a $30$-term setup. Checks $S(11) = 36120$ and $S(1000) equiv 18232686$ confirm the formula.
 
 #pagebreak()
+#link("https://projecteuler.net/problem=507")[= Problem 507: Shortest Lattice Vector]
+
+Solution: 316558047002627270
+
+From tribonacci residues $r_i = t_i mod 10^7$, each $n$ yields vectors $V_n = (r-r, r+r, r dot r)$ and $W_n$ (the next six residues), and $S(n)$ is the minimal Manhattan length of $k V_n + l W_n$ over integer $(k, l) != (0, 0)$. We need $sum_(n=1)^(2 dot 10^7) S(n)$.
+
+Each instance is a shortest-vector problem in a rank-2 lattice under the $L^1$ norm, solved by generalized Gauss (Kaib–Schnorr) reduction, valid for any symmetric convex norm: repeatedly swap so $norm(V) <= norm(W)$ and replace $W arrow.l W - t V$ with the integer $t$ minimizing $norm(W - t V)_1$. That objective is convex piecewise-linear in $t$ with its minimum at the weighted median of the ratios $w_i\/v_i$ (weights $|v_i|$); a float median estimate is corrected by evaluating a $plus.minus 2$ integer window, so exactness never relies on floating point. Norms strictly decrease, giving Euclidean-style convergence, and a final scan over $|k|, |l| <= 2$ of the reduced basis guards the terminal case. Degenerate inputs are handled separately: a zero vector makes the minimum 0, and collinear $V = c U$, $W = d U$ (primitive $U$) give $gcd(c, d) norm(U)_1$. Magnitudes stay within int64 throughout.
+
+Verified against the given $S(1) = 32$ and $sum_(n <= 10) S(n) = 130762273722$, and against literal minimisation over $|k|, |l| <= 150$ for 3000 random small-entry instances including degenerate ones.
+
+#pagebreak()
 #link("https://projecteuler.net/problem=509")[= Problem 509: Divisor Nim]
 
 Solution: 151725678
@@ -3116,6 +3127,19 @@ and this is a bijection onto the integer triples. We need $S(n) = sum (r_A + r_B
 For fixed coprime $p <= q$ let $u = p^2(p+q)^2 + q^2(p+q)^2 + p^2 q^2$ be the per-unit sum and $M = floor(n \/ (q^2 (p+q)^2))$ the largest scale. The scales $e = 1, dots, M$ contribute $u dot M(M+1)\/2$. Summing over coprime pairs with $q^2(p+q)^2 <= n$ finishes it. Checks $S(5) = 9$ and $S(100) = 3072$ hold.
 
 #pagebreak()
+#link("https://projecteuler.net/problem=511")[= Problem 511: Sequences with Nice Divisibility Properties]
+
+Solution: 935247012
+
+$"Seq"(n, k)$ counts the sequences $(a_1, dots, a_n)$ of positive integers in which every $a_i$ divides $n$ and $k | n + a_1 + dots.c + a_n$; we need the last nine digits of $"Seq"(1234567898765, 4321)$.
+
+Only the residue of each term modulo $k$ matters, and the terms are chosen independently. Let $f$ be the vector indexed by $ZZ_k$ with $f[d mod k]$ incremented once per divisor $d$ of $n$. The distribution of $a_1 + dots.c + a_n$ over the residues is then the $n$-fold cyclic convolution power of $f$, so
+
+$ "Seq"(n, k) = (f^(* n))[(-n) mod k] mod 10^9. $
+
+Binary exponentiation needs $O(log n)$ cyclic convolutions of length $k$, $O(k^2 log n)$ work overall — about $1.5 times 10^9$ multiply–reduce steps for $k = 4321$ and $n approx 1.2 times 10^12 = 5 dot 41 dot 25343 dot 237631$ (just 16 divisors). The given $"Seq"(3, 4) = 4$, $"Seq"(4, 11) = 8$ and $"Seq"(1111, 24) eq.triple 840643584$ are asserted, and the convolution method is cross-checked against a direct position-by-position dynamic program for several small $(n, k)$.
+
+#pagebreak()
 #link("https://projecteuler.net/problem=512")[= Problem 512: Sums of Totients of Powers]
 
 Solution: 50660591862310323
@@ -3139,6 +3163,17 @@ $
 which we memoise over the $O(sqrt(N))$ distinct values of $floor(N\/k)$, with a linear $phi$-sieve supplying the base cases. As a check, $g(100) = 2007$.
 
 #pagebreak()
+#link("https://projecteuler.net/problem=513")[= Problem 513: Integral Median]
+
+Solution: 2925619196
+
+$A B C$ has integral sides $a <= b <= c$, and $m_C$ is the median from $C$ to the midpoint of $A B$. $F(n)$ counts triangles with $c <= n$ whose median is also integral; we need $F(10^5)$.
+
+The median satisfies $4m^2 = 2a^2 + 2b^2 - c^2$. Working mod 8 forces $c = 2C$ even and $a equiv b mod 2$, so with $S = (a+b)\/2$, $D = (b-a)\/2$ the condition becomes $S^2 + D^2 = C^2 + m^2$, with constraints $C < S <= 2C$, $0 <= D <= 2C - S$ (this is $b <= c$) and $m >= 1$. Grouping as $(S-C)(S+C) = (m-D)(m+D) = u w = x y$ and applying the standard bijection $u = p r$, $x = p s$, $w = q s$, $y = q r$ with $gcd(r, s) = 1$ turns everything into linear conditions on $q$: $3 p r <= q s <= p r + 2C_max$, $q r >= p s$, $q(r-s) <= p(s - 3r)$ — which forces $s > r$ — plus a parity rule ($q equiv p$ if $r, s$ both odd, else $p, q$ both even).
+
+For each $(r, s, p)$ the admissible $q$ form an arithmetic progression counted in $O(1)$; the upper bound caps $s$ near $sqrt(r^2 + 2 C_max r \/ p)$, giving roughly $10^10$ iterations parallelised over $r$. Verified against literal brute force (integer-square test over all triangles) for $n in {10, 50, 100, 300, 700}$, including the given $F(10) = 3$ and $F(50) = 165$.
+
+#pagebreak()
 #link("https://projecteuler.net/problem=516")[= Problem 516: 5-smooth Totients]
 
 Solution: 939087315
@@ -3156,6 +3191,20 @@ $
 summed over all squarefree special-prime products $Q <= L$, where $H(x)$ is the sum of Hamming numbers $<= x$. We list the few thousand Hamming numbers up to $L$ (with prefix sums for $H(x)$), collect the special primes by testing $h + 1$ for primality, and enumerate the products $Q$ by depth-first search. As a check, $S(100) = 3728$.
 
 #pagebreak()
+#link("https://projecteuler.net/problem=517")[= Problem 517: A Real Recursion]
+
+Solution: 581468882
+
+For real $a > 1$, $g_a (x) = 1$ for $x < a$ and $g_a (x) = g_a (x-1) + g_a (x-a)$ otherwise; $G(n) = g_(sqrt(n))(n)$. We need $sum G(p)$ over primes $10^7 < p < 10^7 + 10^4$, modulo $10^9 + 7$.
+
+Unfolding the recursion, $g_a (x)$ counts step sequences over ${-1, -a}$ in which every proper prefix keeps the value at least $a$ while the full sum drops below $a$; since steps are positive decrements, only the last-but-one value matters. Split by the number $j$ of $a$-steps and the type of the final step, with $a = sqrt(n)$ irrational for prime $n$ and $floor(k a) = floor(sqrt(k^2 n))$ computed exactly via integer square roots:
+
+- final step $-1$: the number of unit steps is forced to $L_j = x - floor((j+1)a)$, contributing $binom(L_j - 1 + j, j)$ when $L_j >= 1$ (the preceding steps are arranged freely);
+- final step $-a$ (for $j >= 1$): the unit-step count ranges over $[max(0, L_j), x - floor(j a) - 1]$, and the hockey-stick identity collapses the contribution to $binom(U + j, j) - binom(max(0, L_j) + j - 1, j)$.
+
+So $G(n)$ is a sum of $O(sqrt(n))$ binomials, evaluated with precomputed factorials mod $10^9 + 7$. The expansion is verified against a direct memoized recursion using exact integer comparisons $(n-i)^2 < (j+1)^2 n$ for various $n$, including the given $G(90) = 7564511$.
+
+#pagebreak()
 #link("https://projecteuler.net/problem=518")[= Problem 518: Prime Triples and Geometric Sequences]
 
 Solution: 100315739184392
@@ -3167,6 +3216,19 @@ $
 a = k y^2 - 1, quad b = k x y - 1, quad c = k x^2 - 1,
 $
 the ordering $a < b < c$ is automatic from $y < x$, and we need all three prime with $c < n$. Sieve primes up to $n$, then loop over $x$ (up to $sqrt(n)$), over $k$ with $k x^2 <= n$, prune on $c = k x^2 - 1$ being prime, and finally over coprime $y < x$ checking $a$ and $b$. As a check, $S(100) = 1035$ from the eleven listed triples.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=519")[= Problem 519: Tricolored Coin Fountains]
+
+Solution: 804739330
+
+A fountain of coins has a gapless bottom row and every higher coin resting on exactly two adjacent coins below. $T(n)$ sums, over all fountains with $n$ coins, the number of proper 3-colourings (touching coins differ); we need the last 9 digits of $T(20000)$.
+
+A fountain is equivalent to column heights $(h_1, ..., h_k)$ with $h_k = 1$ and $h_i <= h_(i+1) + 1$: coin $(r, i)$ rests on $(r-1, i)$ and $(r-1, i+1)$, a mutually-touching triangle, so each upper coin's colour is forced to the third colour of its supporters and a colouring is determined by the bottom row — encoded as $c_1$ plus differences $d_i = c_(i+1) - c_i in {plus.minus 1} mod 3$.
+
+Propagating differences along rows via $D(r, i) = -(D(r-1, i) + D(r-1, i+1))$, an adjacent pair in row $r$ is properly coloured iff the two differences below are equal, and then $D(r, i) = D(r-1, i)$; unrolling shows the only constraints are $d_i = d_(i+1)$ whenever columns $i$ and $i+1$ both have height $>= 2$ (higher rows repeat the same equalities). Hence $T(n) = 3 sum 2^(k - 1 - e)$ over fountains, with $e$ the number of adjacent column pairs of height $>= 2$ each. A DP over (coins used, current leftmost height), prepending columns of height $h' <= h + 1$ with weight 1 if $h', h >= 2$ else 2, computes this in $O(n H^2)$ with $H approx sqrt(2n)$.
+
+The analysis is verified by brute force — enumerating all fountains for $n <= 12$ and literally counting proper 3-colourings of the coin graph — matching the given $f(4) = 3$, $f(10) = 78$, $T(4) = 48$ and $T(10) = 17760$.
 
 #pagebreak()
 #link("https://projecteuler.net/problem=520")[= Problem 520: Simbers]
@@ -3200,6 +3262,49 @@ $
 Split at $sqrt(n)$. For $p > sqrt(n)$ we have $floor(n\/p) < p$, so the only valid $m$ is $1$ and $Phi = 1$; these primes contribute $sum_(sqrt(n) < p <= n) p = "PrimeSum"(n) - "PrimeSum"(sqrt(n))$. For $p <= sqrt(n)$ we use a Lucy_Hedgehog sieve: maintaining the array $C[v]$ of integers in $[2, v]$ that are prime or have smallest prime factor exceeding the primes sieved so far, the value read just before sieving out $p$ gives $Phi(floor(n\/p), p) = 1 + C[floor(n\/p)] - pi(p - 1)$. Running a second Lucy pass on prime sums (modulo $10^9$) supplies the large-prime tail. Both passes cost $O(n^(3\/4))$. As checks, $S(100) = 1257$, and the result matches a direct sieve for $n$ up to $10^6$.
 
 #pagebreak()
+#link("https://projecteuler.net/problem=522")[= Problem 522: Hilbert's Blackout]
+
+Solution: 96772715
+
+Each of $n$ floors sends power to one other floor ($f(i) != i$); the hotel works iff the functional graph is a single $n$-cycle. $F(n)$ sums, over all $(n-1)^n$ arrangements, the minimum number of rewirings needed; we need $F(12344321) mod 135707531$.
+
+Edges kept from $f$ must form disjoint simple paths, and any linear forest of size $n - r$ extends to an $n$-cycle with $r$ rewirings. At each vertex all but one incoming edge must go, costing $sum_v ("indeg"(v)-1)^+$; each cycle of $f$ must also lose an edge, but in a cyclic component whose cycle carries a tree attachment the in-degree surplus can be spent on a cycle edge for free — only _bare_ cycles cost one extra. Hence min rewirings $= sum_v ("indeg"-1)^+ + \#"bare cycles" - ["f is the" n"-cycle"]$.
+
+Summing over $f$: in-degrees are Binomial$(n-1, 1\/(n-1))$ and $EE[(B-1)^+] = P(B = 0)$, so the first term totals $n(n-1)(n-2)^(n-1)$. A bare cycle on an $ell$-set forbids outsiders from entering it, leaving $(n-ell-1)^(n-ell)$ completions, so the second totals $sum_(ell=2)^n n! \/ (ell (n-ell)!) dot (n-ell-1)^(n-ell)$; the last is $(n-1)!$. The modular sum costs $n$ power evaluations.
+
+Verified against literal minimisation over all target $n$-cycles for every arrangement with $n = 3, 4, 5$ and the given $F(3) = 6$, $F(8) = 16276736$, $F(100) equiv 84326147$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=523")[= Problem 523: First Sort I]
+
+Solution: 37125450.44
+
+The sorting algorithm scans for the first out-of-order adjacent pair and moves the smaller element of that pair to the front, restarting after every move; $E(n)$ is the expected number of moves over a uniformly random permutation of $1..n$.
+
+The key structural fact is that the moves of any element $k$ depend only on the relative order of the elements ${k, k+1, ..., n}$. Moving an element to the front never changes the relative order of the others, and a descent whose smaller member is below $k$ only relocates that smaller element. Moreover, the scan's prefix up to the first descent is increasing, so any element smaller than $k$ in that prefix sits before all the larger ones and never blocks a pair of larger elements from being adjacent. The process therefore acts on the subsequence of elements $>= k$ exactly as it would on that permutation alone, where $k$ is the minimum.
+
+So $E(n) = sum_(m=1)^n h(m)$, where $h(m)$ is the expected number of moves of the *minimum* in a random permutation of size $m$ (element $k$ in $S_n$ behaves as the minimum of a uniform pattern of size $m = n - k + 1$). The per-size contribution is
+
+$ h(m) = (2^(m-1) - 1) / m, $
+
+which the solution verifies by exhaustively running the algorithm over every permutation for all $n <= 8$, and against the given $E(4) = 3.25$ and $E(10) = 115.725$. With exact rational arithmetic, $E(30) = sum_(m=1)^30 (2^(m-1)-1)\/m$ rounds to $37125450.44$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=528")[= Problem 528: Constrained Sums]
+
+Solution: 779027989
+
+$S(n, k, b)$ counts solutions of $x_1 + dots.c + x_k <= n$ with $0 <= x_m <= b^m$; we need $sum_(k=10)^15 S(10^k, k, k) mod 10^9 + 7$.
+
+A slack variable turns the inequality into an equation with $k+1$ nonnegative variables, counted by stars and bars as $binom(n + k, k)$; the upper bounds are removed by inclusion–exclusion over which variables overflow, each overflow at position $m$ shifting $n$ by $b^m + 1$:
+
+$ S(n,k,b) = sum_(T subset.eq [k]) (-1)^(|T|) binom(n - sum_(m in T)(b^m + 1) + k, k), $
+
+with $binom(N, k) = 0$ for $N < k$. At most $2^15$ subsets per evaluation, each binomial a $k$-term falling-factorial product mod $p$.
+
+Verified against literal enumeration for the given $S(14,3,2) = 135$ and $S(200,5,3) = 12949440$, plus the given $S(1000,10,5) equiv 624839075$.
+
+#pagebreak()
 #link("https://projecteuler.net/problem=530")[= Problem 530: GCD of Divisors]
 
 Solution: 207366437157977206
@@ -3226,6 +3331,88 @@ $
 where the inverse is taken modulo $m\/G$ (which is coprime to $n\/G$). We sieve $phi$ over the small window $[10^6, 1005000)$ and evaluate the roughly $1.25 dot 10^7$ pairs directly, accumulating the smallest solutions. The given values $g(2, 4, 4, 6) = 10$ and $g(3, 4, 4, 6) = 0$ check the congruence solver.
 
 #pagebreak()
+#link("https://projecteuler.net/problem=533")[= Problem 533: Minimum Values of the Carmichael Function]
+
+Solution: 789453601
+
+The Carmichael function $lambda(n)$ is the least $m$ with $a^m equiv 1 mod n$ for all $a$ coprime to $n$; $L(n)$ is the least $m$ with $lambda(k) >= n$ for all $k >= m$, so $L(n) - 1$ is the largest $k$ with $lambda(k) < n$. We need $L(20000000) mod 10^9$.
+
+$lambda(k)$ is the lcm of the components $lambda(p^e)$: $p^(e-1)(p-1)$ for odd $p$, and $1, 2, 2^(e-2)$ for $p = 2$ with $e = 1, 2, >= 3$. If $lambda(k) = L_0$ then every component divides $L_0$, so $k <= K(L_0)$, the product of $2^(v_2(L_0)+2)$ (just $2$ for odd $L_0$) and $p^(1+v_p(L_0))$ over odd primes $p$ with $(p-1) | L_0$; conversely $lambda(K(L_0))$ divides $L_0$. Hence $L(n) - 1 = max_(L_0 < n) K(L_0)$.
+
+The $K(L_0)$ are astronomically large, so a sieve accumulates $log K(L_0)$ for all $L_0 < n$: each prime $p$ adds $ln p$ at multiples of $p - 1$ and at multiples of $(p-1)p^j$ for the valuation term, plus one extra $ln 2$ at even $L_0$ — about $n sum_p 1\/(p-1) approx 6.5 dot 10^7$ updates. Distinct huge products can be too close for floating point, so the top 200 candidates by log are recomputed exactly with big integers (factor $L_0$, run over its divisors $d$ with $d + 1$ prime) and the true maximum taken.
+
+Everything is verified against a direct $lambda$ sieve (smallest-prime-factor factorisation, lcm of components, with the given $lambda(8) = 2$ and $lambda(240) = 4$) for $n in {3, 4, 6, 10, 16, 24}$ where $L(n) - 1$ falls inside the $3 dot 10^6$ table, including the given $L(6) = 241$; the given $L(100) = 20174525281$ is asserted too.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=535")[= Problem 535: Fractal Sequence]
+
+Solution: 611778217
+
+$S = 1, circle(1), 2, circle(1), 3, circle(2), 4, dots$ is characterised by three properties: the circled numbers are the consecutive integers from 1; each non-circled $a$ is immediately preceded by exactly $floor(sqrt(a))$ circled numbers; and deleting the circled numbers leaves $S$ itself. $T(n)$ sums the first $n$ elements; we need $T(10^18) mod 10^9$.
+
+Writing $Q(n)$ for the sum of $floor(sqrt(S_j))$ over the first $n$ elements, the $i$-th non-circled element closes a prefix of length $i + Q(i)$ containing the circled values $1..Q(i)$ plus the non-circled values $S_1 .. S_i$ — a copy of $S$. So for any $n$, taking the largest $i$ with $i + Q(i) <= n$ and $r = n - i - Q(i)$ (at most the next block length by maximality), the prefix is the circled values $1..m$ with $m = Q(i) + r$ together with $S$'s first $i$ elements:
+
+$ T(n) = m(m+1)/2 + T(i), quad Q(n) = F(m) + Q(i), $
+
+with $F(m) = sum_(k<=m) floor(sqrt(k))$ in closed form. Since every $floor(sqrt(S_j)) >= 1$, $Q(i) >= i$ and the recursion contracts $n$ to about $(3n\/2)^(2\/3)$; locating $i$ is a binary search whose probes evaluate $Q$ one level down, all memoised, so $10^18$ resolves through three levels into a directly generated table of the first $10^6$ elements (the generator bootstraps from $S_1 = 1$ and emits $floor(sqrt(S_i))$ fresh circled integers then $S_i$, the produced prefix always running ahead of the read pointer).
+
+The generated prefix is validated against the 20 given terms and both defining properties, and $T(20) = 86$, $T(10^3) = 364089$ and $T(10^9) = 498676527978348241$ are asserted exactly — the last a particularly strong check of the full recursion.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=536")[= Problem 536: Modulo Power Identity]
+
+Solution: 3557005261906288
+
+$S(n)$ sums the $m <= n$ with $a^(m+4) eq.triple a mod m$ for all integers $a$; we need $S(10^12)$.
+
+The property holds exactly when $m$ is squarefree and $(p - 1) | (m + 3)$ for every prime $p | m$ (verified against the literal all-$a$ definition for $m <= 1000$). Indeed the condition splits over prime powers $p^e || m$ by CRT; $a = p$ forces $e = 1$, and for $a$ coprime to $p$ the requirement $a^(m+3) eq.triple 1 mod p$ for all such $a$ is $(p - 1) | (m + 3)$.
+
+Two consequences shape the search. First, $m = 2$ is the only even solution beyond $m = 1$, since an odd $p | m$ would need the even $p - 1$ to divide the odd $m + 3$. Second, writing $m = p s$ gives $m eq.triple s mod (p - 1)$, so the condition reads $(p - 1) | (s + 3)$: every prime factor obeys $p(p - 4) <= m <= n$, i.e. $p < 10^6 + 5$.
+
+The solver runs a depth-first search over the odd prime factors in decreasing order. With chosen primes of product $T$ and $M = "lcm"(p - 1)$, the unknown cofactor $s$ must solve the single congruence $T s eq.triple -3 mod M$ — solvable only if $gcd(T, M) | 3$, which prunes most branches (a chosen prime other than 3 may never divide another chosen prime's $p - 1$). Once the arithmetic progression of possible $s$ up to $n\/T$ is short, every member is checked directly; otherwise the next smaller prime is branched on. $M | m + 3$ also bounds $M <= n + 3$. The search matches a per-$m$ factorisation brute force at $n = 100$, $10^4$ and $10^6$, and finds 12997 solutions up to $10^12$ in about two seconds.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=537")[= Problem 537: Counting Tuples]
+
+Solution: 779429131
+
+$T(n, k)$ counts the $k$-tuples of positive integers with $pi(x_1) + dots.c + pi(x_k) = n$; we need $T(20000, 20000) mod 1004535809$.
+
+The number of $x$ with $pi(x) = j$ is $c_0 = 1$ (only $x = 1$) and $c_j = p_(j+1) - p_j$ for $j >= 1$ (the integers from $p_j$ up to just below the next prime). The coordinates are independent, so $T(n, k) = [z^n] f(z)^k$ with $f(z) = sum_j c_j z^j$, and only degrees up to $n$ matter, requiring the primes through $p_(n+1)$.
+
+The power is binary exponentiation of the truncated polynomial. The modulus $1004535809 = 479 dot 2^21 + 1$ is NTT-friendly with primitive root 3 (both facts asserted), so each product of two degree-$<= n$ polynomials is one length-$2^16$ NTT multiplication, alias-free since $2n < 2^16$ — about thirty transforms in total. The given $T(3,3) = 19$, $T(10,10) = 869985$ and $T(10^3, 10^3) eq.triple 578270566$ are asserted, and the NTT path is cross-checked against a direct coordinate-by-coordinate dynamic program on several small cases.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=538")[= Problem 538: Maximum Quadrilaterals]
+
+Solution: 22472871503401097
+
+$f(S)$ is the perimeter of the maximum-area quadrilateral with side lengths taken from four distinct positions of $S$ (ties broken by largest perimeter). With $u_n = 2^(B(3n)) + 3^(B(2n)) + B(n+1)$ ($B$ = binary bit count) and $U_n = (u_1, ..., u_n)$, we need $sum f(U_n)$ for $4 <= n <= 3 dot 10^6$.
+
+For fixed sides the maximum area is attained by the cyclic quadrilateral, with Brahmagupta's formula $16 dot "area"^2 = (2s-2a)(2s-2b)(2s-2c)(2s-2d)$ where $2s$ is the perimeter — independent of side order. Increasing any non-maximal side strictly increases the area (the log-derivative $(1\/(s-a) + 1\/(s-b) + 1\/(s-c) - 1\/(s-d))\/2$ is positive since $s-a <= s-d$), so an optimal multiset is always a consecutive window of the values in sorted descending order. A valid window can still lose to a deeper one when its largest side nearly degenerates the quadrilateral, so windows are scanned downward with a rigorous prune: by AM–GM, $16 "area"^2 <= s^4 <= (2 v_j)^4$, so once $(2 v_j)^4$ cannot beat the best product no deeper window can.
+
+The $u_n$ take only about $10^4$ distinct values, so the multiset is kept as counts over a descending distinct-value list, each step lazily expanding just the top few values; areas are compared exactly with integer arithmetic. Verified against literal enumeration of all 4-subsets with exact lexicographic (area, perimeter) comparison for every $n <= 60$, plus the given $f(U_5) = 59$, $f(U_10) = 118$, $f(U_150) = 3223$ and $sum_(n=4)^150 f(U_n) = 234761$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=539")[= Problem 539: Odd Elimination]
+
+Solution: 426334056
+
+From the list $1..n$, every other number is repeatedly deleted, sweeping left to right first, then alternating direction, until one number $P(n)$ remains; we need $S(10^18) mod 987654321$ where $S(n) = sum_(k=1)^n P(k)$.
+
+The first sweep leaves the evens $2, 4, ..., 2 floor(n\/2)$, and the rest of the process is the mirror image of the original process on a list of length $m = floor(n\/2)$: it survives at mirrored position $m + 1 - P(m)$. Hence
+
+$ P(n) = 2(floor(n\/2) + 1 - P(floor(n\/2))), quad P(1) = 1, $
+
+confirmed against direct simulation for $n < 200$ and the given $P(9) = 6$, $P(1000) = 510$.
+
+Summing the recurrence over $k = 2..N$ and grouping $k = 2m$ with $k = 2m + 1$ (both have $floor(k\/2) = m$) gives, with $a = floor(N\/2)$, $b = floor((N-1)\/2)$ and $T(M) = M(M+1)\/2$:
+
+$ S(N) = 1 + 2(N-1) + 2(T(a) + T(b)) - 2(S(a) + S(b)). $
+
+Repeated halving only ever reaches $O(log^2 N)$ distinct arguments, so the memoised recursion is instant. $S(1000) = 268271$ is the check, and the exact $S(10^18)$ is reduced modulo $987654321$ at the end.
+
+#pagebreak()
 #link("https://projecteuler.net/problem=540")[= Problem 540: Counting Primitive Pythagorean Triples]
 
 Solution: 500000000002845
@@ -3239,6 +3426,71 @@ $
 where $T(X) = \#{(a, b) : a > b >= 1, a^2 + b^2 <= X}$ and $T_"odd"$ restricts to both $a, b$ odd. Each of $T$ and $T_"odd"$ is read off a quarter-disc lattice count in $O(sqrt(X))$ (summing $floor(sqrt(X - a^2))$ over $a$), and the Möbius sums need $mu(d)$ for $d <= sqrt(N)$. Checks: $P(20) = 3$ and $P(10^6) = 159139$.
 
 #pagebreak()
+#link("https://projecteuler.net/problem=543")[= Problem 543: Prime-Sum Numbers]
+
+Solution: 199007746081234640
+
+$P(n, k) = 1$ when $n$ is a sum of $k$ primes, $S(n) = sum_(1 <= i, k <= n) P(i, k)$, and we need $sum_(k=3)^44 S(F(k))$ over Fibonacci numbers, the largest being $F(44) = 701\,408\,733$.
+
+Classify by $k$. For $k = 1$, the count of valid $i <= n$ is $pi(n)$. For $k = 2$: every even $i >= 4$ works by the Goldbach conjecture (verified computationally far beyond $7 times 10^8$), while an odd $i$ is a sum of two primes only as $2 + (i - 2)$, i.e. iff $i - 2$ is prime; the count is $floor(n\/2) - 1 + pi(n - 2) - 1$. For $k >= 3$ the answer depends only on the size $i >= 2k$: if $i$ is even, write $i = 2(k - 2) + m$ with even $m >= 4$ and apply Goldbach; if $i$ is odd (so $i >= 2k + 1$), write $i = 2(k - 3) + m$ with odd $m >= 7$, a sum of three primes by the weak Goldbach theorem (proven by Helfgott). So each $k >= 3$ contributes $n - 2k + 1$ for $2k <= n$, a quadratic closed form. Hand checks: $S(10) = 20$, $S(100) = 2402$.
+
+The only computational work is $pi(F(k))$ and $pi(F(k) - 2)$ for each $k$, obtained in one pass of a segmented sieve up to $F(44)$, recording the running prime count at the 84 required thresholds. $S(1000) = 248838$ is asserted as well.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=544")[= Problem 544: Chromatic Conundrum]
+
+Solution: 640432376
+
+$F(r, c, n)$ counts proper $n$-colourings of the $r times c$ grid graph and $S(r, c, n) = sum_(k=1)^n F(r, c, k)$; we need $S(9, 10, 1112131415) mod 10^9 + 7$.
+
+$F(9, 10, k)$ is the grid's chromatic polynomial, of degree 90 in $k$, so $S(9, 10, n)$ is a degree-91 polynomial in $n$: evaluating $F$ at $k = 0..91$ determines $S$ at $n = 0..91$, and Lagrange interpolation gives $S$ at the target.
+
+Each evaluation uses a broken-profile DP whose state is the colour-equality partition of the 9 frontier cells: a new cell must differ only from its two neighbours, both of which sit on the frontier, so its colour either joins one of the $b$ frontier blocks other than the neighbours' (weight 1 each) or is any colour absent from the frontier (weight $k - b$ — previously used but dropped colours are interchangeable with fresh ones). Vertical adjacency keeps the reachable partitions to 5017, far below $B_9 = 21147$, and the 90-step unrolled transition structure is built once and reused for all 92 values of $k$.
+
+Verified against literal enumeration of all colourings for small grids, the given $F(2,2,3) = 18$, $F(2,2,20) = 130340$, $F(3,4,6) = 102923670$ and $S(4,4,15) equiv 325951319$, plus a self-check that interpolating the $S$ table at points inside the sample range reproduces the table.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=545")[= Problem 545: Faulhaber's Formulas]
+
+Solution: 921107572
+
+$D(k)$ is the denominator of the coefficient $a_1$ of $n^1$ in the Faulhaber polynomial for $1^k + 2^k + dots.c + n^k$; we need the $10^5$-th $k$ with $D(k) = 20010$.
+
+By Faulhaber's formula the coefficient of $n^1$ is exactly the Bernoulli number $B_k$ (with the $B_1 = +1\/2$ convention), and the von Staudt–Clausen theorem states that for even $k >= 2$ the denominator of $B_k$ is the product of all primes $p$ with $(p - 1) | k$. Both facts are verified in the code: $a_1$ is recovered by exact linear algebra through the first $k + 1$ partial sums and compared against the Bernoulli recurrence for $k <= 12$, and the denominator product is checked for all even $k <= 60$ (plus $D(308) = 20010$ exactly).
+
+Since $20010 = 2 dot 3 dot 5 dot 23 dot 29$, $D(k) = 20010$ means $(p - 1) | k$ for exactly these five primes: $k$ must be divisible by $"lcm"(1, 2, 4, 22, 28) = 308$, and no divisor $d$ of $k$ outside ${1, 2, 4, 22, 28}$ may have $d + 1$ prime.
+
+Writing $k = 308 m$, a prime $p$ with $d = p - 1$ rules out exactly the $m$ divisible by $d \/ gcd(d, 308)$. All primes $p < 10^5$ are removed in one sieve over $m$, which kills the vast majority of candidates. Each survivor's $k$ is then factorised (a smallest-prime-factor sieve over $m$ plus $308 = 2^2 dot 7 dot 11$) and its few divisors $d >= 10^5$ are tested with Miller–Rabin on $d + 1$. The given $F(1) = 308$ and $F(10) = 96404$ are asserted before counting up to the $10^5$-th survivor.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=546")[= Problem 546: The Floor's Revenge]
+
+Solution: 215656873
+
+$f_k (0) = 1$ and $f_k (n) = sum_(i=0)^n f_k (floor(i\/k))$; we need $sum_(k=2)^10 f_k (10^14) mod 10^9 + 7$.
+
+Differencing consecutive values telescopes the definition to $f(n) = f(n-1) + f(floor(n\/k))$. Define the iterated strict-prefix sums $T_0 = f$ and $T_t (m) = sum_(q<m) T_(t-1)(q)$. Writing $n = m k + s$,
+
+$ f(n) = (s+1) f(m) + k thin T_1 (m), $
+
+and summing such expressions over a full block of $k$ children turns each $T_t (m)$ into $T_(t+1)(m)$ while the partial block contributes prefix sums over $s < r$: so every $T_t (n)$ is a linear combination of $f(m), T_1 (m), ..., T_(t+1)(m)$ with coefficients depending only on the digit $r = n mod k$. The coefficient tables are built iteratively (numeric mod $p$, per residue), and the vector $(f, T_1, ..., T_D)$ is propagated up the base-$k$ digit chain of $10^14$ from the base case $f(0) = 1$, $T_t (0) = 0$, with $D$ bounded by the chain length (at most 49 for $k = 2$) since each level references one more sum order. The whole computation is a few thousand modular operations.
+
+Verified against the direct recurrence with exact integers for the given $f_5 (10) = 18$, $f_7 (100) = 1003$, $f_2 (10^3) = 264830889564$, and for 30 random $n <= 5000$ for every $k in 2..10$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=548")[= Problem 548: Gozinta Chains]
+
+Solution: 12144044603581281
+
+A gozinta chain for $n$ is $\{1, a, b, dots, n\}$ with each element properly dividing the next, $g(n)$ counts them, and we sum the $n <= 10^16$ with $g(n) = n$.
+
+A chain is determined by its sequence of successive ratios, all greater than 1, so $g$ counts ordered factorisations: $g(n) = sum_(d | n, d < n) g(d)$ with $g(1) = 1$. In particular $g$ depends only on $n$'s prime signature (the multiset of exponents).
+
+The search enumerates every canonical signature $E$ (descending exponents) whose minimal realisation $2^(e_1) 3^(e_2) dots.c$ is at most $10^16$ — the 17563 members of A025487 up to that bound. $g(E)$ is the memoised sum of $g$ over all proper sub-vectors of the exponent lattice; processing signatures in increasing minimal-realisation order guarantees every canonicalised sub-vector is already known. Since $g$ is monotone under sub-vectors, saturating the arithmetic at a cap above $10^16$ avoids 64-bit overflow while keeping every value at most $10^16$ exact. A signature $E$ then yields a solution $v = g(E)$ exactly when $v <= 10^16$ and $v$'s own signature is $E$; factoring $v$ needs only primes up to $10^6$, the leftover cofactor being $1$, a prime, a prime squared, or a product of two distinct large primes (a square test plus one Miller–Rabin call).
+
+There are 21 solutions, from $n = 1$ and $g(48) = 48$ up to $5806013294837760$. The method is cross-checked against the direct sieve recurrence for all $n <= 10^6$, which yields exactly $\{1, 48, 1280, 2496, 28672, 29808, 454656\}$.
+
+#pagebreak()
 #link("https://projecteuler.net/problem=549")[= Problem 549: Divisibility of Factorials]
 
 Solution: 476001479068717
@@ -3248,6 +3500,400 @@ Let $s(n)$ be the smallest $m$ with $n | m!$, and $S(n) = sum_(i=2)^n s(i)$; we 
 Writing $n = product p^e$, the factorial $m!$ must absorb each prime power independently, and the binding requirement is the largest, so $s(n) = max_(p^e || n) s(p^e)$. For a single prime power, $s(p^e)$ is the smallest multiple $m$ of $p$ at which $v_p(m!)$ reaches $e$ (the exponent $v_p(m!)$ only grows as $m$ passes multiples of $p$).
 
 This gives a single modified sieve. A slot still holding $0$ marks a prime $p$; walking $m = p, 2p, 3p, dots$ and accumulating $c = v_p(m!)$, each time $c$ climbs past an integer $k$ the value $s(p^k)$ equals the current $m$, so we raise $s[j]$ to $m$ for every multiple $j$ of $p^k$. Composite slots are filled in by their smallest prime before they are reached, exactly as in the sieve of Eratosthenes, and summing the array yields $S(N)$. The total update work is $sum_p sum_k N\/p^k = O(N log log N)$. As a check, $S(100) = 2012$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=550")[= Problem 550: Divisor Game]
+
+Solution: 328104836
+
+Two players face $k$ piles of $2..n$ stones; a move replaces a pile of $m$ stones with two piles $a, b$ where $1 < a, b < m$ and $a | m$, $b | m$, and whoever cannot move loses. $f(n, k)$ counts the first-player-winning ordered starting tuples; we need $f(10^7, 10^12) mod 987654321$.
+
+By Sprague–Grundy theory the piles are independent games: a position wins exactly when the XOR of the pile Grundy values $g(m) = "mex"{g(a) xor g(b)}$ is nonzero. Since a move never mixes piles and divisors correspond to exponent sub-vectors, $g$ depends only on $m$'s prime signature — a few hundred signatures below $10^7$ — so the Grundy table is computed once per signature and every $m <= 10^7$ is routed through a smallest-prime-factor sieve to produce the counts $c_v = \#{m : g(m) = v}$.
+
+Counting XOR-zero $k$-tuples is a $k$-fold XOR convolution: with $W$ the Walsh–Hadamard transform of $c$,
+
+$ f(n, k) = (n-1)^k - 1/"size" sum_i W_i^k mod 987654321, $
+
+dividing by the modular inverse of the power of two (the modulus is odd, and being composite it requires a general inverse rather than a Fermat power). Verified against the direct Grundy recursion for all $m <= 5000$, a brute-force tuple DP for small $(n, k)$, and the given $f(10, 5) = 40085$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=551")[= Problem 551: Sum of Digits Sequence]
+
+Solution: 73597483551591773
+
+$a_0 = 1$ and $a_n$ is the sum of the digits of all preceding terms, which collapses to $a_n = a_(n-1) + "digitsum"(a_(n-1))$ for $n >= 2$, since the running digit total is exactly the previous term. We need $a_(10^15)$.
+
+The walk is memoryless given the current value, and while the digits above position $k$ stay fixed, the low $k$ digits evolve in a way that depends only on the pair (block value $L$, digit sum $h$ of the high part). Define $"jump"(k, L, h)$ as the number of steps until the low-$k$ block overflows together with the block's value after the carry; a single step adds at most $"digitsum"(v) < 1000$, so for $k >= 3$ the overflow is a single carry and the jump is well defined. The base level $k = 3$ is simulated directly, and level $k$ peels the top digit $d$ of the block and chains ten level-$(k-1)$ jumps with high sum $h + d$. Memoised on $(k, L, h)$, the table stays around 8000 entries because exit values recur — the driver then applies the largest jump fitting the remaining step budget and finishes with single steps. Verified against direct simulation up to the given $a_(10^6) = 31054319$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=552")[= Problem 552: Chinese Leftovers II]
+
+Solution: 326227335
+
+$A_n$ is the smallest positive integer with $A_n mod p_i = i$ for $1 <= i <= n$; $S(n)$ sums the primes up to $n$ dividing at least one $A_k$, and we need $S(300000)$.
+
+Incremental CRT: with $M_n = p_1 dots.c p_n$, the minimal solution grows as $A_n = A_(n-1) + t M_(n-1)$ where $t = (n - A_(n-1)) M_(n-1)^(-1) mod p_n$; inductively $1 <= A_n <= M_n$, so this is the smallest positive solution.
+
+The crucial observation: once $p_j$ enters the system, $A_n eq.triple j mod p_j$ with $0 < j < p_j$, so $p_j$ never divides any later term — only the $n < j$ matter, a finite window per prime. We therefore track $A_n mod p_j$ and $M_n mod p_j$ for every prime index $j > n$ and update both in $O(1)$ per pair, marking $p_j$ whenever its residue hits zero: about $pi(300000)^2 \/ 2 approx 3.4 times 10^8$ operations. The recurrence is cross-checked against exact big-integer CRT on the given $A_2 = 5$, $A_3 = 23$, $A_4 = 53$, $A_5 = 1523$, $A_10 = 5765999453$, and $S(50) = 69$ is asserted.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=553")[= Problem 553: Power Sets of Power Sets]
+
+Solution: 57717170
+
+$R(n)$ is the set of non-empty families of non-empty subsets of ${1..n}$; each family $X$ gets a graph with the member sets as vertices and edges between intersecting sets. $C(n, k)$ counts families whose graph has exactly $k$ connected components; we need $C(10^4, 10) mod 10^9 + 7$.
+
+Sets in different components are pairwise disjoint, so the components' supports partition the union of $X$. With $U(m)$ the number of non-empty families of subsets of $[m]$ with union exactly $[m]$, inclusion-exclusion over the union gives $U(m) = sum_j (-1)^(m-j) binom(m, j) 2^(2^j - 1)$ (the empty family cancels), and in exponential generating functions $U = e^A - 1$ where $A$ is the EGF of _connected_ full-support families, so $A = log(1 + U)$. Splitting $[n]$ into unused elements, the support, and a partition of the support into $k$ connected blocks:
+
+$ C(n, k) = sum_m binom(n, m) thin m! thin [x^m] A(x)^k / k! . $
+
+Everything is $O(n^2)$ arithmetic mod $p$: the inclusion-exclusion table (with $2^(2^j - 1)$ reduced via Fermat), the power-series logarithm recurrence $m a_m = m u_m - sum_i i thin a_i u_(m-i)$, and five length-$10^4$ convolutions for $A^10$ by binary exponentiation. Verified against literal enumeration of all families with union-find component counting for $n <= 4$ (including the given $C(2,1) = 6$, $C(3,1) = 111$, $C(4,2) = 486$) and the given $C(100, 10) equiv 728209718$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=554")[= Problem 554: Centaurs on a Chess Board]
+
+Solution: 89539872
+
+A centaur moves like a king or a knight. At most $n^2$ non-attacking centaurs fit on a $2n times 2n$ board; $C(n)$ counts the maximum placements. We need $sum_(i=2)^90 C(F_i) mod 10^8 + 7$ with $F_90 approx 2.9 dot 10^18$.
+
+Maximality forces structure: kings alone limit each $2 times 2$ block to one piece, so a maximum placement chooses one corner $(a, b) in {0,1}^2$ per block of the $n times n$ block grid, and only adjacent (including diagonal) blocks interact. Translating the king + knight attack set into block coordinates: along each row the $b$'s must be non-decreasing with $a$ constant wherever $b$ stays constant (and symmetrically for columns); the diagonals add three forbidden patterns each. Consequently every valid row is determined by (threshold, $a$-left, $a$-right) — exactly $4n$ rows, verified exhaustively against all $4^n$ cell rows for $n <= 6$ — and $C(n)$ is a path count in a $4n$-state row-transfer graph, cross-checked against a literal $4^(n+1)$-state sliding-window DP over blocks for $n <= 8$ and the given $C(1) = 4$, $C(2) = 25$, $C(10) = 1477721$.
+
+The transfer values for $n = 1..40$ reveal and verify the closed form
+
+$ C(n) = 8 binom(2n, n) - 3n^2 - 2n - 7, $
+
+(the correction has constant second differences), whose binomial term is evaluated at Fibonacci arguments by Lucas' theorem over $p = 10^8 + 7$ with a precomputed factorial table — since $2 F_90 < p^3$, at most three base-$p$ digits per evaluation.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=555")[= Problem 555: McCarthy 91 Function]
+
+Solution: 208517717451208352
+
+The generalised McCarthy function is $M_(m,k,s)(n) = n - s$ for $n > m$ and $M(M(n + k))$ otherwise; $"SF"(m,k,s)$ sums its fixed points and $S(p, m) = sum_(1 <= s < k <= p) "SF"(m,k,s)$. We need $S(10^6, 10^6)$.
+
+Let $d = k - s > 0$. For $n in (m - k, m]$ we have $M(n) = M(M(n+k)) = M(n + k - s) = M(n + d)$: the function is $d$-periodic just below $m$, with values in $(m - s, m - s + d]$. The periodicity propagates to all $n <= m$ exactly when $d | s$; then $M$ sends every $n <= m$ to the unique element of $[m - s + 1, m - s + d]$ congruent to $n$ modulo $d$, so the fixed points are precisely the non-negative integers of that interval, and there are none at all when $d divides.not s$. This characterisation is verified exhaustively against the literal recursive definition for several $m$ and every $1 <= s < k <= 3m + 2$ (covering the clipping at zero when $s > m$).
+
+For $p <= m + 1$ no clipping occurs, so with $s = d t$, $k = d(t + 1)$:
+
+$ S(p, m) = sum_(d >= 1) sum_(t = 1)^(floor(p\/d) - 1) (d(m - d t) + d(d+1)/2), $
+
+whose inner sum has a closed form, leaving one $O(p)$ loop over $d$. The given $S(10, 10) = 225$ and $S(1000, 1000) = 208724467$ are asserted.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=556")[= Problem 556: Squarefree Gaussian Integers]
+
+Solution: 52126939292957
+
+A proper Gaussian integer has $a > 0$, $b >= 0$; it is squarefree if its factorization into proper Gaussian primes has no repeats. $f(n)$ counts proper squarefree Gaussian integers of norm at most $n$; we need $f(10^14)$.
+
+Möbius inversion over $ZZ[i]$: $[z "squarefree"] = sum_(d^2 | z) mu_G (d)$ over proper $d$, so $f(n) = sum_k m(k) thin G(floor(n \/ k^2))$ where $G(M)$ counts proper Gaussian integers of norm in $[1, M]$ — one quarter of the nonzero circle-lattice count, $G(M) = floor(sqrt(M)) + sum_(x=1)^(floor(sqrt(M))) floor(sqrt(M - x^2))$ — and $m(k) = sum_(N(d) = k) mu_G (d)$. Since $sum m(k) k^(-s) = 1 \/ zeta_(QQ(i))(s)$, $m$ is multiplicative with $m(2) = -1$ (ramified), $m(p) = -2$ and $m(p^2) = 1$ for $p equiv 1 mod 4$ (split), $m(p^2) = -1$ for $p equiv 3 mod 4$ (inert: no norm-$p$ elements), and 0 at all other prime powers. $m$ is built by a linear sieve to $k <= 10^7$, and the $G$ evaluations cost $sqrt(n) thin H(10^7) approx 1.6 dot 10^8$ integer square roots.
+
+Verified against a literal brute force for $n <= 300$ — testing divisibility of each proper $z$ by $d^2$ over all proper $d$ — and the given $f(10) = 7$, $f(10^2) = 54$, $f(10^4) = 5218$, $f(10^8) = 52126906$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=557")[= Problem 557: Cutting Triangles]
+
+Solution: 2699929328
+
+A triangle is cut by two cevians, one from each of two vertices to the opposite side, into four integer-area pieces: $a$ (the triangle between the two cut vertices), $b <= c$ (the other two triangles) and $d$ (the quadrilateral). $S(n)$ sums the total area over all valid quadruples with $a + b + c + d <= n$; we need $S(10^4)$.
+
+With cevian feet at fractions $e, f$ along the sides, barycentric coordinates of their intersection give $a\/T = (1-e)(1-f)\/(1-e f)$, $b\/T = e(1-f)^2\/(1-e f)$, $c\/T = f(1-e)^2\/(1-e f)$ for total $T$. From $a + b = (1-f)T$ and $a + c = (1-e)T$ — so $e = (b+d)\/T$ and $f = (c+d)\/T$ — substituting back collapses the whole geometry into a single relation:
+
+$ 1/(a+b) + 1/(a+c) = 1/a + 1/T, $
+
+equivalently $T(a^2 - b c) = a(a+b)(a+c)$, with $d = b c(2a+b+c)\/(a^2 - b c)$ automatically a positive integer whenever $T$ is integral. Conversely any quadruple satisfying it has $e, f in (0,1)$ reconstructing exactly those areas (checked with exact rationals for every quadruple with $T <= 60$), so the relation is the full characterisation.
+
+For fixed $a, b$ the value $T$ is monotone increasing in $c$, so $T <= n$ bounds $c <= a^2(n-a-b)\/(a^2+a b+n b)$; the resulting triple loop with a divisibility test runs about $2 dot 10^10$ iterations, parallelised over $a$. Verified against literal quadruple-loop brute force at $n = 100$, the given $S(20) = 259$, and the two given quadruples $(22,8,11,14)$ and $(20,2,24,9)$ being exactly the solutions of total 55.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=558")[= Problem 558: Irrational Base]
+
+Solution: 226754889
+
+$r$ is the real root of $x^3 = x^2 + 1$. Every positive integer has a unique finite representation $n = sum b_k r^k$ with $b_k in {0, 1}$ and any two used exponents differing by at least 3; $w(n)$ counts the terms. We need $S(m) = sum_(j=1)^m w(j^2)$ for $m = 5 dot 10^6$.
+
+Greedy works and is forced: with gap-3 representations the supremum of values with top exponent $m$ is the geometric sum $r^m \/ (1 - r^(-3)) = r^(m+1)$ _exactly_ (since $r^3 - 1 = r^2$), approached but never attained by finite sums — so the top exponent must be the largest $k$ with $r^k <= x$, and the remainder satisfies $x - r^k < r^k (r - 1) = r^(k-2)$ because $r - 1 = r^(-2)$ exactly, forcing the next exponent down by at least 3 automatically.
+
+Exactness: $x$ is tracked as an integer scaled by $2^400$ against precomputed rounded powers. Accumulated rounding is tiny, but when a remainder is _exactly_ a power, an underestimate sends the greedy into an infinite $r^t = r^(t-1) + r^(t-4) + dots$ descent; comparing with a slack of $2^64$ fixes this and is sound because distinct elements of the lattice $ZZ + ZZ r + ZZ r^2$ at the coefficient sizes occurring here differ by far more than $2^(-336)$. Termination is $X < 2^70$, with genuine remaining terms at least $r^(-130) 2^400 approx 2^330$.
+
+Each representation is independently verified for $j <= 1500$ (and the given examples for 3 and 10) by summing the exact coordinate triples of $r^k$ in $ZZ[r]$ — multiplication by $r$ maps $(a, b, c)$ to $(c, a, b+c)$ — and checking the total equals $(n, 0, 0)$, plus the gap condition. The given $S(10) = 61$ and $S(1000) = 19403$ are asserted.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=559")[= Problem 559: Permuted Matrices]
+
+Solution: 684724920
+
+$P(k, r, n)$ counts $r times n$ matrices whose rows are permutations of ${1..n}$ and where a column ascent (every row increasing from column $j$ to $j+1$) occurs exactly at the columns $j < n$ not divisible by $k$. $Q(n) = sum_(k=1)^n P(k, n, n)$; we need $Q(50000) mod 1000000123$.
+
+The columns split into $m = ceil(n\/k)$ base blocks of length $k$ (last block of length $ell = n - (m-1)k$); within blocks all rows ascend, and each boundary must fail to ascend in some row. Inclusion-exclusion over boundaries relaxed to "all ascend" merges consecutive blocks: a matrix where every row ascends within prescribed blocks of sizes $c_i$ is counted by $(n! \/ product c_i !)^r$, so
+
+$ P(k, r, n) = (n!)^r sum_("compositions" (a_1..a_s) "of" m) (-1)^(m-s) product_(i<s) ((a_i k)!)^(-r) dot (((a_s - 1)k + ell)!)^(-r). $
+
+A linear DP over the number of consumed regular blocks computes the signed composition sum in $O((n\/k)^2)$, and summing over $k$ costs $sum_k (n\/k)^2 approx zeta(2) n^2 approx 4 dot 10^9$ multiply-adds for $n = 50000$, with the $((a k)!)^(-n)$ weights as modular powers of precomputed inverse factorials.
+
+Verified against literal enumeration of all $r$-tuples of permutations for six small $(k, r, n)$, exact rational evaluation of the given $P(1,2,3) = 19$, $P(2,4,6) = 65508751$ and $Q(5) = 21879393751$, and the given modular values $P(7,5,30) equiv 161858102$ and $Q(50) equiv 819573537$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=560")[= Problem 560: Coprime Nim]
+
+Solution: 994345168
+
+In Coprime Nim a move removes $y$ stones from a pile of $m$ only when $gcd(m, y) = 1$, last stone wins; $L(n, k)$ counts the losing starting positions over $k$ piles of $1..n-1$ stones, and we need $L(10^7, 10^7) mod 10^9 + 7$.
+
+The Grundy values have a striking form, verified against the literal mex recursion for all $m <= 2000$: $g(m) = 0$ for even $m$, $g(1) = 1$, and $g(m) = pi("spf"(m))$ for odd $m >= 3$ — the index of the smallest prime factor. From an even pile every legal removal is odd, landing only on odd positions of positive Grundy value, so even piles lose; from an odd pile the reachable set is exactly ${0, dots, pi("spf"(m)) - 1}$.
+
+A position loses iff its pile values XOR to zero, so $L(n, k)$ is the XOR-zero count of a $k$-fold XOR convolution. One smallest-prime-factor sieve produces the value counts ($c_0$ the evens, $c_1 = 1$ for the lone pile of one stone, and $c_(pi(p))$ the odd numbers with smallest factor $p$), and with $W$ the Walsh–Hadamard transform of $c$ over length $2^20$ (covering the largest prime index below $10^7$), $L = 2^(-20) sum_i W_i^k mod 10^9 + 7$. All three given values $L(5,2) = 6$, $L(10,5) = 9964$, $L(10,10) = 472400303$ and $L(10^3, 10^3) = 954021836$ are asserted, the first two also by direct enumeration.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=561")[= Problem 561: Divisor Pairs]
+
+Solution: 452480999988235494
+
+$S(n)$ counts pairs $(a, b)$ of distinct divisors of $n$ with $a | b$; $E(m, n)$ is the 2-adic valuation of $S((p_m\#)^n)$, and $Q(n) = sum_(i=1)^n E(904961, i)$. We need $Q(10^12)$.
+
+Chains $a | b | n$ choose exponents $0 <= x_i <= y_i <= e_i$ independently per prime, so $S(n) = product (e_i+1)(e_i+2)\/2 - product (e_i+1)$. For $(p_m\#)^i$ all exponents equal $i$, giving $S = A^m - B^m$ with $B = i + 1$ and $A = (i+1)(i+2)\/2$. Writing $k = i + 1$ and using that $m = 904961$ is odd, the valuation splits by $k mod 4$: for $k eq.triple 1$, $E = v_2(k - 1) - 1$ (the cofactor of $u - 1$ in $u^m - 1$ is odd for odd $m$); for $k eq.triple 0$, $v_2(A) = v_2(k) - 1 < v_2(B)$ gives $E = m(v_2(k) - 1)$; and $E = 0$ for $k eq.triple 2, 3$. The case formula is checked against direct big-integer valuations — exhaustively for several small odd $m$, and for $m = 904961$ itself against million-digit powers at small $i$.
+
+Summing the two surviving cases over $k$ telescopes into floor sums:
+
+$ Q(n) = m sum_(j >= 2) floor((n+1)/2^j) + sum_(j >= 2) floor(n/2^j), $
+
+verified term-by-term for several $n$ and against the given $Q(8) = 2714886$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=562")[= Problem 562: Maximal Perimeter]
+
+Solution: 51208732914368
+
+Among triangles with lattice vertices inside or on the circle of radius $r$ that contain no other lattice point (inside or on edges), take the one of maximum perimeter; $T(r)$ is its circumradius over $r$. We need $T(10^7)$ rounded to the nearest integer.
+
+By Pick's theorem an empty lattice triangle has area $1\/2$, so with longest side $v = B - A$ (primitive) the third vertex satisfies $"cross"(v, C - A) = plus.minus 1$: $C$ lies on one of the two lattice lines adjacent to $A B$, at position $s = (C - A) dot v$ with $s$ fixed modulo $v^2$ ($s equiv v_y v_x^(-1)$). Then $|C A|^2 = (s^2+1)\/v^2$, $|C B|^2 = ((v^2-s)^2+1)\/v^2$, the circumradius is $R = sqrt((s^2+1)((v^2-s)^2+1)) \/ (2|v|)$ (from $R = a b c\/(4K)$, $K = 1\/2$), and the perimeter is $P = |v| + (sqrt(s^2+1) + sqrt((v^2-s)^2+1))\/|v| = 2|v| + O(1\/v^2)$ because a lattice $C$ forces $s >= sqrt(v^2 - 1)$. Consecutive achievable $|v|$ differ by at least $1\/(2|v|) >> 1\/v^2$, so the maximum perimeter first maximises $N = v^2$ over feasible placements, then within equal $N$ minimises $min(s, N - s)$.
+
+Feasibility of $v$ needs a lattice $A$ with $A$, $A + v$, $A + p$ all in the disk. Since $|A + v\/2|^2 <= r^2 - N\/4$, valid $A$ lie in a disk of radius $sqrt(4r^2 - N)\/2$ around $-v\/2$, so each test scans only $approx sqrt("gap")$ columns. All primitive vectors with $N$ in a window below $4r^2$ (four sign/line variants each) are tested in decreasing $N$; the winner at $r = 10^7$ has gap $4r^2 - N = 2718$, far inside the $2 dot 10^5$ window. $T = sqrt(X \/ (4 r^2 N))$ with $X = (s^2+1)((N-s)^2+1)$ is rounded by exact integer comparison. Verified against a literal maximum-perimeter brute force over all empty triangles for $r = 10$ and the given $T(10) approx 97.26729$, $T(100) approx 9157.64707$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=563")[= Problem 563: Robot Welders]
+
+Solution: 27186308211734760
+
+Robots weld up to 25 identical rectangles along an edge, starting from unit squares, so a sheet $a times b$ is constructible exactly when both sides are 23-smooth (every factor in $2..25$ splits into primes up to 23). A variant of area $A$ is a pair $(s, l)$ of 23-smooth sides with $s <= l <= 1.1 s$ and $s l = A$; $M(n)$ is the least area with exactly $n$ variants, and we need $sum_(n=2)^100 M(n)$.
+
+All 23-smooth numbers up to $B = 10^8$ (63768 of them) are generated by depth-first search, and a two-pointer sweep lists every pair with $10 l <= 11 s$ — about $6.8 times 10^7$ products. For any area $A <= B^2$ the short side obeys $s <= sqrt(A) <= B$, so every variant of such an area is captured and its count is exact. Sorting the products and taking the first area attaining each count gives $M(n)$; every $n in [2, 100]$ is realised and the largest value, $M(100) approx 2.3 times 10^15$, sits a factor four below the completeness boundary $B^2 = 10^16$. The table is cross-checked against an independent run at $B = 10^7$, and the given $M(3) = 889200$ — with its variants $900 times 988$, $912 times 975$, $936 times 950$ — is confirmed by a direct divisor scan.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=564")[= Problem 564: Maximal Polygons]
+
+Solution: 12363.698850
+
+A segment of length $2n-3$ is split uniformly at random into one of the $binom(2n-4, n-1)$ ordered sequences of $n$ positive integer parts, which become consecutive sides of the maximal-area convex $n$-gon. $E(n)$ is the expected area; we need $S(50) = sum_(n=3)^50 E(n)$ to 6 decimals.
+
+The maximal-area polygon with given sides is the cyclic one, and its area does not depend on the side order, so $E(n)$ collapses to a sum over partitions of $2n-3$ into $n$ parts — at most $p(47) = 124754$ of them for $n = 50$ — each weighted by its number of arrangements $n! \/ product("multiplicities"!)$ over the binomial total.
+
+For each side multiset the circumradius solves $sum_i 2 arcsin(s_i \/ 2R) = 2pi$ when the centre is inside the polygon (the left side is decreasing in $R$, and its sign at $R = s_max \/ 2$ decides the case); otherwise the centre lies beyond the longest side and $R$ solves $arcsin(s_max \/ 2R) = sum_(i != max) arcsin(s_i \/ 2R)$, with the longest side's triangle counted negatively in $A = sum plus.minus (R^2\/2) sin(2 arcsin(s_i \/ 2R))$. A root always exists since $s_max <$ the sum of the rest (the largest of $n$ parts of $2n-3$ is at most $n-2 < n-1$). Bisection to $approx 10^(-15)$ relative accuracy over all 320k partitions gives $S(50)$ far beyond the required precision. The given $E(3) = 0.433013$, $E(4) = 1.299038$, $S(5) = 4.604767$ and $S(10) = 66.955511$ are asserted.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=565")[= Problem 565: Divisibility of Sum of Divisors]
+
+Solution: 2992480851924313898
+
+We sum the $n <= 10^11$ with $sigma(n) eq.triple 0 mod 2017$. Since $sigma$ is multiplicative, and $2017$ is prime, $2017 | sigma(n)$ exactly when some exact prime-power component $p^e || n$ has $2017 | sigma(p^e)$. Call such $p^e$ *special*.
+
+Finding the special prime powers: for $e = 1$, $sigma(p) = p + 1$, so $p eq.triple -1 mod 2017$. The candidates $2017k - 1 <= 10^11$ are sieved by every prime up to $sqrt(10^11) approx 316228$ (striking an arithmetic progression of $k$ for each small prime), which leaves exactly the special primes — no primality testing needed. For $e >= 2$, only $p <= 10^(11\/e)$ matter, so all $sigma(p^e) mod 2017$ are checked directly over the primes up to $316228$.
+
+The smallest special value is $12101$, so $n$ can contain at most two special components ($12101^3 > 10^11$). By inclusion–exclusion, with $T(M) = M(M+1)\/2$:
+
+$ S = sum_(q = p^e "special") q (T(M) - p T(floor(M\/p)))_(M = floor(N\/q)) - sum_(q_1 q_2 <= N) q_1 q_2 sum_(m <= N\/(q_1 q_2), p_1 divides.not m, p_2 divides.not m) m, $
+
+where the single terms sum $q m$ over $m$ coprime to $p$ (so that the $p$-component of $n = q m$ is exactly $q$), and the pair terms remove the double count of $n$ containing two special components, computed with the analogous two-prime exclusion. Only special $q_1 < sqrt(N)$ can appear in a pair, so the pair sum is tiny. All arithmetic uses exact Python integers. $S(20, 7) = 49$, $S(10^6, 2017) = 150850429$ and $S(10^9, 2017) = 249652238344557$ are the checks.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=567")[= Problem 567: Reciprocal Games I]
+
+Solution: 75.44817535
+
+Each of $n$ turns picks $k$ uniformly from $1..n$ with prize $1\/k$. In game A a generator turns each of $n$ lights on with probability $1\/2$ and Jerry wins $1\/k$ if exactly $k$ light up; in game B Tom and Jerry each draw a uniformly random $k$-subset and Jerry wins on a match. Over $n$ turns, $J_A(n) = 2^(-n) sum_k binom(n, k)\/k$ and $J_B(n) = sum_k 1\/(k binom(n, k))$; we need $S(m) = sum_(n<=m)(J_A(n) + J_B(n))$ for $m = 123456789$ to 8 decimal places.
+
+The identity $sum_k binom(n,k)\/k = sum_j (2^j - 1)\/j$ (verified exactly for $n < 200$) telescopes the $J_A$ sum to $2H_m - 2 sum_(j<=m) 2^(-j)\/j - E(m)$, where $E(m)$ keeps only the $tilde 200$ top terms. The $J_B$ terms decay super-polynomially away from the edges $k = 1, 2, dots$ and $k = n, n-1, dots$, so Kahan-compensated 60-wide edge windows are exact to double precision up to $N_0 = 10^6$, beyond which $J_B(n) = 2\/n + 2\/(n(n-1)) + 4\/(n(n-1)(n-2)) + O(1\/n^4)$ telescopes in closed form with tail error below $10^(-17)$. $H_m$ uses Euler–Maclaurin. The given $J_A(6)$, $J_B(6)$ and $S(6) = 7.58932292$ are asserted via exact rationals, $S(100)$ agrees with exact summation to $10^(-9)$, and the answer is stable under doubling $N_0$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=568")[= Problem 568: Reciprocal Games II]
+
+Solution: 4228020
+
+With the games of problem 567, we need the 7 most significant digits of $D(n) = J_B(n) - J_A(n)$ at $n = 123456789$ — after stripping leading zeros, of which there are about 37 million: every order of the $1\/n$ expansion cancels and $D$ decays like $2^(-n)$, so floating-point subtraction is hopeless.
+
+The way through is an exact recurrence. From $1\/(k binom(n,k)) = (1\/k - 1\/n) \/ binom(n-1, k)$ follows $J_B(n) = J_B(n-1) + 2\/n - A_n$ with $A_n = 2^(-n) sum_(j<=n) 2^j\/j$, while problem 567's identity gives $J_A(n) = A_n - 2^(-n) H_n$. Together with $A_(n-1) = 2A_n - 2\/n$ everything collapses to
+
+$ D(n) = D(n-1) + 2^(-n)(H_n - 2H_(n-1)), $
+
+verified exactly with rationals for $n < 60$. Since $sum 2^(-m) H_(m-1) = sum 2^(-m)\/m = ln 2$, the series telescopes to zero at infinity, leaving the exact tail $D(n) = sum_(m>n) 2^(-m)(H_(m-1) - 1\/m) = 2^(-n) G(n)$ with $G(n) tilde H_n$ — also verified directly. $G$ is evaluated in 60-digit decimal arithmetic, and the leading digits come from the fractional part of $log_10 D = -n log_10 2 + log_10 G$ with $log_10 2$ at 60 digits. The extraction machinery reproduces the worked example $D(6) = 0.03828125 -> 3828125$ and the exact digits of $D(40)$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=569")[= Problem 569: Prime Mountain Range]
+
+Solution: 21025060
+
+Mountains with $45 degree$ slopes rise by $p_(2k-1)$ and fall by $p_(2k)$; $P(k)$ counts previous peaks visible from peak $k$, and we need $sum_(k<=2500000) P(k)$.
+
+Peak $k$ sits at $x_k = p_1 + dots.c + p_(2k-1)$, $y_k = p_1 - p_2 + dots.c + p_(2k-1)$; the heights strictly increase (each step adds the positive prime gap $p_(2k+1) - p_(2k)$, asserted over the whole range). A peak $j$ is visible from $k$ exactly when its sight slope $s_j = (y_k - y_j)\/(x_k - x_j)$ is a strict prefix minimum scanning $j = k-1$ down to $1$.
+
+The farthest visible peak is the rightmost global minimiser of $s_j$, and that is a vertex of the upper convex hull of peaks $1..k-1$: the minimal-slope tangent from $k$ has every peak on or below it, with peaks strictly below the hull strictly below the tangent. So one sweep maintains the hull incrementally (monotone stack, $O(n)$ total), locates the tangent vertex $t$ by binary search — the slope from $k$ along a strictly convex hull is unimodal — and scans only $j = k-1, dots, t$ for prefix minima; measured scan lengths stay tiny. Slope and orientation tests multiply $y$-differences ($< 2^26$) by $x$-differences ($< 2^48$), overflowing int64, so an exact 128-bit product comparison via 32-bit limbs is used throughout. Verified against an $O(n^2)$ scan for the first 3000 peaks plus the given $P(3) = 1$, $P(9) = 3$ and $sum_(k<=100) P(k) = 227$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=570")[= Problem 570: Snowflakes]
+
+Solution: 271197444
+
+A snowflake of order $n$ overlays a $180°$-rotated equilateral triangle onto each same-size equilateral triangle of the order $n-1$ snowflake. $A(n)$ counts unit triangles exactly one layer thick, $B(n)$ those three layers thick, $G(n) = gcd(A(n), B(n))$; we need $sum_(n=3)^(10^7) G(n)$.
+
+The construction had to be reverse-engineered from the problem's picture: fitting the triangular lattice to the order-3 panel pixel-by-pixel gave the true per-cell thickness field ${1: 30, 2: 84, 3: 6}$, and an exact subset-cover over candidate stamps proved each step refines the lattice by 3 (children inherit thickness) and then adds $+1$ over the rotated-star footprint of every cell _visible as a unit triangle_ — one whose thickness differs from all three edge-neighbours. The rule reproduces every given value, including the six 4-layer (green) spots of the order-4 panel.
+
+Thickness values grow with $n$, but visibility only needs value _differences_, which propagate cleanly (corner and mid children preserve the parent difference; new pairs differ by stamp bits). Abstracting each cell's 3-shell neighbourhood by clamping values above 3 into equality classes yields an exact local-configuration dynamics that closes at 1009 types with zero conflicts; iterating its integer transition counts reproduces the simulation for $n <= 8$ and the given $A(11) = 3027630$, $B(11) = 19862070$. The sequences obey $x^2-7x+12$ and its square:
+
+$ A(n) = 3 dot 4^(n-1) - 2 dot 3^(n-1), quad B(n) = (9n-69) 2^(2n-3) + (4n+26) 3^(n-1). $
+
+For the gcd, $A\/6 = 2^(2n-3) - 3^(n-2)$ is coprime to 6, and modulo it $2^(2n-3) equiv 3^(n-2)$, which collapses $2B\/6$ to $3^(n-2)(7n+3)$; since $3^(n-2)$ is invertible, $G(n) = 6 gcd(2^(2n-3) - 3^(n-2), 7n+3)$ — verified against exact big-integer gcds for all $n <= 300$, with the given $G(500) = 186$ and $sum_(n=3)^500 G(n) = 5124$ asserted. The final sum needs two modular exponentiations mod $7n+3$ per $n$, parallelised over 64 lanes.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=571")[= Problem 571: Super Pandigital Numbers]
+
+Solution: 30510390701978
+
+A number is pandigital in base $b$ if its base-$b$ digits include every value $0..b-1$, and $n$-super-pandigital if this holds in every base from 2 to $n$. We need the sum of the 10 smallest 12-super-pandigital numbers.
+
+Pandigitality in base $n$ forces at least $n$ base-$n$ digits, so the smallest candidates are exactly the $n$-digit base-$n$ pandigitals: permutations of the digits $0..n-1$ with nonzero leading digit. Enumerating leading digits in increasing order and the remaining digits in lexicographic permutation order visits these numbers in strictly increasing value (they share a common length), so the first ten hits are the ten smallest — provided all ten fit within the $n$-digit range, which is asserted. Each candidate is screened with digit bitmasks from base $n - 1$ downward, the highest base being by far the most selective; about $1.7 times 10^8$ permutations are sifted for $n = 12$.
+
+The search is validated on all the given facts: 978 is the smallest 5-super-pandigital, 1093265784 the smallest 10-super-pandigital, and the ten smallest 10-super-pandigitals sum to 20319792309.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=572")[= Problem 572: Idempotent Matrices]
+
+Solution: 19737656
+
+$C(n)$ counts $3 times 3$ integer matrices with $M^2 = M$ and entries in $[-n, n]$; we need $C(200)$.
+
+An idempotent matrix is a projection, so its rank equals its trace: $0$, $1$, $2$ or $3$. Ranks 0 and 3 give $M = 0$ and $M = I$. A rank-1 integer idempotent factors as $M = m p q^top$ with $p, q$ primitive integer vectors, and $"tr" M = m (p dot q) = 1$ forces $m = plus.minus 1$, so $M = p q^top$ with $p dot q = 1$ — which makes both vectors primitive automatically, the factorisation being unique up to negating both. Rank-2 idempotents biject with rank-1 ones via the complement $N = I - M$, whose off-diagonal entries lie in $[-n, n]$ and diagonal entries in $[1-n, n+1]$.
+
+Entry $(i, j)$ of $p q^top$ is $p_i q_j$, so each $q_j$ is confined to an interval determined by $p$ (off-diagonal bounds $n\/|p_i|$ plus the diagonal window). Sweeping all $p$ with $|p_i| <= n + 1$, for each $q_3$ in its interval the equation $p_1 q_1 + p_2 q_2 = 1 - p_3 q_3$ is a line in the $(q_1, q_2)$ rectangle, counted in $O(1)$ by extended-gcd parametrisation and interval intersection; the grand total halves for the $(p, q) tilde (-p, -q)$ symmetry. Verified against literal nine-loop brute force for $n = 1, 2, 3$, including the given $C(1) = 164$ and $C(2) = 848$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=574")[= Problem 574: Verifying Primes]
+
+Solution: 5780447552057000454
+
+For a prime $q$ and coprime $A >= B > 0$ with $A B$ divisible by every prime below $q$, any sum $A + B < q^2$ and any difference $1 < A - B < q^2$ is prime. $V(p)$ is the smallest $A$ over all such certificates of $p$, and $S(n) = sum V(p)$ over primes $p < n$; we need $S(3800)$.
+
+Enlarging $q$ only adds divisibility requirements, so the minimum is attained at the smallest prime $q$ with $q^2 > p$. For a sum $p = A + B$ the gcd condition is automatic and each prime $r < q$ must divide $A$ or $p - A$; $A$ is found by scanning $[p\/2, p)$, and sums beat differences whenever they exist since a difference has $A = p + B > p$. For a difference, $gcd(A, B) = gcd(p, B)$, so we need the smallest $B >= 1$ with $p divides.not B$ and $B equiv 0$ or $-p mod r$ for every odd prime $r < q$ ($r = 2$ is automatic for odd $p$).
+
+That is a minimum-CRT problem over $2^17$ residue classes for the largest $q = 67$, where the answer can reach $approx 10^16$. Splitting the odd primes into halves with balanced products $M_1, M_2 < 2^40$, each half's residues are enumerated by iterative CRT, and for each pair $x = x_1 + M_1 t$ with $t = (x_2 - x_1) M_1^(-1) mod M_2$; minimising $x$ is minimising $(t, x_1)$ lexicographically, so everything stays in 64-bit integers (an exact 20-bit-split mulmod handles $t$), with the $p | x$ exclusion checked modularly. Verified against a direct $B$-scan up to twice the primorial for all $p < 525$, the given $V(2) = 1$, $V(37) = 22$, $V(151) = 165$, and $S(10) = 10$, $S(200) = 7177$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=575")[= Problem 575: Wandering Robots]
+
+Solution: 0.000989640561
+
+A robot wanders a $1000 times 1000$ grid of rooms numbered row by row. Its designers were told to program it "with equal probability of remaining in the same room or moving to an adjacent room" — an ambiguous brief admitting two readings, and the robot was built with either, equally likely: (A) a lazy walk that stays with probability $1\/2$ and otherwise moves to a uniformly random neighbour, or (B) all $d + 1$ options (the $d$ neighbours plus staying) each with probability $1\/(d+1)$.
+
+Both chains are reversible, so detailed balance gives the stationary laws directly: $pi(v) prop deg(v)$ for the lazy walk (laziness does not alter the simple random walk's stationary distribution) and $pi(v) prop deg(v) + 1$ for the uniform variant, since $pi(v) dot 1\/(deg(v) + 1)$ is then symmetric across each edge. After "unfathomable periods of time" the answer is the stationary probability of a square-numbered room averaged over the two builds:
+
+$ P = 1/2 (S_d / (2E) + (S_d + n) / (2E + n^2)), $
+
+with $S_d$ the degree sum over rooms $k^2$, $2E = 4n(n-1)$ the total degree, and $n$ square rooms each gaining $+1$ in variant B. Room $r$ sits at row $floor((r-1)\/n)$, column $(r-1) mod n$, with degree 4 minus one per touched boundary. Exact rationals throughout; the given $5 times 5$ value $0.177976190476$ is asserted and both $5 times 5$ stationary laws are cross-checked by power iteration of the literal transition matrices.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=577")[= Problem 577: Counting Hexagons]
+
+Solution: 265695031399260211
+
+$H(n)$ counts the regular hexagons with all six vertices on the triangular lattice of an equilateral triangle of side $n$; we need $sum_(n=3)^12345 H(n)$.
+
+The tilted hexagons are the heart of the problem (they are why $H(6) = 12$ rather than $11$). Every regular hexagon with lattice vertices inscribes in a unique smallest *upright* lattice hexagon: sliding the six vertices of an upright hexagon of side $s$ the same offset $t$ along its sides, $0 <= t < s$, produces $s$ distinct regular hexagons with the same centre, one of which is the upright hexagon itself, and every lattice hexagon arises exactly once this way. An upright hexagon of side $s$ spans a triangle of side $3s$ and can be placed in $binom(n - 3s + 2, 2)$ positions inside the side-$n$ triangle. Therefore
+
+$ H(n) = sum_(s = 1)^(floor(n\/3)) s (n - 3s + 1)(n - 3s + 2) / 2, $
+
+reproducing $H(3) = 1$, $H(6) = 12$ and $H(20) = 966$. The final answer is a cheap double loop over $n$ and $s$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=578")[= Problem 578: Integers with Decreasing Prime Powers]
+
+Solution: 9219696799346
+
+An integer $n = p_1^(e_1) dots.c p_k^(e_k)$ with $p_1 < dots.c < p_k$ has decreasing prime powers if $e_1 >= e_2 >= dots.c >= e_k$; $C(n)$ counts them up to $n$, and we need $C(10^13)$.
+
+A depth-first search builds factorisations in increasing prime order, carrying the prefix product $m$ and the cap $e_max$ (the last exponent used). Each node counts its own prefix, recurses on primes $q <= sqrt(n\/m)$ above the last one with every legal exponent, and counts the remaining possibilities in bulk: a prime $q > sqrt(n\/m)$ can only carry exponent 1 and admits no further extension (the next prime would have to exceed $q$ yet stay below $(n\/m)\/q < q$), so those leaves number exactly $pi(n\/m) - pi(max(p_"last", sqrt(n\/m)))$.
+
+Every $pi$ query lands on a value of the form $floor(n\/m)$ or below $sqrt(n)$ — precisely what one Lucy_Hedgehog sieve provides in $O(n^(3\/4))$ time via the tables $pi(v)$ for $v <= sqrt(n)$ and $pi(floor(n\/k))$ for all $k$. The sieve is sanity-checked against $pi(10^8) = 5761455$, and the count against per-integer factorisation up to $10^5$ plus the given $C(100) = 94$ and $C(10^6) = 922052$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=581")[= Problem 581: 47-smooth Triangular Numbers]
+
+Solution: 2227616372734
+
+We sum all $n$ with $T(n) = n(n+1)\/2$ 47-smooth. As $n$ and $n + 1$ are coprime and the division by 2 cannot affect primes above 47, $T(n)$ is 47-smooth exactly when $n$ and $n + 1$ both are. Størmer's theorem guarantees only finitely many such pairs of consecutive smooth integers exist, so the sum is finite.
+
+Every pair $(n, n + 1)$ contains exactly one odd member, and odd 47-smooth numbers are far sparser than all of them. A depth-first search over exponent vectors of $3, 5, dots, 47$ enumerates every odd 47-smooth $v$ up to the bound $9 times 10^18$ (the int64 limit), and $v - 1$ and $v + 1$ are tested for smoothness by trial division; each pair is discovered exactly once via its odd member. The enumeration is cross-checked against plain trial division of every integer up to $10^7$.
+
+The search finds 1502 pairs, the largest beginning at $n = 1109496723125 approx 1.1 times 10^12$ — and then runs more than $8 times 10^6$ times further without finding another, in agreement with Lehmer's Pell-equation computation of the complete list of consecutive 47-smooth pairs (OEIS A117581).
+
+#pagebreak()
+#link("https://projecteuler.net/problem=582")[= Problem 582: Nearly Isosceles 120 Degree Triangles]
+
+Solution: 19903
+
+We count integer triangles with a $120 degree$ angle, sides $a <= b <= c$, $b - a <= 100$ and $c <= 10^100$.
+
+The $120 degree$ angle faces $c$, so $c^2 = a^2 + a b + b^2$. With $b = a + d$ for $d = b - a in 1..100$ ($d = 0$ would force $c = a sqrt(3)$), the quadratic formula demands that $3(4c^2 - d^2)$ be a square $(3z)^2$, i.e. the Pell-like equation
+
+$ x^2 - 3 z^2 = d^2, quad x = 2c, quad a = (z - d)/2, $
+
+with $x$ even, $z eq.triple d mod 2$ and $z >= d + 2$ so that $a >= 1$. Solutions form orbits under the fundamental unit $2 + sqrt(3)$ of $x^2 - 3y^2 = 1$, acting as $(x, z) -> (2x + 3z, x + 2z)$. The inverse map strictly decreases $z$ (as $x > z sqrt(3)$) and stays non-negative exactly while $z >= d$, so every orbit has a representative with $z < d$; enumerating seeds with $z <= 2d$ and expanding upward with exact integers until $x > 2n$ — about 175 steps reach $10^100$ — collects each solution once. Verified against brute-force enumeration for $n = 1000$ and $10^4$ and the given $T(1000) = 235$, $T(10^8) = 1245$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=583")[= Problem 583: Heron Envelopes]
+
+Solution: 1174137929000
+
+An envelope is a convex pentagon $A B C D E$: a rectangle $A B D E$ (width $w$, height $h$) with an isosceles flap $B C D$ of height $t < h$ on top. A Heron envelope has all five sides and all five diagonals ($A C$, $A D$, $B D$, $B E$, $C E$) integral; $S(p)$ sums the perimeters of those with perimeter at most $p$.
+
+With $A = (0,0)$, $E = (w, 0)$, $B = (0, h)$, $D = (w, h)$, $C = (w\/2, h + t)$: $B D = w$, $A D = B E = sqrt(w^2 + h^2)$, $B C = C D = sqrt((w\/2)^2 + t^2)$ and $A C = C E = sqrt((w\/2)^2 + (h+t)^2)$. Integrality of $B C$ forces $w = 2u$, leaving three Pythagorean conditions sharing legs — $u^2 + t^2$, $u^2 + (h+t)^2$ and $(2u)^2 + h^2$ all squares — with perimeter $P = 2(h + u + sqrt(u^2 + t^2)) <= p$ and $1 <= t < h$.
+
+For each $u$, the legs $x$ partnering $u$ come from the factorisations $u^2 = d e$ with $d < e$ of equal parity as $x = (e - d)\/2$, generated from the divisors of $u^2$ via a smallest-prime-factor sieve and pruned to $1 <= x <= p$ (anything larger can never fit the perimeter, and unpruned values overflow int64 squares). An envelope is then a pair $t < y$ from this list with $y > 2t$ (so $h = y - t > t$), perimeter in bound, and $4u^2 + h^2$ a perfect square; sorting lets both loops break early on the monotone perimeter. Verified against an independent brute scan at $p = 10^4$ — the given $S(10^4) = 884680$ — and $p = 3 dot 10^4$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=584")[= Problem 584: Birthday Problem]
+
+Solution: 32.83822408
+
+We need the expected number of people entering a room until 4 of them have birthdays within 7 days of each other, on a 365-day circular year, to 8 decimals.
+
+On a circle, "$c$ people pairwise within $w$ days" is the same as "some window of $w+1$ consecutive days holds $c$ birthdays". So with $W = 8$ and cap 3, survival after $m$ people means every circular 8-day window holds at most 3 birthdays, and $EE[T] = sum_(m >= 0) P(T > m) = sum_m (m! \/ 365^m) thin a_m$, where $a_m$ sums $product 1\/c_i !$ over valid day-count vectors. The $a_m$ come from a circular transfer over days: the state is the count vector of the last 7 days (sum at most 3: 120 states), each day appending a count $c$ with weight $x^c\/c!$, tracked as polynomials in $x$. The circle closes by carrying the 120 boundary (first-7-days) states as a tensor axis and admitting only pairs whose concatenation passes every seam-crossing window. Degrees cap at $approx 140$, all coefficients are nonnegative (no cancellation), and 80-bit long doubles carry ample precision for the Borel sum.
+
+The two given planets are asserted: 3 within 1 day on a 10-day year gives $5.78688636$, and 3 within 7 days on a 100-day year gives $8.48967364$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=585")[= Problem 585: Nested Square Roots]
+
+Solution: 17714439395932
+
+$F(n)$ counts distinct values $sqrt(x + sqrt(y) + sqrt(z))$ ($x <= n$; $y, z$ positive non-squares) that denest into a finite $plus.minus$-combination of square roots of integers; we need $F(5 dot 10^6)$.
+
+If $kappa = sum s_i sqrt(a_i)$ then $kappa^2$ has even coefficients on every surd class, so the value $V$ determines $kappa = sqrt(V) > 0$ uniquely and distinct values correspond to distinct $kappa$. A Galois argument pins down $kappa$: every automorphism of the multiquadratic closure fixing $QQ(sqrt(D_1), sqrt(D_2))$ sends $kappa$ to $plus.minus kappa$, so $kappa = sqrt(rho) dot mu$ with $mu$ in the quadruple field — $kappa$ has at most four surd components whose cores form a coset of a Klein group. Three components force three surd classes in $kappa^2$, so $kappa$ is either _family 1_: $sqrt(A) + sqrt(B)$ with $A B$ non-square, or _family 2_: $plus.minus sqrt(p_1) plus.minus sqrt(q_1) plus.minus sqrt(p_2) plus.minus sqrt(q_2)$ with four pairwise distinct cores and $p_1 q_1 = p_2 q_2$, which kills exactly one of the three surd classes (two cannot vanish: apply the automorphism negating the surviving class), the signs being forced.
+
+$F_1 = sum_x floor(x\/2) - sum_(kappa "squarefree") Q(floor(n\/kappa))$ with $Q(M) = \#{a >= b >= 1: a^2 + b^2 <= M}$. For $F_2$ all orbits of ordered tuples under the 8 relabelings are free, so $F_2 = N\/8$ where, via $p_1 = e f$, $q_1 = g h$, $p_2 = e h$, $q_2 = g f$, $gcd(f, h) = 1$, the sum becomes $(e+g)(f+h)$ and the unconstrained count is $sum_t phi(t) B(floor(n\/t))$, $B(M) = M(M-1)\/2$. Core collisions reduce to single group relations: (I) $"core"(p_1) = "core"(q_1) <=> e f g h$ square, counted per $m = kappa a b$ by sort + two-pointer over decomposition weights $kappa(a^2+b^2)$; (II) $"core"(p_1) = "core"(p_2) <=> f, h$ both squares, giving $sum_("coprime" (F,H)) B(floor(n\/(F^2+H^2)))$; (III) equals (II) by swapping $p_2, q_2$; any two relations force all four cores equal (E, a squarefree-count double sum), so bad $= I + 2 dot I I - 2E$. Total $approx 10$ s.
+
+Verified against a literal brute force with core tests for $n <= 30$ and all six given values up to $F(5000) = 11134074$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=586")[= Problem 586: Binary Quadratic Form]
+
+Solution: 82490213
+
+$f(n, r)$ counts $k <= n$ expressible as $k = a^2 + 3a b + b^2$ with $a > b > 0$ in exactly $r$ ways; we need $f(10^15, 40)$.
+
+Completing the square, $4k = (2a + 3b)^2 - 5 b^2$, so representations correspond to elements $xi = (u + v sqrt(5))\/2$ of the ring of integers of $QQ(sqrt(5))$ with norm $k$, subject to $v > 0$ and $u > 5v$, i.e. $phi^(-2) < xi' \/ xi < 1$. Multiplying by the norm-one unit $phi^2$ scales the ratio by $phi^(-4)$, so the window is exactly half a unit period: each orbit ${plus.minus phi^(2j) xi, plus.minus phi^(2j) xi'}$ contributes exactly one representation, with the boundary ratios ($v = 0$ and $a = b$) excluded. Since $h(QQ(sqrt(5))) = 1$ and $N(phi) = -1$, orbits correspond to conjugate-pairs of ideals of norm $k$, and self-conjugate ideals land exactly on the excluded boundary. Hence $r(k) = (A(k) - S(k))\/2$ with $A(k) = sum_(d | k) chi_5 (d)$ the ideal count (split $p equiv plus.minus 1 mod 5$ give $e+1$; inert $p$ force even exponents; 5 is free) and $S(k) = 1$ iff every split exponent is even. $r = 40$ means $A - S = 80$: either $A = 80$ (always containing an even factor, consistent with $S = 0$) or $A = 81$ (all factors odd $arrow.r.double$ all split exponents even, consistent with $S = 1$).
+
+Counting: $k = g dot ("split part")$ with $g$ over the 14.1M background values $5^a m^2$ ($m$ inert-composed, sieved to $sqrt(n)$), and the split part realizing a multiplicative partition of 80 or 81 as $product (e_i + 1)$ over distinct split primes. A DFS assigns split primes to exponents and counts the innermost level via a $pi_"split"$ table, subtracting used primes in range; total work is proportional to the number of solutions ($approx 10^8$).
+
+Verified against a literal representation histogram for all $k <= 10^5$ (five $r$ values including the given $f(10^5, 4) = 237$), the identity $r = (A-S)\/2$ checked by factorization for all $k <= 30000$, and the given $f(10^8, 6) = 59517$.
 
 #pagebreak()
 #link("https://projecteuler.net/problem=587")[= Problem 587: Concave Triangle]
@@ -3281,6 +3927,76 @@ And so the ratio is:
 $
 ("TriangleArea" + "SectionArea") / (1-pi/4)
 $
+
+#pagebreak()
+#link("https://projecteuler.net/problem=588")[= Problem 588: Quintinomial Coefficients]
+
+Solution: 11651930052
+
+$Q(k)$ counts the odd coefficients of $(x^4 + x^3 + x^2 + x + 1)^k$; we need $sum_(k=1)^18 Q(10^k)$.
+
+Over $"GF"(2)$, $P(x)^(2^j) = P(x^(2^j))$, so $P^k eq.triple product_(j in "bits"(k)) P(x^(2^j))$. The coefficient of $x^e$ is therefore the parity of the number of ways to write $e = sum c_j 2^j$ with $c_j in {0, dots, 4}$ at the set bits of $k$ and $c_j = 0$ elsewhere — a base-2 carry process where position $j$ receives $c_j$ plus an incoming carry, emits one bit of $e$, and passes the rest on (carries never exceed 3).
+
+A digit DP counts the exponents with odd parity. The state of an exponent prefix is the vector of representation parities indexed by pending carry — a 5-bit class — and processing the bits of $k$ from the bottom, each prefix splits over the next exponent bit while the class updates by XOR over the allowed $c_j$ and live carries. After the last bit of $k$, a prefix in class $v$ completes to exactly $"popcount"(v)$ exponents with an odd coefficient, since appending the carry's binary digits determines the rest of $e$ uniquely and injectively. Hence $Q(k)$ is the popcount-weighted class total. Verified against literal $"GF"(2)$ expansion for all $k < 200$ and the given $Q(3) = 7$, $Q(10) = 17$, $Q(100) = 35$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=589")[= Problem 589: Poohsticks Marathon]
+
+Solution: 131776959.25
+
+Two sticks repeatedly float under a bridge (journey times uniform integers in $[n, m]$, 5 seconds to refloat); the game ends when a stick emerges having made one more journey than the other. $E(m, n)$ is the expected duration; we need $S(100) = sum_(m=2)^100 sum_(n=1)^(m-1) E(m, n)$ to 2 decimals.
+
+Stick A's $j$-th journey finishes at $sum a_(<= j) + 5(j-1)$, so A laps B at round $j$ exactly when $W + a_j <= -6$ where $W = sum_(i<j)(a_i - b_i)$; symmetrically B laps when $b_j <= W - 6$. The two can never trigger in the same round (they need $W <= -n-6$ and $W >= n+6$), so the game is a Markov chain on $W$, confined on continuing rounds to $[-5-m, 5+m]$.
+
+The ending time equals (winner's journey sum) $+ thin 5(J-1) = sum_"rounds" ("winner's" t_i + 5) - 5$. Each round's $a$ counts only if A eventually wins, so with $p(W) = P("A wins from" W)$ (one linear solve), the expected remaining weighted time $g(W) = EE[(a+5) bold(1)_"Alap" + (b+5) bold(1)_"Blap" + ((a+5)p(W') + (b+5)(1-p(W')) + g(W')) bold(1)_"cont"]$ is a second linear solve, and $E(m, n) = g(0) - 5$.
+
+Verified against the given $E(60, 30) = 1036.15$ and $S(5) = 7722.82$, and against a $4 dot 10^5$-game direct simulation of the lap rules for $(m, n) = (5, 2)$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=590")[= Problem 590: Sets with a Given Least Common Multiple]
+
+Solution: 834171904
+
+$H(n)$ counts the sets of positive integers whose least common multiple is exactly $n$, and $L(n) = "lcm"(1..n)$; we need $H(L(50000))$ modulo $10^9$.
+
+A set with lcm $n$ consists of divisors of $n$ covering each prime's maximal exponent, so inclusion-exclusion over the primes whose exponent is capped one below maximal gives, for $n = product p_i^(e_i)$, $H(n) = sum_T (-1)^(|T|) 2^(product_i (e_i + 1 - [i in T]))$ — verified by literal subset enumeration for small $n$ and the given $H(12) = 44$. For $L(50000)$ the 5133 primes group by exponent: one each of $e = 15, 9, 6, 5$, two of $e = 4$, five of $e = 3$, thirty-seven of $e = 2$, and $k_1 = 5085$ primes with $e = 1$. Choices within a class of $c$ equal exponents contribute binomially, collapsing the $2^5133$-term sum to about $10^4$ class-choice combinations times a sum over $j$ (capped $e = 1$ primes) of $binom(k_1, j) (-1)^j 2^(D dot 2^(k_1 - j))$.
+
+The towers $2^E mod 10^9$ split by CRT: $E >= 9$ always in the real computation (the smallest $D$ exceeds $2^37$), so the residue is $0$ modulo $2^9$, while 2 is a primitive root modulo $5^9$ with order $4 dot 5^8$, so only $E mod 4 dot 5^8$ is needed — one modular exponentiation per $(D, j)$ pair. Exact small exponents are handled directly so the same code validates $H L(n)$ for $n <= 20$ against exact big-integer evaluation; binomials mod $10^9$ come from a Pascal row.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=591")[= Problem 591: Best Approximations by Quadratic Integers]
+
+Solution: 526007984625966
+
+$"BQA"_d (x, n)$ is the quadratic integer $a + b sqrt(d)$ closest to $x$ with $|a|, |b| <= n$, and $I_d$ takes its integral part. We need $sum |I_d ("BQA"_d (pi, 10^13))|$ over non-square $d < 100$.
+
+For fixed $d$ this is inhomogeneous Diophantine approximation: minimise the distance of $b sqrt(d) - pi$ to the nearest integer over $|b| <= B$, where $B$ caps $b$ so the rounded $a$ stays within range ($b sqrt(d) <= n + 1\/2 + pi$, and then the nearest integer automatically has $|a| <= n$). Each of the four sign/side combinations reduces to $"minmod"(t, c, N) = min_(0 <= b <= N) (c + b t) mod 1$, solved exactly by a Euclidean recursion: the candidates are $c$ itself and the value just after each wrap $j$, which equals $(c - j) mod t$ — an identical problem at scale $t$ with step $(-1) mod t$ and offset $(c-1) mod t$, recursing in $O(log N)$ continued-fraction-like steps with the argmin rebuilt as $ceil((j - c)\/t)$ on the way out. All arithmetic is 130-digit Decimal with a floored mod (Decimal's `%` truncates), comfortably resolving distances around $10^(-27)$.
+
+The recursion is verified against literal scans for 300 random $(t, c, N)$; the full solver against literal scans over $|b| <= 3000$ for every $d$; and all four given facts, including $I_2 ("BQA"_2 (pi, 10^13)) = -6188084046055$, are asserted.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=592")[= Problem 592: Factorial Trailing Digits 2]
+
+Solution: 13415DF2BE9C
+
+$f(N)$ is the last twelve hexadecimal digits of $N!$ before the trailing zeroes; we need $f(20!)$ with $20! approx 2.4 dot 10^18$.
+
+Write $N! = 2^v m$ with $m$ odd and $v = sum_(i>=1) floor(N\/2^i)$; the trailing hex zeroes number $floor(v\/4)$, so $f(N) = m dot 2^(v mod 4) mod 2^48$. The odd part factors as $m = product_(i>=0) "OF"(floor(N\/2^i))$ with $"OF"(R)$ the product of odd $j <= R$, so everything reduces to $"OF"(R) mod 2^56$ for huge $R$.
+
+$"OF"$ is computed 2-adically: every $j equiv 3 mod 4$ is replaced by $-j$ (tracking the sign $(-1)^(floor((R+1)\/4))$), leaving units $u equiv 1 mod 4$ where $log u = sum_(m>=1) (-1)^(m+1)(u-1)^m\/m$ converges with $v_2 >= 2m - v_2(m)$, so truncating at $m = 34$ is exact mod $2^56$. The sum of $(u-1)^m$ over each arithmetic progression up to $R$ expands binomially into exact power sums $sum t^i$ (Pascal recursion, big integers); divisions by $m$ and by $t!$ in the exponential are exact 2-adic operations, and $exp(L) = sum L^t\/t!$ terminates at $t + s_2(t) >= 56$ since $4 | L$. The whole computation is a few dozen polynomial sums and runs in 0.1 s.
+
+$"OF"$ is verified against literal products mod $2^56$ for various $R <= 1.3 dot 10^5$, and $f$ against actual factorials with zeroes stripped for $N = 20$ (the given 21C3677C82B4), 21, 25, 50, 100 and 1000.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=593")[= Problem 593: Fleeting Medians]
+
+Solution: 96632320042.0
+
+With $S(k) = p_k^k mod 10007$ ($p_k$ the $k$-th prime) and $S_2(k) = S(k) + S(floor(k\/10000) + 1)$, $F(n, k)$ sums the medians of all length-$k$ sliding windows of $S_2$; we need $F(10^7, 10^5)$.
+
+The values $S_2$ are confined to $0..2 dot 10006$, so a window is just a counting distribution over about $20000$ buckets. A Fenwick tree over the value range gives $O(log)$ insert and delete as the window slides and $O(log)$ selection of the $r$-th smallest via binary lifting; with the even window length the median is the mean of the $k\/2$-th and $(k\/2+1)$-th order statistics, so the code accumulates twice the median sum as an exact integer and halves at the end with `.0`/`.5` formatting.
+
+Building $S$ needs the first $10^7$ primes ($p_(10^7) = 179424673$) and a modular power each, with the exponent reduced to $k mod 10006$ by Fermat ($10007$ is prime; the prime $10007$ itself maps to $0$). The sliding machinery is cross-checked against sort-the-window medians on a $3000$-element prefix, and the given $M(1,10) = 2021.5$, $M(10^2,10^3) = 4715.0$, $F(100,10) = 463628.5$ and $F(10^5,10^4) = 675348207.5$ are all asserted.
 
 #pagebreak()
 #link("https://projecteuler.net/problem=600")[= Problem 600: Integer Sided Equiangular Hexagons]
@@ -3452,6 +4168,26 @@ $
 with the successors $t$ being the values whose minimal string is $"minimal"(s)$ plus one letter. This yields $319.30207833$.
 
 #pagebreak()
+#link("https://projecteuler.net/problem=611")[= Problem 611: Hallway of Square Steps]
+
+Solution: 49283233900
+
+Door $n$ is toggled once for every pair $0 < i < j$ with $i^2 + j^2 = n$, so it ends open iff $r(n) = \#{(i, j) : 0 < i < j, thick i^2 + j^2 = n}$ is odd; $F(N)$ counts such $n <= N$ and we need $F(10^12)$.
+
+== Parity of the representation count
+
+Write $n = 2^a product p^e product q^f$ with $p equiv 1$, $q equiv 3 (mod 4)$, and $B = product (e + 1)$. The lattice-point formula $r_2(n) = 4B$ (all $f$ even, else $0$), refined by separating the $i = 0$ and $i = j$ points, gives $r(n) = (B - s)\/2$ with $s = [n "is a square"] + [n\/2 "is a square"]$ — so $r(n)$ is odd iff $B equiv 2 + s (mod 4)$. Two clean families result:
+
+- $B equiv 2 (mod 4)$ (forcing $s = 0$): exactly one $p$ carries an odd exponent, which must be $equiv 1 (mod 4)$; uniquely $n = 2^a p^(4t+1) m^2$ with $m$ odd and $p$ coprime to $2m$.
+- $B equiv 3 (mod 4)$ with $s = 1$: $n = 2^a m^2$ with $m$ odd and an odd number of primes $equiv 1 (mod 4)$ dividing $m$ to an odd power.
+
+== Counting
+
+The second family is a direct smallest-prime-factor sieve over $m <= 10^6$ with prefix counts. The first needs $pi_1(X)$, the count of primes $equiv 1 (mod 4)$ up to $X = N\/(2^a m^2)$ — all quotients of $N$ — supplied by a Lucy–Hedgehog sieve split over the residue classes $1$ and $3$ modulo $4$ (only odd numbers live in the classes, so sieving starts at $p = 3$); the rare $t >= 1$ prime powers use the explicit small-prime list, with care that $p^5$ already overflows 64-bit arithmetic for $p$ near $10^6$. About nine seconds in `numba`.
+
+Checks: $F(5) = 1$, $F(100) = 27$, $F(1000) = 233$, $F(10^6) = 112168$ as given, plus a brute-force door-toggling simulation compared at several cutoffs.
+
+#pagebreak()
 #link("https://projecteuler.net/problem=612")[= Problem 612: Friend Numbers]
 
 Solution: 819963842
@@ -3513,6 +4249,79 @@ $
 computed by collecting the distinct perfect powers in a set and subtracting the prime-power-of-a-prime values and the lone exception $16$.
 
 #pagebreak()
+#link("https://projecteuler.net/problem=617")[= Problem 617: Mirror Power Sequence]
+
+Solution: 1001133757
+
+An $(n,e)$-MPS is an infinite sequence with $a_(i+1) = min(a_i^e, n - a_i^e)$ and all $a_i > 1$, determined by $(n, e, a_0)$; $C(n)$ counts them over all $e$ and we need $D(10^18) = sum_(n <= 10^18) C(n)$.
+
+== Cycles have exactly one reflection
+
+A surviving orbit alternates strictly increasing power runs $x -> x^e$ with reflections $x -> n - x^e$, so it ends in a cycle. A cycle with two reflections would force $m^(e^a) - m = r^(e^b) - r$ with $m != r$ and both exponents powers of the same $e$; the convexity gap $x^E - (x-1)^E >= 2(x - 1)$ rules this out. Every cycle is therefore $b -> b^e -> dots -> b^(e^(k-1)) -> b$ with
+$
+n = b + b^(e^k),
+$
+valid for all $b, e >= 2$, $k >= 1$ (the min-mode conditions hold automatically), and contributing $k$ sequences — one per starting rotation. Magnitude comparisons show distinct $(b, e, k)$ never collide.
+
+== Transients are root chains only
+
+Backward from the cycle, the only predecessors are $e$-th-root chains below the base: starts $a_0 = c$ with $c^(e^t) = b$, i.e. $n = c^(e^t) + c^(e^(t+k))$, one sequence per $(c >= 2, t >= 1)$. Reflection-type predecessors never exist: for any surviving $v$, the value $n - v$ falls strictly between consecutive $e$-th powers (a window argument around $b^(e^(k-1))$, resp. the chain top), so it is never a perfect power. Hence
+$
+D(N) = sum_(e >= 2, k >= 1) [k dot \#{b : b + b^(e^k) <= N} + \#{(c, t) : c^(e^t) + c^(e^(t+k)) <= N}],
+$
+a few hundred integer-root counts. Checks: a brute-force orbit-survival simulation for all $n <= 3000$ agrees exactly, as do the given $D(10) = 2$, $D(100) = 21$, $D(1000) = 69$, $D(10^6) = 1303$ and $D(10^12) = 1014800$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=618")[= Problem 618: Numbers with a Given Prime Factor Sum]
+
+Solution: 634212216
+
+$S(k)$ sums every $n$ whose prime factors (with multiplicity) add to $k$, e.g. $S(8) = 15 + 16 + 18 = 49$; we need $sum_(k=2)^24 S(F_k) mod 10^9$ with $F_24 = 46368$.
+
+Each $n >= 2$ is, uniquely, a multiset of primes, so $S$ is an unbounded-knapsack sum over the primes up to $46368$. Start from $f[0] = 1$ (the empty product) and for each prime $p$ apply, with $k$ increasing,
+$
+f[k] <- f[k] + p dot f[k - p].
+$
+Increasing $k$ lets a prime repeat; processing primes one at a time counts each multiset once. Afterwards $f[k] = S(k)$, with all arithmetic modulo $10^9$ since only the last nine digits matter. Checks: $S(5) = 11$ and $S(8) = 49$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=619")[= Problem 619: Square Subsets]
+
+Solution: 857810883
+
+$C(a, b)$ counts the non-empty subsets of ${a, a+1, dots, b}$ whose product is a perfect square; we need $C(10^6, 1234567) mod (10^9 + 7)$.
+
+== Rank over $"GF"(2)$
+
+Map each element to the vector of its prime exponents mod $2$ (its squarefree kernel). A product is square exactly when the chosen vectors XOR to zero, so with $N = b - a + 1$ elements and $r$ the rank of the vectors, the subsets with square product form a $"GF"(2)$ kernel of dimension $N - r$ and
+$
+C(a, b) = 2^(N - r) - 1.
+$
+
+== Large primes pivot first
+
+Factor every element with a smallest-prime-factor sieve. A prime above $sqrt(1234567) approx 1111$ can only appear to the first power and at most once per element, so eliminate those greedily: the first element seen containing large prime $p$ becomes the pivot for $p$ (adding one to the rank), and any later element containing $p$ is XORed against that pivot, leaving a vector over only the $186$ primes up to $1111$. Each such vector fits in one machine-word-scale bitmask and feeds an ordinary binary linear basis. Checks: $C(5, 10) = 3$, $C(40, 55) = 15$, and $C(1000, 1234) = 975523611$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=621")[= Problem 621: Expressing an Integer as the Sum of Triangular Numbers]
+
+Solution: 11429712
+
+$G(n)$ counts ordered triples of triangular numbers (including $T_0 = 0$) summing to $n$; we need $G(17526 dot 10^9)$.
+
+== Three odd squares
+
+Completing the square, $n = T_a + T_b + T_c$ exactly when $8n + 3 = (2a+1)^2 + (2b+1)^2 + (2c+1)^2$, and every representation of $m = 8n + 3 equiv 3 (mod 8)$ as three squares is automatically all-odd and zero-free, so $G(n) = r_3(m) \/ 8$, the positive ordered triples. Fixing the first square,
+$
+G(n) = sum_(x "odd", x^2 <= m - 2) P(m - x^2),
+$
+where $P(r)$ counts ordered pairs of positive odd $y, z$ with $y^2 + z^2 = r$. Each $r equiv 2 (mod 4)$ forces both coordinates odd, so Jacobi's two-square theorem gives $P(r) = r_2(r)\/4 = d_1(r) - d_3(r)$: the multiplicative function with factor $(e + 1)$ at $p equiv 1 (mod 4)$, factor $[e "even"]$ at $p equiv 3 (mod 4)$, and factor $1$ at $p = 2$. Sanity check: $G(9) = 7$ by hand.
+
+== A quadratic polynomial sieve
+
+Evaluating $d_1 - d_3$ needs the factorisation of all $3.4$ million values $r(x) = m - x^2$, which a polynomial sieve does collectively: for each odd prime $p <= sqrt(max r)$, solve $x^2 equiv m (mod p)$ by Tonelli–Shanks (skipping non-residues), convert the two roots into index progressions over the odd-$x$ grid, and at each hit divide out the full power of $p$ while updating the multiplicative factor. Whatever remains after sieving is $1$ or a single prime with exponent $1$. The whole computation is a few seconds under `numba`. Checks: $G(1000) = 78$ and $G(10^6) = 2106$.
+
+#pagebreak()
 #link("https://projecteuler.net/problem=622")[= Problem 622: Riffle Shuffles]
 
 Solution: 3010983666182123972
@@ -3522,6 +4331,41 @@ $
 s(n) = "ord"_(n-1)(2).
 $
 We want the sum of all $n$ with $s(n) = 60$. Setting $m = n - 1$ (odd), the condition is $"ord"_m(2) = 60$: equivalently $m | 2^60 - 1$ while $m$ divides none of $2^t - 1$ for the maximal proper divisors $t in {30, 20, 12}$ of $60$ (any proper divisor of $60$ divides one of these). Every divisor of $2^60 - 1$ is odd, so $n = m + 1$ is automatically even. We factor $2^60 - 1 = 3^2 dot 5^2 dot 7 dot 11 dot 13 dot 31 dot 41 dot 61 dot 151 dot 331 dot 1321$, enumerate its divisors, keep those of exact order $60$, and sum $n = m + 1$. The analogous computation reproduces the given $s(n) = 8$ total of $412$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=623")[= Problem 623: Lambda Count]
+
+Solution: 3679796
+
+$Lambda(n)$ counts closed lambda-terms writable with at most $n$ symbols (parentheses, $lambda$, dot and variables), up to $alpha$-equivalence; we need $Lambda(2000) mod (10^9 + 7)$.
+
+Counting symbols gives the sizes: a variable is $1$, an application $(M space N)$ adds $2$, and an abstraction $(lambda x. M)$ adds $5$ — consistent with $Lambda(6) = 1$, the lone term $(lambda x.x)$. $alpha$-classes are counted de-Bruijn style by $T(s, m)$, the number of terms of size $s$ whose free variables are drawn from $m$ enclosing binders:
+$
+T(s, m) = m[s = 1] + T(s - 5, m + 1) + sum_a T(a, m) thin T(s - 2 - a, m),
+$
+the three summands being variables, abstractions and applications. Each extra binder costs $5$ symbols, so only states with $5m + s <= n$ matter; computing $m = n\/5$ down to $0$ makes the convolution about $n^3 \/ 30 approx 2.7 dot 10^8$ modular products, quick under `numba`. The answer is $sum_s T(s, 0)$. Checks: $Lambda(9) = 2$, $Lambda(15) = 20$, $Lambda(35) = 3166438$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=624")[= Problem 624: Two Heads Are Better Than One]
+
+Solution: 984524441
+
+A fair coin is tossed until the first $H H$, ending at toss $M$; $P(n)$ is the probability that $n | M$, and $Q(P(n), p)$ reduces the rational $P(n)$ modulo $p$. We need $Q(P(10^18), 10^9 + 9)$.
+
+== A Fibonacci tail and two geometric series
+
+The first $H H$ ends exactly at toss $m$ with probability $F(m-1) \/ 2^m$: the first $m - 3$ tosses avoid $H H$ and are followed by $T H H$, and length-$j$ strings without $H H$ are counted by a Fibonacci recurrence. So
+$
+P(n) = sum_(k >= 1) F(k n - 1) / 2^(k n).
+$
+Binet's formula $F(m) = (phi^m - psi^m) \/ sqrt(5)$ splits this into two geometric series: with $u = (phi\/2)^n$ and $v = (psi\/2)^n$,
+$
+P(n) = 1/sqrt(5) ( u / (phi (1 - u)) - v / (psi (1 - v)) ).
+$
+
+== Evaluating in $"GF"(p)$
+
+$5$ is a quadratic residue modulo $p = 10^9 + 9$ (surely why that modulus was chosen), so $sqrt(5)$, $phi$, $psi$ and the whole closed form live in the field; the square root comes from Tonelli–Shanks and divisions from Fermat inverses. $Q$ is then just the residue taken in $1 dots p - 1$. The same code checks $Q(P(2), 109) = 66$ and $Q(P(3), 109) = 46$, and reproduces $P(2) = 3\/5$, $P(3) = 9\/31$ modulo $10^9 + 9$.
 
 #pagebreak()
 #link("https://projecteuler.net/problem=625")[= Problem 625: Gcd Sum]
@@ -3541,6 +4385,401 @@ $
 evaluated bottom-up with a $phi$-sieve for small arguments, all modulo the prime. The whole computation is $O(N^(3\/4))$. Checks: $G(10) = 122$, $G(1000) = 2475190$, $G(10^4) = 317257140$.
 
 #pagebreak()
+#link("https://projecteuler.net/problem=626")[= Problem 626: Counting Binary Matrices]
+
+Solution: 695577663
+
+$c(n)$ counts $n times n$ binary matrices up to row/column swaps and row/column complementations; we need $c(20) mod 1001001011$.
+
+== Burnside over the hyperoctahedral pair
+
+The group is $G = B_n times B_n$ with $B_n = S_n times.l ZZ_2^n$, $|G| = (2^n n!)^2$. For an element with row cycles $(a, p)$ and column cycles $(b, q)$ ($p, q$ the flip parities), each cycle pair splits its cells into $gcd(a, b)$ orbits, and a fixed matrix exists on them iff the accumulated flip $(b\/g) p + (a\/g) q$ is even — each consistent cell orbit contributing a factor $2$. In 2-adic terms: equal valuations $v_2(a) = v_2(b)$ force $p = q$; otherwise the cycle of larger valuation must have parity $0$. Globally, with $m_r, m_c$ the minimal valuations per side: if $m_r = m_c$ every cycle of minimal valuation shares one free parity bit and all others are forced to $0$ ($N = 2$ patterns); if $m_r < m_c$ all column parities are forced and exactly the row cycles of valuation $< m_c$ stay free ($N = 2^"count"$).
+
+== Partition-pair sum
+
+For a fixed underlying permutation each parity pattern arises from $2^(n - \#"cycles")$ sign vectors, so Burnside collapses to a sum over pairs of partitions of $20$ ($627^2$ pairs):
+$
+c(n) (2^n n!)^2 = sum A(lambda_r) A(lambda_c) thin 2^(2n - k_r - k_c) thin N thin 2^(sum_(i,j) gcd(a_i, b_j)),
+$
+evaluated exactly in Python integers ($2^400$-sized terms) and divided exactly by $|G|$ before reducing modulo the composite $1001001011$. Checks: brute-force orbit enumeration for $n <= 3$ and all nine given values $c(1) dots c(9)$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=628")[= Problem 628: Open Chess Positions]
+
+Solution: 210286684
+
+$n$ pawns sit one per row and column of an $n times n$ board; a position is open when a rook can travel from the empty lower-left corner to the upper-right corner moving only right or up. $f(3) = 2$ and $f(5) = 70$; we need $f(10^8) mod 1008691207$.
+
+== Anti-diagonal walls are the only obstructions
+
+A monotone rook path threads through the columns at non-decreasing heights. Tracking how the set of feasible heights evolves column by column shows a wall must lose exactly one row of clearance per column to stay tight — so the only way a permutation can block _every_ path is a solid anti-diagonal in a corner: pawns at $(r - j, j)$ for $j = 0 dots r$ (sealing the lower-left), or the mirror image sealing the upper-right. This characterisation is confirmed against a brute-force path search for all $n <= 9$.
+
+== Inclusion–exclusion
+
+Two walls of different sizes in the same corner would demand two pawns in one column, so each family is a disjoint union; a lower-left wall of size $r + 1$ coexists with an upper-right wall of size $s + 1$ exactly when $r + s <= n - 2$, the lone exception being the full anti-diagonal, which belongs to both families at once. Hence
+$
+"blocked"(n) = 2 sum_(k=0)^(n-1) k! - (sum_(r+s <= n-2) (n - 2 - r - s)! + 1),
+$
+and after telescoping $sum j dot j! = (n-1)! - 1$, with $S(m) = sum_(k <= m) k!$,
+$
+f(n) = n! - 2 S(n-1) + (n-1) S(n-2) - (n-1)! + 2.
+$
+One streaming pass produces $n!$, $S(n-1)$ and $S(n-2)$ modulo $1008691207$ — no divisions, so the modulus needn't be prime.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=629")[= Problem 629: Scatterstone Nim]
+
+Solution: 626616617
+
+A move splits one pile into between $2$ and $k$ non-empty piles; $f(n, k)$ counts the partitions of $n$ that are first-player wins, and $g(n) = sum_(k=2)^n f(n, k)$; we need $g(200) mod (10^9 + 7)$.
+
+== Three Grundy regimes
+
+A position wins iff the XOR of its piles' Grundy values is nonzero, so $f(n, k) = p(n) - Z_k(n)$ with $Z_k$ the count of XOR-zero partitions. The single-pile Grundy function has three regimes. For $k = 2$ every move adds exactly one pile, fixing the game length, so $G_2(m) = (m - 1) mod 2$. For $k = 3$ there is no closed form; an exact mex DP tracks the set of achievable split-XORs as a $256$-bit mask, appending one part at a time (XOR by $G(t)$ permutes the bits of a set-mask). For $k >= 4$, $G_k(m) = m - 1$: inductively any split into $j$ parts has XOR at most $sum (p_i - 1) = m - j <= m - 2$, while the $k = 4$ moves already realise every value $0 dots m - 2$ (verified by the exact DP up to $200$); larger $k$ only adds moves under the same bound, so the mex is unchanged.
+
+== Counting partitions by XOR
+
+A knapsack over pile sizes counts partitions by their Grundy-XOR: even multiplicities of a size $s$ form an XOR-neutral step-$2s$ closure, plus an optional odd copy contributing $G(s)$. Then
+$
+g(n) = (n - 1) p(n) - Z_2(n) - Z_3(n) - (n - 3) Z_(>=4)(n),
+$
+exact in Python integers ($p(200) approx 4 dot 10^12$). Checks: $f(5, 2) = 3$, $f(5, 3) = 5$, $g(7) = 66$, $g(10) = 291$, and agreement with brute per-$k$ Grundy tables for every $n <= 30$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=630")[= Problem 630: Crossed Lines]
+
+Solution: 9669182880384
+
+From $2500$ pseudo-random points, $L$ is the set of distinct lines through pairs of points, $M(L)$ its size, and $S(L)$ the total number of crossings over all lines (each crossing pair counted from both sides). We need $S(L_2500)$.
+
+Canonicalise the line through $(x_1, y_1)$ and $(x_2, y_2)$ as $A x + B y = C$ with $A = y_2 - y_1$, $B = x_1 - x_2$, $C = A x_1 + B y_1$, divided through by $gcd(A, B, C)$ with the first nonzero of $(A, B)$ made positive; distinct triples are then exactly distinct lines. Two distinct lines cross unless parallel, so
+$
+S(L) = M(M - 1) - sum_d c_d (c_d - 1),
+$
+where $c_d$ counts the lines in parallel class $d = (A, B) \/ gcd(A, B)$, sign-fixed. Packing each triple into one $64$-bit key turns the $3.1$ million point pairs into two `numpy` unique scans. Checks: $M(L_3) = 3$, $S(L_3) = 6$, $M(L_100) = 4948$, $S(L_100) = 24477690$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=634")[= Problem 634: Numbers of the Form $a^2 b^3$]
+
+Solution: 4019680944
+
+$F(N)$ counts the integers up to $N = 9 dot 10^18$ expressible as $a^2 b^3$ with $a, b >= 2$, each counted once. Split by whether $n$ is a perfect square.
+
+== Non-squares
+
+If $n = a^2 b^3$ has an odd prime exponent then the representation with $b$ squarefree is forced ($b$ is the product of the odd-exponent primes) and unique, and any odd exponent of $a^2 b^3$ is automatically $>= 3$, so it exists. Squarefree $b >= 2$ exactly captures the non-squares; $a >= 2$ must still be demanded since a squarefree cube $b^3$ admits no other representation. Hence the non-square count is
+$
+A = sum_(b >= 2 "squarefree") max(0, floor(sqrt(N \/ b^3)) - 1),
+$
+a sum over $b$ up to $(N\/4)^(1\/3) approx 1.3 dot 10^6$ with exact integer square roots.
+
+== Squares
+
+$n = m^2$ is expressible iff $b$ is itself a square $c^2$ (as $b^3 = n \/ a^2$ is a square), i.e. iff $m = a c^3$ with $a, c >= 2$. Distinct $m <= M = sqrt(N)$ give distinct $n$, so count the $m$ having a cube divisor $c^3 >= 8$ with cofactor $>= 2$. Having any cube divisor $c >= 2$ is the same as not being cubefree, and the only non-cubefree $m$ where every witness fails ($m = c^3$ forced, no proper divisor $2 <= d < c$) are the cubes of primes:
+$
+B = (M - sum_(d <= M^(1\/3)) mu(d) floor(M / d^3)) - pi(M^(1\/3)).
+$
+$F(N) = A + B$. Checks: $F(100) = 2$, $F(2 dot 10^4) = 130$, $F(3 dot 10^6) = 2014$, plus a brute force agreeing for every $N <= 3000$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=635")[= Problem 635: Subset Sums]
+
+Solution: 689294705
+
+$A_q(n)$ counts the $n$-element subsets of ${1, dots, q n}$ with sum divisible by $n$; we need $S_2(10^8) + S_3(10^8) mod (10^9 + 9)$ where $S_q(L) = sum_(p <= L "prime") A_q(p)$.
+
+== Roots-of-unity filter
+
+For a primitive $d$-th root of unity $omega$ with $d | n$, each residue class mod $d$ appears $q n \/ d$ times among $1 dots q n$, so the subset generating function collapses: $product_(k=1)^(q n)(1 + z omega^k) = (1 - (-z)^d)^(q n \/ d)$, whose $z^n$ coefficient is $plus.minus binom(q n \/ d, n \/ d)$. Averaging over the $n$ filters and grouping by order $d$ gives, for an odd prime $p$,
+$
+A_q (p) = 1/p (binom(q p, p) + (p - 1) q),
+$
+and $A_q(2) = (binom(2q, 2) - q) \/ 2$. Both match brute force, and $S_2(10) = 554$.
+
+== Binomials at five million primes
+
+The remaining work is $binom(2p, p)$ and $binom(3p, p)$ modulo $10^9 + 9$ for every prime $p <= 10^8$. Stream the factorial $k!$ once for $k$ up to $3 dot 10^8$, recording its value whenever $k$ hits $p$, $2p$ or $3p$ for a prime $p$ (three pointer walks over the already-sorted multiples), then assemble each binomial from the recorded factorials with two Fermat inversions. About $3 dot 10^8$ modular products in total under `numba`. Check: $S_2(100) + S_3(100) = 100433628 + 855618282$ modulo $10^9 + 9$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=637")[= Problem 637: Flexible Digit Sum]
+
+Solution: 49000634845039
+
+One step inserts plus signs into the base-$B$ digits of $n$ and adds; $f(n, B)$ is the least number of steps to reach a single digit, and $g(n, B_1, B_2)$ sums the $i <= n$ with $f(i, B_1) = f(i, B_2)$. We need $g(10^7, 10, 3)$.
+
+== Classifying $f$
+
+Merging adjacent digits $a, b$ changes a split sum by $a(B - 1) >= 0$, so the plain digit sum is the _minimum_ split sum. Hence $f(i, B) = 1$ exactly when $d s_B (i) < B$, and $f(i, B) = 2$ exactly when some proper split sum $v$ has $d s_B (v) < B$. Moreover $f$ never exceeds $3$ in range: the finest split gives $f(i) <= 1 + f(d s_B (i))$, the digit sums are at most $70$ (base $10$) and $30$ (base $3$), and every value that small has $f <= 2$ — the smallest base-$3$ number with $f = 3$ is $1781$.
+
+== The exists-test
+
+Classification therefore reduces to an existence test over proper splits: a DFS over cut positions accumulates completed parts and exits as soon as a finished split's sum lands in the precomputed table of "digit sum $< B$" values, trying single-digit parts first since the finest splits hit most often. Base $10$ has at most $2^7$ splits per number; base $3$ up to $2^14$, but a third of all $i$ resolve instantly through the digit-sum precheck, nearly all the rest exit within a few nodes, and full traversals occur only for the very rare $f = 3$ numbers (ten of them below $3^11$, with striking digit patterns like $1, 2, 0, dots, 0, 2, 2, 2, 2, 2$). Checks: $g(100, 10, 3) = 3302$ as given, and both classifiers agree with a brute-force recursive $f$ for every $i <= 3^10$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=638")[= Problem 638: Weighted Lattice Paths]
+
+Solution: 18423394
+
+$C(a, b, k)$ sums $k^(A(P))$ over the monotone lattice paths $P$ of an $a times b$ grid, $A$ being the enclosed area; we need $sum_(k=1)^7 C(10^k + k, 10^k + k, k) mod (10^9 + 7)$.
+
+Summing $q^("area")$ over lattice paths is the combinatorial definition of the Gaussian binomial coefficient,
+$
+C(a, b, k) = binom(a + b, a)_q |_(q = k) = product_(i=1)^(a) (1 - q^(b + i)) / (1 - q^i) quad (q != 1),
+$
+and which side of the path carries the area is immaterial (transposing the grid swaps the conventions without changing the sum). Each factor uses the next power of $q$, so a running power and running product evaluate the whole thing in $O(a)$ modular multiplications with one Fermat inversion at the end. No factor vanishes modulo $p = 10^9 + 7$: the order of $q$ divides $p - 1 = 2 dot 500000003$, far beyond $2 dot 10^7 + 14$. The $k = 1$ term is the plain central binomial. Checks: brute-force path enumeration on small grids, and the given $C(10000, 10000, 4) equiv 395913804$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=639")[= Problem 639: Summing a Multiplicative Function]
+
+Solution: 797866893
+
+$f_k$ is multiplicative with $f_k (p^e) = p^k$ for every $e >= 1$; we need $sum_(k=1)^(50) S_k (10^12) mod (10^9 + 7)$ with $S_k (n) = sum_(i <= n) f_k (i)$.
+
+== Convolving off the powerful part
+
+Write $f_k = "id"_k * c_k$ (Dirichlet convolution). Matching prime powers gives $c_k (p) = 0$ and $c_k (p^e) = p^k - sum_(i=1)^(e) p^(i k) c_k (p^(e-i))$, so $c_k$ is supported on _powerful_ numbers — only about $2.4 dot 10^6$ of them lie below $10^12$. Then
+$
+S_k (N) = sum_("powerful" m <= N) c_k (m) dot P_k (floor(N\/m)), quad P_k (x) = sum_(i <= x) i^k.
+$
+
+== Evaluation
+
+For each $k$, a DFS over primes $p <= 10^6$ generates every powerful $m$ together with its running $c_k$-product, the prime-power values produced on the fly from the recurrence. Quotients below $10^6$ hit a precomputed prefix-power table; the roughly $2400$ powerful $m < 10^6$ have large quotients, for which $P_k$ — a polynomial of degree $k + 1$ — is evaluated by Lagrange interpolation from $k + 2$ sample points. Fifteen seconds in `numba` for all fifty $k$.
+
+Checks: the given $S_1(10) = 41$, $S_1(100) = 3512$, $S_2(100) = 208090$, $S_1(10^4) = 35252550$ and $sum_(k <= 3) S_k (10^8) equiv 338787512$, plus a brute-force multiplicative sieve for $n <= 10^5$, $k <= 4$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=640")[= Problem 640: Shut the Box]
+
+Solution: 50.317928
+
+Bob rolls two dice $(x, y)$ each turn and must toggle card $x$, card $y$, or card $x + y$ among twelve cards, winning when all are face down; we need the expected number of turns under the optimal strategy, to six decimals.
+
+The game is a $4096$-state Markov decision process over bitmasks of face-down cards. The optimal expectation satisfies
+$
+E[s] = 1 + 1/36 sum_("rolls") min_(a in {x, y, x+y}) E[s xor 2^(a-1)], quad E["goal"] = 0,
+$
+a stochastic shortest-path problem solved by Gauss–Seidel value iteration (sweeping states in place) until values move by less than $10^(-13)$. Toggling makes revisits possible, but the optimal policy reaches the goal with probability bounded away from zero each turn, so iteration converges geometrically. Alice's analogue — four cards, two fair coins valued $1$ or $2$ — is the same MDP in miniature; reproducing her given optimum $5.673651$ validates the solver, alongside a Monte-Carlo simulation of the computed greedy policy.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=641")[= Problem 641: A Long Row of Dice]
+
+Solution: 793525366
+
+$n = 10^36$ dice all start showing $1$; for $j = 2 dots n$ every $j$-th die is turned (incrementing its face, with $6$ wrapping to $1$). $f(n)$ counts the dice showing $1$ at the end.
+
+== Reduction to a divisor condition
+
+Die $i$ is turned $d(i) - 1$ times, so it ends on $1$ iff $d(i) equiv 1 (mod 6)$. Odd $d$ forces $i = m^2$, and with $m = product p^e$, $d(i) = product (2e + 1)$, whose factors are $1, 0, 2 mod 3$ according to $e equiv 0, 1, 2 (mod 3)$. So the condition is: every exponent of $m$ avoids $e equiv 1 (mod 3)$ (in particular $m$ is powerful) and the number of exponents with $e equiv 2 (mod 3)$ is even.
+
+== Bijection and Mertens
+
+Each allowed exponent decomposes uniquely as $e = 2u + 3v$ with $u in {0, 1}$, giving a bijection $m <-> a^2 b^3$ with $a$ squarefree, where $u$-parity is $mu(a)$. With $Y = sqrt(10^36) = 10^18$,
+$
+A(Y) = sum_(b^3 <= Y) Q(floor(sqrt(Y\/b^3))), quad B(Y) = sum_(b^3 <= Y) M(floor(sqrt(Y\/b^3))), quad f = (A + B)/2,
+$
+with $Q$ the squarefree count and $M$ the Mertens function. $Q(z) = sum_(d^2 <= z) mu(d) floor(z\/d^2)$ costs $(Y\/b^3)^(1\/4)$ per term — about $4 dot 10^6$ operations in all. A sieved Mertens table to $4 dot 10^7$ covers every $b >= 9$; the eight larger arguments (up to $10^9$) use the classic quotient-block recursion $M(x) = 1 - sum_(k >= 2) M(floor(x\/k))$ with memoisation. Checks: $f(100) = 2$ and $f(10^8) = 69$ as given, plus a brute divisor-count sieve at several cutoffs up to $10^7$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=642")[= Problem 642: Sum of Largest Prime Factors]
+
+Solution: 631499044
+
+$F(N) = sum_(i=2)^N f(i)$ with $f$ the largest prime factor; we need $F(201820182018) mod 10^9$.
+
+== Three regimes
+
+Grouping $i = p m$ by its largest prime gives $F(N) = sum_p p dot Psi(N\/p, p)$ with $Psi(y, p)$ counting the $p$-smooth $m <= y$. A Lucy–Hedgehog sieve over the quotient lattice supplies the prime-counting function $pi(v)$ and the prime-sum function $S(v)$ (kept modulo $10^9$ — the sieve uses only ring operations) at every $v = floor(N\/k)$. Then:
+
+- For $p > sqrt(N)$ every $m <= N\/p < p$ is automatically smooth, so the contribution is $p floor(N\/p)$, summed in quotient blocks against $S$.
+- For $root(3, N) < p <= sqrt(N)$ we have $p^2 >= N\/p$, so a non-smooth $m <= N\/p$ contains exactly one prime $q > p$, with multiplicity one and cofactor below $p$: $Psi(N\/p, p) = floor(N\/p) - sum_(p < q <= N\/p) floor(N\/(p q))$, evaluated in quotient blocks against $pi$. Because the block count per prime is only $N\/p^2$, all these walks total a few million steps.
+- The handful of primes with $p^3 <= N$ (up to $5865$, about $770$ of them) are handled by an in-place ascending array DP over the same lattice, applying $Psi(v, p) = Psi(v, "prev") + Psi(v\/p, p)$ one prime at a time and reading off $Psi(N\/p, p)$ after each.
+
+Checks: the given $F(10) = 32$, $F(100) = 1915$, $F(10^4) = 10118280$, plus agreement with a brute-force largest-prime-factor sieve at several irregular cutoffs up to $10^7$. Runs in about ten seconds.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=643")[= Problem 643: $2$-Friendly]
+
+Solution: 968274154
+
+$f(n)$ counts pairs $1 <= p < q <= n$ with $gcd(p, q) = 2^t$, $t > 0$; we need $f(10^11) mod (10^9 + 7)$.
+
+== Reducing to the totient summatory function
+
+$gcd(p, q) = 2^t$ exactly when $p = 2^t p'$, $q = 2^t q'$ with $gcd(p', q') = 1$, so with $Phi(m) = sum_(k <= m) phi(k)$ and the coprime pairs $p' < q' <= m$ numbering $sum_(q' = 2)^m phi(q') = Phi(m) - 1$,
+$
+f(n) = sum_(t >= 1) (Phi(floor(n / 2^t)) - 1).
+$
+
+== Sublinear $Phi$
+
+Pairing each fraction $p\/q$ in lowest terms with all its multiples gives the classic identity $sum_(d >= 1) Phi(floor(n\/d)) = n(n+1)\/2$, hence the recursion
+$
+Phi(n) = (n(n+1)) / 2 - sum_(d = 2)^(n) Phi(floor(n / d)),
+$
+evaluated by grouping equal quotients, memoising, and reading arguments below $2 dot 10^7$ from a sieved prefix table — about $O(n^(2\/3))$ work. Every argument that ever appears is a quotient $floor(10^11 \/ k)$, so the cache is shared across all powers of two. Checks: $f(10^2) = 1031$ and $f(10^6) = 321418433$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=645")[= Problem 645: Every Day Is a Holiday]
+
+Solution: 48894.2174
+
+Each emperor's uniformly random birthday becomes a holiday, and any day flanked by two holidays becomes one too; $E(D)$ is the expected number of emperors until the whole $D$-day (circular) year is holidays. We need $E(10000)$ to four decimals.
+
+== Independent missed sets
+
+The flanking rule closes gaps of exactly one day, so the year completes precisely when no two cyclically adjacent days are both un-drawn: the missed set must be an independent set of the cycle $C_D$, of which there are $N_k = D/(D-k) binom(D-k, k)$ of size $k$. Conditioning on the exact missed set and counting surjections,
+$
+P(T <= t) = sum_k N_k dot "Surj"(t, D - k) \/ D^t.
+$
+
+== Collapsing the sums
+
+Summing $E[T] = sum_(t >= 0) P(T > t)$ turns each surjection term into a geometric series, leaving inner sums $sum_j (-1)^j binom(m, j) \/ (k + j)$, which the Beta-integral identity evaluates to $(k-1)! thin m! \/ (m+k)!$. Everything collapses to the closed form
+$
+E(D) = D H_D - D^2 sum_(k=1)^(floor(D\/2)) r_k / k, quad r_k = ((D-k-1)! thin (D-k)!) / ((D-2k)! thin D!),
+$
+with $r_1 = 1\/D$ and the ratio $r_(k+1) \/ r_k = (D-2k)(D-2k-1) \/ ((D-k)(D-k-1))$. Every term is positive — no cancellation — so extended-precision accumulation gives far more than four decimals. Checks: $E(2) = 1$, $E(5) = 31\/6$, $E(365) = 1174.3501$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=646")[= Problem 646: Bounded Divisors]
+
+Solution: 845218467
+
+$S(n, L, H)$ sums $lambda(d) dot d$ (Liouville function times divisor) over the divisors of $n$ in $[L, H]$; we need $S(70!, 10^20, 10^60) mod (10^9 + 7)$.
+
+$70!$ has about $3.5 dot 10^12$ divisors — far too many to enumerate — but its $19$ distinct primes split into two halves whose divisor counts are both near the square root, about $1.9 dot 10^6$ (the split greedily balances the product of exponent-plus-ones). Meet in the middle: every divisor factors uniquely as $d = a b$ across the halves, and $lambda(d) d = (lambda(a) a)(lambda(b) b)$. Sorting the $b$-side by value with exact-integer prefix sums of $lambda(b) b$, the constraint $L <= a b <= H$ becomes a contiguous window $[ceil(L\/a), floor(H\/a)]$ located by bisection on exact integers — no floating-point boundary risk — contributing $lambda(a) a$ times a prefix difference. All arithmetic stays in exact big integers, reduced only at the end, which also lets the given checks $S(10!, 100, 1000) = 1457$, $S(15!, 10^3, 10^5) = -107974$ and $S(30!, 10^8, 10^12) = 9766732243224$ be verified exactly.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=647")[= Problem 647: Linear Transformations of Polygonal Numbers]
+
+Solution: 563132994232918611
+
+For odd $k$ there exist positive integers $(A, B)$ with $A P_n + B$ always $k$-gonal; $F_k (N)$ sums $A + B$ over pairs with $max(A, B) <= N$, and we need $sum_k F_k (10^12)$ over all odd $k$.
+
+== Pell forces the family
+
+With $c = k - 2$ (odd), the $n$-th $k$-gonal number satisfies $8c P_n + (c-2)^2 = x^2$, $x = 2c n - (c - 2)$ — so $P$ is $k$-gonal exactly when that quantity is a square with $x equiv -(c-2) (mod 2c)$. If $A P + B$ is $k$-gonal for every $P_n$, then $y^2 = A x^2 + D$ must hold along a whole arithmetic progression of $x$; Pell orbits are exponentially sparse, so $A$ must be a perfect square $a^2$, and then $(y - a x)(y + a x) = D$ admits unboundedly many $x$ only when $D = 0$. Hence $B = (a^2 - 1)(c - 2)^2 \/ (8c)$ and the index congruence demands $2c | (a - 1)(c - 2)$. For odd $c$, $gcd(2c, c - 2) = 1$, so this is simply $a equiv 1 (mod 2c)$; writing $a = 2c t + 1$ makes the divisibility of $B$ automatic ($t(c t + 1)$ is always even), giving the complete family
+$
+A = (2c t + 1)^2, quad B = t(c t + 1)(c - 2)^2 \/ 2, quad t >= 1.
+$
+For $c = 1$ this is the classic triangular family $9T + 1$, $25T + 3$, $49T + 6$, …, and for $c = 3$ the pentagonal $49P + 2$.
+
+== Summation
+
+Enumerate odd $c$ and $t >= 1$ with $2c t + 1 <= 10^6$ and $B <= N$, summing $A + B$ exactly. Checks: an exhaustive brute-force search over $A, B <= 1200$ for $k = 3, 5, 7, 9, 11$ finds exactly the family, and the given $sum_k F_k (10^3) = 14993$ is reproduced.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=648")[= Problem 648: Skipping Squares]
+
+Solution: 301483197
+
+A sum starts at $0$ and repeatedly gains $+1$ with probability $rho$, else $+2$, stopping on a perfect square (or past $10^18$); $f(rho)$, the expected number of squares skipped, is a polynomial $sum_k a_k rho^k$, and we need $F(1000) = sum_(k <= 1000) a_k mod 10^9$.
+
+== Skip probabilities
+
+With $q = 1 - rho$, the chance the walk ever visits a point $d$ ahead solves a two-term recurrence with roots $1$ and $-q$: $h(d) = (1 + q(-q)^d)\/(1 + q)$. Skipping square $m^2$ — having just landed on $m^2 + 1$ — therefore has probability $1 - h(2m) = q(1 - q^(2m))\/(1 + q)$, and the first skip from $0$ has probability $q$, so
+$
+f = sum_(m >= 1) q^m / (1+q)^(m-1) product_(j=1)^(m-1) (1 - q^(2 j)).
+$
+
+== The denominators cancel
+
+Each factor $(1 - q^(2j))\/(1 + q) = (1 - q)(1 + q^2 + dots + q^(2j - 2))$, so
+$
+f = sum_(m >= 1) rho^(m-1) q^m product_(j=1)^(m-1) [j]_(q^2),
+$
+an all-integer series with no division — term $m$ starts at order $rho^(m-1)$, so modulo $rho^1001$ only $m <= 1001$ contribute (which is also why the $10^18$ cap never disturbs these coefficients), and the running product needs ever fewer terms as $m$ grows: about $sum (1001 - m)^2 approx 3 dot 10^8$ multiply-adds modulo $10^9$ in `numba`, a few seconds.
+
+Checks: $a_0 = 1$, $a_1 = 0$, $a_5 = -18$, $a_10 = 45176$, $F(10) = 53964$ and $F(50) equiv 842418857$, all as given.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=649")[= Problem 649: Low-Prime Chessboard Nim]
+
+Solution: 924668016
+
+$c$ distinguishable coins sit on an $n times n$ board; a move shifts one coin left or up by $2$, $3$, $5$ or $7$. $M(n, c)$ counts the starting arrangements that the first player wins; we need the last nine digits of $M(10000019, 100)$.
+
+Each coin is an independent impartial game — the sum of two copies of the one-dimensional subtraction game with set ${2, 3, 5, 7}$, whose Grundy sequence is periodic with period $9$: $(0, 0, 1, 1, 2, 2, 3, 3, 4)$ (verified against a direct mex computation). A coin on $(x, y)$ has Grundy value $g(x) xor g(y)$, and the first player wins exactly when the XOR over all coins is nonzero, so $M(n, c) = n^(2c) - \#{"XOR-zero arrangements"}$.
+
+The per-coin Grundy distribution is the XOR-convolution square of the per-axis distribution, and the $c$-fold XOR convolution evaluated at $0$ diagonalises under the Walsh–Hadamard transform over $(ZZ\/2)^3$:
+$
+\#"zero" = 1/8 sum_(s=0)^(7) w_s^c, quad w_s = sum_v (-1)^("popcount"(s and v)) "cnt"_2 [v].
+$
+Since the modulus $10^9$ is not prime, exact Python integers (the powers have only about $1400$ digits) sidestep the division by $8$. Checks: $M(3, 1) = 4$, $M(3, 2) = 40$, $M(9, 3) = 450304$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=650")[= Problem 650: Divisors of Binomial Product]
+
+Solution: 538319652
+
+With $B(n) = product_(k=0)^n binom(n, k)$ and $D(n) = sigma(B(n))$, we need $S(20000) = sum_(k <= 20000) D(k) mod (10^9 + 7)$.
+
+Writing each binomial in factorials collapses the product: $B(n) = (n!)^(n+1) \/ F(n)^2$ where $F(n) = product_(k <= n) k!$ is the superfactorial, so for every prime $p$
+$
+e_p (B(n)) = (n + 1) thin e_p (n!) - 2 thin e_p (F(n)).
+$
+Walk $n$ from $1$ to $20000$, adding the factorisation of $n$ (smallest-prime-factor sieve) to a running $e_p(n!)$ table and accumulating $e_p(F(n))$. The exponent of _every_ prime changes at each step because of the $(n+1)$ weight, so the divisor sum
+$
+D(n) = product_(p <= n, thin e_p > 0) (p^(e_p + 1) - 1) / (p - 1)
+$
+is recomputed in full each time — roughly $sum_n pi(n) approx 2.6 dot 10^7$ modular exponentiations under `numba`, with the largest exponent $(n+1) e_2(n!) approx 4 dot 10^8$ still comfortably in `int64`. Checks: $S(5) = 5736$, $S(10) = 141740594713218418$, and $S(100) equiv 332792866$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=651")[= Problem 651: Patterned Cylinders]
+
+Solution: 448233151
+
+Stickers tile an infinite cylinder in an $a$-periodic axial grid with $b$ stickers around the circumference, so patterns are colourings of the $ZZ_a times ZZ_b$ torus; $f(m, a, b)$ counts patterns with exactly $m$ colours up to all rigid motions, and we need $sum_(i=4)^(40) f(i, F_(i-1), F_i) mod 10^9 + 7$.
+
+== The group is $D_a times D_b$
+
+Axial translations, rotations about the axis, reflections in planes containing or perpendicular to the axis, and end-over-end flips act coordinatewise as $(x, theta) -> (plus.minus x + s, plus.minus theta + t)$: the symmetry group is exactly the product of two dihedral groups, of order $4 a b$.
+
+== Burnside by cycle types
+
+Cycles of a product permutation obey $c(g times h) = sum gcd(|gamma|, |delta|)$ over cycle pairs, so grouping $D_a$ and $D_b$ elements by cycle type (rotations of order $d | a$: $phi.alt(d)$ elements with $a\/d$ cycles of length $d$; reflections: fixed points plus transpositions by parity) evaluates the $j$-colour orbit count $B_j$ in $O(d(a) thin d(b))$ exact cycle counts, with $j^c$ by modular exponentiation and the division by $|G|$ via a modular inverse. Exactly $m$ colours follows by inclusion–exclusion $f(m) = sum (-1)^(m-j) binom(m, j) B_j$.
+
+Checks: brute-force orbit enumeration over the full group for small $(a, b, m)$, the given $f(2,2,3) = 11$, $f(3,2,3) = 56$, $f(2,3,4) = 156$, and the given residues of $f(8,13,21)$ and $f(13,144,233)$. The full Fibonacci sum runs in about a second.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=653")[= Problem 653: Frictionless Tube]
+
+Solution: 1130658687
+
+Marbles of diameter $20$ mm bounce elastically in a tube sealed at the west end, with pseudo-random gaps and directions; $d(L, N, j)$ is the distance the $j$-th marble travels before its centre reaches the open east end. We need $d(10^9, 10^6 + 1, 5 dot 10^5 + 1)$.
+
+== Pass-through equivalence
+
+Identical elastic marbles never overtake one another, and an equal-mass collision merely exchanges velocities — so the dynamics are those of non-interacting points passing through each other, with marble labels read off in sorted order. The diameters are removed by the standard shrink $y_i = x_i - 20(i - 1) - 10$, which turns the wall into a reflection at $0$, adjacent contact into coincidence of points, and the gap data into prefix sums $y_i = g_1 + dots + g_i$. Each point then moves ballistically (westbound ones bounce off the wall once), marble $j$'s centre is the $j$-th order statistic plus a fixed offset, and since a marble's speed is always $v$, its travelled distance is just $v$ times its exit time — the first moment the $j$-th smallest point reaches $E = L - 10 - 20(j - 1)$.
+
+== Event scan
+
+Each point crosses $E$ upward exactly once (at $E - y$ eastbound, $E + y$ after a bounce), and a westbound point starting above $E$ additionally dips below at $y - E$. Sorting these $plus.minus 1$ events and scanning for the first instant the below-$E$ count drops to $j - 1$ (simultaneous events processed together) gives the exit time exactly in integers with $v = 1$. Checks: the three given values, plus a full event-driven simulation of the actual colliding marbles for the small cases.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=654")[= Problem 654: Neighbourly Constraints]
+
+Solution: 815868280
+
+$T(n, m)$ counts $m$-tuples of positive integers in which every two adjacent entries sum to at most $n$; we need $T(5000, 10^12) mod (10^9 + 7)$.
+
+== Cheap iteration, deep index
+
+For $m >= 2$ every entry lies in $[1, n-1]$, and the transfer matrix $A[a][b] = [a + b <= n]$ acts by reversed prefix sums: $(A v)(a) = S(n - a)$ with $S$ the prefix sums of $v$. So consecutive terms $T(m) = bold(1)^T A^(m-1) bold(1)$ cost only $O(n)$ each — but $10^12$ of them is out of reach, and powering the $4999 times 4999$ matrix directly is too. Instead, generate the first $2(n-1) + 30$ terms by iteration, recover the minimal linear recurrence with Berlekamp–Massey over $"GF"(p)$ — its order is exactly $n - 1$, confirmed experimentally across many $n$ — and jump to the $10^12$-th term with Kitamasa: square-and-multiply of $x^(m-2)$ modulo the recurrence's characteristic polynomial, schoolbook $O(d^2)$ per multiplication with $d = 4999$ and about $40$ squarings.
+
+Checks: $T(3, 4) = 8$, $T(5, 5) = 246$, the two given residues $T(10, 100)$ and $T(100, 10)$, and the full BM-plus-Kitamasa pipeline reproducing directly iterated terms at scattered indices for $n = 10$ and $n = 57$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=655")[= Problem 655: Divisible Palindromes]
+
+Solution: 2000008332
+
+Count the palindromes below $10^32$ divisible by $P = 10000019$ (e.g. nine palindromes below $10^5$ are divisible by $109$).
+
+An $L$-digit palindrome is determined by its outer $ceil(L\/2)$ digits, digit $i$ (most significant first) contributing with weight $w_i = 10^i + 10^(L-1-i) mod P$ — or $10^((L-1)\/2)$ for the middle digit of an odd length. For each length, run a DP over the whole residue ring $ZZ_P$: keep the count vector of prefixes by remainder and fold in each digit position's ten choices as cyclic shifts of the vector by $d dot w_i$ (two contiguous `numpy` slice-adds per shift; the leading digit ranges over $1 dots 9$ only). The count of $L$-digit palindromes divisible by $P$ is the final entry at remainder $0$, and the answer sums $L = 1 dots 32$ — about $sum_L ceil(L\/2) = 272$ positions of ten $10^7$-length folds each. Check: a direct brute force over all palindromes below $10^7$ for the modulus $109$, length by length.
+
+#pagebreak()
 #link("https://projecteuler.net/problem=657")[= Problem 657: Incomplete Words]
 
 Solution: 219493139
@@ -3552,6 +4791,123 @@ $
 I(N, M) = sum_(i=0)^(N-1) (-1)^(N-1-i) binom(N, i) sum_(j=0)^M i^j.
 $
 The geometric inner sum is $(i^(M+1) - 1) \/ (i - 1)$ for $i >= 2$, equals $M + 1$ for $i = 1$, and equals $1$ for $i = 0$. The powers $i^(M+1)$ are taken modulo $p$ with the exponent reduced modulo $p - 1$ by Fermat, and the binomial coefficients are streamed multiplicatively, so the whole sum is one $O(N log M)$ pass. Checks: $I(3,0) = 1$, $I(3,2) = 13$, $I(3,4) = 79$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=658")[= Problem 658: Incomplete Words II]
+
+Solution: 958280177
+
+$S(k, n) = sum_(alpha <= k) I(alpha, n)$, where $I$ counts words of length at most $n$ over an $alpha$-letter alphabet that miss at least one letter; we need $S(10^7, 10^12) mod (10^9 + 7)$.
+
+== Swapping the inclusion–exclusion
+
+As in Problem 657, $I(alpha, n) = sum_(i=0)^(alpha-1) (-1)^(alpha-1-i) binom(alpha, i) G(i)$ with $G(i) = sum_(j <= n) i^j$. Swapping the order of summation,
+$
+S(k, n) = sum_(i=0)^(k-1) G(i) thin W(i), quad W(i) = sum_(alpha=i+1)^(k) (-1)^(alpha-1-i) binom(alpha, i).
+$
+
+== A recurrence for the column sums
+
+Applying Pascal's rule $binom(alpha, i) = binom(alpha+1, i+1) - binom(alpha, i+1)$ inside $W(i)$ telescopes the alternating column sum into the next column:
+$
+W(i) = 2 W(i + 1) + (-1)^(k-i-1) binom(k+1, i+1) - 1, quad W(k - 1) = k,
+$
+verified directly for small $k$. A single downward sweep with precomputed factorials therefore yields every $W(i)$, while each $G(i) = (i^(n+1) - 1)\/(i - 1)$ costs one modular power (exponent reduced by Fermat) and a batch inverse. About $10^7$ modexps in `numba`, under three seconds.
+
+Checks: the given $S(4, 4) = 406$, $S(8, 8) = 27902680$, $S(10, 100) equiv 983602076$; the Problem 657 values $I(3, 0) = 1$, $I(3, 2) = 13$, $I(3, 4) = 79$ recovered as $S(3, n) - S(2, n)$; and brute-force word enumeration for $alpha <= 4$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=659")[= Problem 659: Largest Prime]
+
+Solution: 238518915714422000
+
+$P(k)$ is the largest prime dividing two successive terms of $n^2 + k^2$; we need the last $18$ digits of $sum_(k=1)^(10^7) P(k)$.
+
+== Reduction to one factorisation
+
+If $p$ divides both $n^2 + k^2$ and $(n+1)^2 + k^2$ it divides their difference $2n + 1$, and then $4(n^2 + k^2) = (2n + 1)^2 - 2(2n + 1) + 1 + 4k^2 equiv 4k^2 + 1 (mod p)$. Conversely, for any odd $p | 4k^2 + 1$, choosing $n$ with $2n + 1 equiv 0$ makes $p$ divide both terms. Hence $P(k)$ is simply the largest prime factor of $4k^2 + 1$ — consistent with the problem's $n^2 + 3$ example, where $4 dot 3 + 1 = 13$.
+
+== Sieving the quadratic
+
+The $10^7$ values $4k^2 + 1$ are factored collectively with the same polynomial sieve as Problem 621: for each prime $p equiv 1 (mod 4)$ up to $2 dot 10^7 + 1$, a square root of $-1$ (Euler's criterion) gives the two roots of $(2k)^2 equiv -1 (mod p)$, walked as index progressions with full power extraction. The sieve bound squared exceeds $max (4k^2 + 1)$, so any post-sieve remainder is $1$ or a single prime — necessarily the largest. Summation is modulo $10^18$. Check: brute-force factorisation for all $k <= 2000$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=660")[= Problem 660: Pandigital Triangles]
+
+Solution: 474766783
+
+An integer triangle is $n$-pandigital if it has a $120 degree$ angle and its three sides written in base $n$ use each of the $n$ digits exactly once. We sum the largest sides over all such triangles for $9 <= n <= 18$.
+
+== Factoring out the triangles
+
+With $a, b$ adjacent to the $120 degree$ angle and $c$ opposite (strictly the largest side), $c^2 = a^2 + a b + b^2$, equivalently $(2c)^2 - (2b + a)^2 = 3a^2$. Writing $3a^2 = u v$ with $u = 2c - 2b - a$ recovers $b = (v - u - 2a)\/4$ and $c = (u + v)\/4$, so every triangle arises from its smaller adjacent side $a$ by walking the divisor pairs of $3a^2$ (built from a smallest-prime-factor sieve) and keeping the integral ones with $b > a$.
+
+== Digit budget
+
+Lengths obey $L_a <= L_b <= L_c <= L_b + 1$ (since $c < a + b < 2b$) and sum to $n$, so $L_a <= floor(n\/3) <= 6$ and $L_c <= 9$: only $a < 18^6$ and $c < 18^9$ can ever fit. For a fixed triangle the total digit count is non-increasing in the base while the target $n$ increases, so at most one base can match; each candidate is length-checked per base with early exit and digit-counted for pandigitality only on an exact fit. Check: an independent brute force over all $(a, b)$ pairs reproduces the complete $n = 9$ set — exactly $(104, 621, 679)$ and the statement's $(217, 248, 403)$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=661")[= Problem 661: A Long Chess Match]
+
+Solution: 646231.2177
+
+After every game the match continues with probability $q = 1 - p$; counting the games after which $A$ leads, with $S_t$ the score difference (steps $+1, -1, 0$ with probabilities $p_A, p_B, p_d$),
+$
+EE_A = sum_(t >= 1) q^(t-1) P(S_t >= 1).
+$
+
+== Resolvent and closed form
+
+With $phi(x) = p_A x + p_d + p_B\/x$ the step generating function, $P(S_t = s) = [x^s] phi(x)^t$, and summing the geometric series in $t$ extracts positive-power coefficients of $1\/(1 - q phi(x))$. Factoring $1 - q phi(x) = -(q p_A\/x)(x - r_1)(x - r_2)$ with $r_1 < 1 < r_2$ the roots of $q p_A x^2 - (1 - q p_d) x + q p_B = 0$, the Laurent expansion in the annulus $r_1 < |x| < r_2$ gives $[x^s] = r_2^(-s) \/ (q p_A (r_2 - r_1))$ for $s >= 1$, and the geometric sum in $s$ collapses everything to
+$
+EE_A (p_A, p_B, p) = 1 / (q^2 thin p_A thin (r_2 - r_1)(r_2 - 1)).
+$
+Sanity: $EE_A (0.25, 0.25, 0.5) = 2 - sqrt(2)$ exactly. The discriminant $(1 - q p_d)^2 - 4 q^2 p_A p_B$ loses about nine digits to cancellation at the $H$-sum's parameters ($p_B - p_A = 1\/k^2$, $p = 1\/k^3$), so evaluation uses extended-precision long doubles; the whole sum is instantaneous.
+
+Checks: both given $EE_A$ examples, an independent truncated distribution-DP cross-check, and $H(3) approx 6.8345$ as given.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=662")[= Problem 662: Fibonacci Paths]
+
+Solution: 860873428
+
+Alice steps from $(a, b)$ to $(a + x, b + y)$ with $x, y >= 0$ whenever $sqrt(x^2 + y^2)$ is a Fibonacci number; $F(W, H)$ counts her paths from the origin to $(W, H)$, and we need $F(10^4, 10^4) mod (10^9 + 7)$.
+
+Useful steps have both components at most $10^4$, so Fibonacci lengths run up to $10946$ (usable only split diagonally, e.g. $10946^2 = 4870^2 + 9804^2$); for each length the axis steps and every Pythagorean decomposition $x^2 + y^2 = F^2$ (found by scanning $x$ and testing $F^2 - x^2$ for squareness) give $88$ steps in total. Then a plain path-count DP fills the $(W+1) times (H+1)$ grid row by row, each cell summing its $88$ predecessors — sources are always final before being read since steps with $x = 0$ only look left within the current row. About $10^8$ cells under `numba`, stored as `int32` to keep the table at $400$ MB. Checks: $F(3, 4) = 278$ and $F(10, 10) = 215846462$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=663")[= Problem 663: Sums of Subarrays]
+
+Solution: 1884138010064752
+
+Tribonacci-driven point updates $A[t_(2i-2) mod n] += 2(t_(2i-1) mod n) - n + 1$ hit an array of length $n = 10000003$; $M_n (i)$ is the maximal contiguous subarray sum after step $i$, and the answer sums $M$ over steps $10000001 dots 10200000$ only.
+
+No queries occur during the first $10^7$ steps, so they are applied as raw point updates. A square-root decomposition then takes over: each of the $approx 3200$ blocks stores the classic max-subarray summary (total, best prefix, best suffix, best subsegment — all non-empty). Each queried step recomputes the one touched block by a linear scan and folds the block summaries left to right with the standard merge $"best" = max("best"_l, "best"_r, "suf"_l + "pre"_r)$, reading $M$ off the final fold — about $7000$ operations per step, $200000$ steps, a few seconds in `numba`. The tribonacci pair is advanced two indices at a time modulo $n$.
+
+Checks: the worked $n = 5$ example with $S(5, 6) = 32$, the given $S(5, 100) = 2416$, $S(14, 100) = 3881$, $S(107, 1000) = 1618572$ against a per-step Kadane brute force, and a split-consistency check $S(107, 600 + 400) - S(107, 600)$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=666")[= Problem 666: Polymorphic Bacteria]
+
+Solution: 0.48023168
+
+Species $S_(k,m)$ has $k$ types; a type-$i$ bacterium picks $j$ uniform in $[0, m)$, reads $q = r_(i m + j) mod 5$ (with $r_0 = 306$, $r_(n+1) = r_n^2 mod 10007$), and then dies ($q = 0$), clones ($q = 1$), mutates to type $2i$ ($q = 2$), splits into three of type $i^2 + 1$ ($q = 3$), or spawns type $i + 1$ alongside itself ($q = 4$), all indices mod $k$. $P_(k,m)$ is the extinction probability from a single $alpha_0$; we need $P_(500,10)$.
+
+== Multitype branching process
+
+Let $x_i$ be the probability a lineage seeded by one type-$i$ bacterium eventually dies out. First-step analysis over the $m$ equally likely choices gives
+$
+x_i = 1/m sum_(j < m) g_q (x), quad cases(
+  g_0 = 1\,,
+  g_1 = x_i^2\,,
+  g_2 = x_(2i mod k)\,,
+  g_3 = x_(i^2+1)^3\,,
+  g_4 = x_i thin x_(i+1)\,
+).
+$
+The required probability is the _minimal_ nonnegative fixed point of this monotone system. Iterating from $x = 0$, the iterates increase monotonically to that minimal root; in-place Gauss–Seidel updates accelerate the otherwise linear convergence, and a few thousand sweeps pin down eight decimals essentially instantly.
+
+Checks: the given $P_(2,2) = 0.07243802$ (the original $alpha\/beta$ species $S_(2,2)$), $P_(4,3) = 0.18554021$ and $P_(10,5) = 0.53466253$.
 
 #pagebreak()
 #link("https://projecteuler.net/problem=668")[= Problem 668: Square Root Smooth Numbers]
@@ -3816,6 +5172,40 @@ The numbers split by whether $10 | n$. If $10 divides.not n$, then $d(n)$ turns 
 If $10 | n$ every multiple ends in $0$, so the duodigit must contain $0$ and its digit set is ${0, x}$ for a single $x in {1, dots, 9}$; here $d(n)$ can reach $21$ digits. For each $x$ a breadth-first search over residues modulo $n$ finds the shortest (then lexicographically least) string of $0$s and $x$s, leading with $x$, that is divisible by $n$; taking the minimum over $x$ gives $d(n)$. Summing both cases as exact big integers and rounding reproduces $D(110) = 11047$, $D(150) = 53312$, $D(500) = 29570988$, and gives $D(50000) approx 2.452767775565 times 10^20$.
 
 #pagebreak()
+#link("https://projecteuler.net/problem=715")[= Problem 715: Sextuplet Norms]
+
+Solution: 883188017
+
+$f(n)$ counts $6$-tuples mod $n$ whose sum of squares is coprime to $n$, and $G(n) = sum_(k<=n) f(k)\/(k^2 phi(k))$; we need $G(10^12)$ mod $10^9 + 7$.
+
+== Collapsing the summand
+
+$f$ is multiplicative with $f(p^e) = p^(6(e-1))(p^6 - N_0(p))$, where $N_0(p)$ counts $6$-tuples mod $p$ with square sum $equiv 0$. The classical Gauss-sum evaluation of sums of $2m$ squares gives $N_0(p) = p^5 + (p - 1) p^2 chi_4(p)$ for odd $p$ (the quadratic character of $(-1)^3$) and $N_0(2) = 32$. Hence $g(k) = f(k)\/(k^2 phi(k))$ is multiplicative with
+$ g(p^e) = p^(3e) - chi_4(p) p^(3(e-1)), $
+which is exactly $(op("Id")_3 * mu chi_4)(p^e)$ — including $p = 2$, where $chi_4(2) = 0$ gives $g(2^e) = 2^(3e)$. A hand computation of $g(1), dots, g(10)$ sums to $3053$, confirming the identity against the given $G(10)$.
+
+== Summation
+
+Therefore $G(n) = sum_d mu(d) chi_4(d) dot T_3(floor(n\/d))$ with $T_3(M) = (M(M+1)\/2)^2$, grouped over quotient blocks. The partial sums $H(x) = sum_(d<=x) mu(d) chi_4(d)$ are needed at all arguments $floor(n\/d)$: since $(mu chi_4) * chi_4 = epsilon$, they satisfy the Mertens-style recurrence $H(x) = 1 - sum_(d>=2) chi_4(d) H(floor(x\/d))$ (the $chi_4$ prefix sum is the periodic pattern $1,1,0,0$). Sieving $H$ linearly to $x_0 = 10^8$ and computing the $10^4$ large arguments by the recurrence in decreasing order gives the standard $O(n^(2\/3))$ algorithm — ten seconds in numba, matching $G(10^5) equiv 157612967$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=716")[= Problem 716: Grid Graphs]
+
+Solution: 238948623
+
+Each of the $H$ rows and $W$ columns of a grid is directed as a whole line; $C(H, W)$ sums the number of strongly connected components over all $2^(H+W)$ orientations. We need $C(10000, 20000)$ mod $10^9 + 7$.
+
+== Structure of the components
+
+Exhaustive checking over every orientation with $H, W <= 4$ established two facts: each orientation has *at most one* nontrivial SCC, and that SCC is exactly the union of the boundaries of all *rectangle cycles* — rectangles $i_1 < i_2$, $j_1 < j_2$ whose lines are directed top $>$, bottom $<$, left $arrow.t$, right $arrow.b$ (type A) or the mirror image (type B). Hence
+$ C = 2^(H+W) H W - sum_("orient") |"big SCC"| + N_1, $
+where $N_1$ counts orientations containing a cycle. The latter is elementary: a type-A cycle exists iff some $>$ row lies above some $<$ row *and* some $arrow.t$ column lies left of some $arrow.b$ column, and direction sequences avoiding such a pattern are monotone ($H + 1$ of them), so $N_1$ follows by inclusion–exclusion over the two cycle types.
+
+== Counting covered nodes
+
+A node $(i, j)$ lies on a type-A rectangle boundary iff it serves as a top/bottom row point ($X_1(i) Y_1(j)$: row $i$ is $>$ with a $<$ below or $<$ with a $>$ above, and a $arrow.t$ exists at column $<= j$ with a $arrow.b$ at $>= j$) or as a left/right column point ($X_2(i) Y_2(j)$, the transposed conditions), with mirrored clauses $X_3 Y_3, X_4 Y_4$ for type B. Rows and columns are independent, so by inclusion–exclusion over the fifteen nonempty clause subsets, $sum |"big"|$ splits into products of per-axis sums. Each per-index count enumerates the $32$ atomic states — own direction times which directions occur before and after — whose sequence counts are powers of two. The whole computation is $O((H + W))$ and runs in under a second, matching the brute-force table for $H <= 4$, $W <= 5$ and all three given values.
+
+#pagebreak()
 #link("https://projecteuler.net/problem=717")[= Problem 717: Summation of a Modular Formula]
 
 Solution: 1603036763131
@@ -3860,6 +5250,819 @@ Rather than scan every $n$, iterate over the root $r$ from $2$ to $sqrt(N) = 10^
 The trailing-block extraction handles blocks with leading zeros automatically (so $9801 = 98 + 0 + 1$ is found). Because $r^2 != r$ for $r >= 2$, any successful split uses at least two blocks, as required. As a check, $T(10^4) = 41333$.
 
 #pagebreak()
+#link("https://projecteuler.net/problem=721")[= Problem 721: High Powers of Irrational Numbers]
+
+Solution: 700792959
+
+With $f(a, n) = floor((ceil(sqrt(a)) + sqrt(a))^n)$, we need $G(n) = sum_(a=1)^(n) f(a, a^2)$ for $n = 5000000$, modulo the prime $999999937$.
+
+If $a = s^2$ is a perfect square the base is just the integer $2s$ and $f(a, a^2) = (2s)^(a^2)$, a single modular power.
+
+Otherwise let $c = ceil(sqrt(a))$ and consider the conjugates $x = c + sqrt(a)$, $y = c - sqrt(a)$. They are the roots of $t^2 - 2c t + (c^2 - a)$, so $x^n + y^n$ is an integer; and since $c - 1 < sqrt(a) < c$ we have $0 < y < 1$, hence $0 < y^n < 1$ and
+$
+floor(x^n) = x^n + y^n - 1.
+$
+Compute $x^n = u + v sqrt(a)$ by binary exponentiation in $bb(Z)_p [sqrt(a)]$ (pairs $(u, v)$ with $(u_1 + v_1 sqrt(a))(u_2 + v_2 sqrt(a)) = (u_1 u_2 + a v_1 v_2) + (u_1 v_2 + u_2 v_1) sqrt(a)$); then $x^n + y^n = 2u$ because the conjugate flips the sign of $v$. So $f(a, a^2) = 2u - 1$ modulo $p$.
+
+Each $a$ costs about $log_2 (a^2) approx 45$ ring squarings; the five million values take under a minute with Numba. Checks: $f(5,2) = 27$, $f(5,5) = 3935$, and $G(1000) equiv 163861845$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=722")[= Problem 722: Slowly Converging Series]
+
+Solution: 3.376792776502e132
+
+$E_k (q) = sum_(n >= 1) sigma_k (n) q^n$; we need $E_15 (1 - 2^(-25))$ in scientific notation with twelve digits after the decimal point.
+
+Expanding $sigma_k$ over divisors and swapping sums turns the slowly converging Lambert series into a fast one:
+$
+E_k (q) = sum_(m >= 1) sum_(j >= 1) j^k q^(j m) = sum_(m >= 1) "Li"_(-k)(q^m),
+$
+and the negative polylogarithm is a rational function with Eulerian-number numerator,
+$
+"Li"_(-k)(x) = (sum_(j) A(k, j) thin x^(j+1)) / (1 - x)^(k+1).
+$
+Near $q = 1$ the $m$th term behaves like $k! \/ (m(1 - q))^(k+1)$, so the new series converges like $sum 1\/m^16$ — about forty terms reach $10^(-25)$ relative accuracy. Each term is evaluated exactly enough with `Decimal` arithmetic at $60$ digits, immune to the $10^132$ magnitude of the answer. All three given values ($E_1$, $E_3$, $E_7$ at their respective $q$) reproduce digit-for-digit.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=724")[= Problem 724: Drone Delivery]
+
+Solution: 18128250110
+
+Every second the depot gives a uniformly random one of $n$ drones a $+1$ cm/s speed boost; the flight ends one second after the last drone receives its first instruction. $E(n)$ is the expected landing distance per package; we need $E(10^8)$ rounded to the nearest integer.
+
+== Reduction to the coupon collector
+
+Let $T$ be the time of the last first-instruction — exactly the coupon collector time for $n$ coupons. An instruction issued at time $t$ raises one drone's speed by $1$ for the remaining $T + 1 - t$ seconds, so the *total* distance of all packages telescopes to $sum_(t=1)^(T) (T + 1 - t) = T(T+1)\/2$, independent of which drones were chosen. Hence $E(n) = bb(E)[T^2 + T] \/ (2n)$.
+
+$T$ is a sum of independent geometrics with success probabilities $(n-i)\/n$, giving $bb(E)[T] = n H_n$ and $"Var" thin T = n^2 H_n^((2)) - n H_n$. Substituting, everything collapses to
+$
+E(n) = n / 2 (H_n^2 + H_n^((2))).
+$
+This reproduces $E(2) = 7\/2$ and $E(5) = 12019\/720$ exactly, and was also confirmed by an exact Markov-chain computation for $n = 4$ plus simulation of the literal process.
+
+== Evaluation
+
+Kahan-compensated summation (small terms first) of $H_n$ and $H_n^((2))$ for $n = 10^8$ keeps the absolute error far below the rounding threshold; a $40$-digit evaluation via $H_n$ and $zeta(2) - zeta(2, n+1)$ gives $18128250110.4186 dots$, agreeing with the float computation and rounding to the answer.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=725")[= Problem 725: Digit Sum Numbers]
+
+Solution: 4598797036650685
+
+A DS-number has one digit equal to the sum of all its other digits, like $352$ or $32812$. We need $S(2020)$, the sum of all DS-numbers with at most $2020$ digits, modulo $10^16$.
+
+== Characterisation
+
+If digit $d$ equals the sum of the others, the total digit sum is $2d$, and $d$ is necessarily the largest digit. Conversely, if the digit sum is $2d$ and the digit $d$ occurs, the other digits sum to $d$. So a number is a DS-number exactly when its digit sum is $2d$ for some digit $d$ it contains. In particular the digit sum is at most $18$, which keeps everything small despite the $2020$-digit length.
+
+== Summing by symmetry
+
+Pad every number to exactly $L = 2020$ digits with leading zeros; this is a bijection that changes no values. For a fixed $d$, the condition "digit sum $= 2d$ and contains $d$" is symmetric under permuting positions, so the count of qualifying strings with value $v$ at a given position is the same for every position. The value-sum over qualifying strings is therefore
+$
+R dot sum_(v=0)^(9) v dot N(v), quad R = underbrace(11 dots 1, L "ones"),
+$
+where $N(v)$ counts strings on the other $L - 1$ positions completing the condition. By inclusion–exclusion, $N(v) = M(2d - v) - [v != d] dot M_d (2d - v)$, where $M(s)$ counts length-$(L-1)$ digit strings with sum $s$, and $M_d$ the same with the digit $d$ forbidden.
+
+Both counts are coefficients of $(1 + x + dots + x^9)^(L-1)$ and of the same product with the $x^d$ term removed, truncated at degree $18$; binary exponentiation of $19$-term polynomials modulo $10^16$ (only additions and multiplications, so the non-prime modulus is harmless) computes them instantly. The repunit $R$ is reduced directly. As a check, $S(3) = 63270$ and $S(7) = 85499991450$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=727")[= Problem 727: Triangle of Circular Arcs]
+
+Solution: 3.64039141
+
+Three mutually externally tangent circles with radii $r_a < r_b < r_c$ form an arc triangle; $d$ is the distance between the centre $D$ of the circle through the three tangency points and the centre $E$ of the circle externally tangent to all three. We average $d$ over coprime integer triples with $r_c <= 100$.
+
+== Two classical centres
+
+The tangency points of three mutually tangent circles lie on the *incircle of the triangle of their centres* (each tangency point sits on a side at the standard incircle contact distances $s - a$, since the side decomposes as $r_a + r_b$), so $D$ is simply the incentre of the centre triangle, computed barycentrically with weights equal to the opposite side lengths $r_b + r_c$, $r_a + r_c$, $r_a + r_b$.
+
+The green circle is the *inner Soddy circle*. Its curvature comes from the Descartes circle theorem $k_4 = k_1 + k_2 + k_3 + 2 sqrt(k_1 k_2 + k_2 k_3 + k_3 k_1)$, and its centre from the complex Descartes theorem $z_4 k_4 = z_1 k_1 + z_2 k_2 + z_3 k_3 plus.minus 2 sqrt(k_1 k_2 z_1 z_2 + k_2 k_3 z_2 z_3 + k_3 k_1 z_3 z_1)$; placing circle $a$ at the origin kills all but the $z_2 z_3$ cross term inside the root, and the sign ambiguity is resolved by checking external tangency $|z_4 - z_1| = 1\/k_4 + r_a$.
+
+With both centres in closed form, the $approx 1.6 dot 10^5$ coprime triples are averaged directly in double precision, comfortably within the eight required decimals.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=728")[= Problem 728: Circle of Coins]
+
+Solution: 709874991
+
+A move flips $k$ consecutive coins of $n$ in a circle; $F(n, k)$ counts the head/tail states from which all-heads is reachable, and $S(N) = sum_(n <= N) sum_(k <= n) F(n, k)$ is wanted for $N = 10^7$ modulo $10^9 + 7$.
+
+== A closed form for $F$
+
+Moves commute and are involutions, so the reachable corrections form the $"GF"(2)$-span of the $n$ cyclic windows, and $F(n, k) = 2^"rank"$. Identifying states with polynomials in $"GF"(2)[x] \/ (x^n + 1)$, the windows generate the ideal of $m(x) = 1 + x + dots + x^(k-1)$, so the rank is $n - deg gcd(m(x), x^n + 1)$. Since $(x + 1) m(x) = x^k + 1$ and $gcd(x^k + 1, x^n + 1) = x^(gcd(n, k)) + 1$, the only subtlety is the multiplicity of the factor $x + 1$, which is $2^(v_2(k)) - 1$ in $m$ and $2^(v_2(n))$ in $x^n + 1$ (where $v_2$ is the $2$-adic valuation). Comparing the two minima yields
+$
+F(n, k) = 2^(n - gcd(n, k) + [v_2(k) <= v_2(n)]),
+$
+verified against brute-force ranks for all $n <= 12$ and matching $F(3,2) = 4$, $F(8,3) = 256$, $F(9,3) = 128$.
+
+== Summation
+
+Group $k$ by $g = gcd(n, k)$: with $n = g m$ and $k = g j$, $gcd(j, m) = 1$, the indicator fails only when $v_2(j) > v_2(m)$, i.e. $m$ odd and $j$ even — exactly half of the $phi(m)$ units when $m > 1$ (the units $j$ and $m - j$ have opposite parity). Therefore
+$
+S(N) = sum_(g >= 1) sum_(m <= N \/ g) w(m) dot 2^(g(m - 1)), quad w(m) = cases(2 & m = 1, 2 phi(m) & m "even", 3 phi(m) \/ 2 & m "odd," > 1).
+$
+With a totient sieve to $10^7$ and, for each $g$, the inner powers advanced by repeated multiplication with $2^g$, the double loop costs $O(N log N)$ modular operations. The givens $S(3) = 22$, $S(10) = 10444$ and $S(10^3) equiv 853837042$ all check out.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=729")[= Problem 729: Range of Periodic Sequences]
+
+Solution: 308896374.2502
+
+The recurrence $a_(n+1) = a_n - 1\/a_n$ is Boole's transformation. We sum the ranges (maximum minus minimum) of all periodic sequences with minimal period at most $25$.
+
+== Sign itineraries
+
+Every real $b$ has exactly two preimages $(b plus.minus sqrt(b^2 + 4))\/2$, whose product is $-1$: one positive and one negative. A periodic orbit is therefore determined by its *sign itinerary*, and orbits of exact period $d$ correspond bijectively to primitive binary necklaces of length $d$: the composition of the $d$ inverse branches along any sign word is a strict contraction (each branch derivative lies in $(0, 1)$), so it has a unique fixed point; the two constant words drift to $plus.minus infinity$, matching the absence of finite fixed points. The correspondence reproduces $S(2) = 2 sqrt(2)$ from the single necklace $+-$, whose orbit is $plus.minus sqrt(1\/2)$.
+
+== Computation
+
+For each of the $approx 2.7 dot 10^6$ Lyndon words of length $2 <= d <= 25$, the rotation-$0$ orbit point is found by thirty plain contraction sweeps followed by Newton iteration on $Phi(x) - x$ (with $Phi'$ available as the product of branch derivatives); the remaining $d - 1$ orbit points warm-start from $T$ of the previous point and need only a couple of Newton steps each, since orbit values are bounded in $[1\/8, 7]$ in absolute value (a $+$-run of length $k$ climbs like $sqrt(2k)$, and $|T(a)| <= 8$ keeps points away from $0$, controlling the warm-start error through $T' = 1 + 1\/a^2$). Each of the $d$ points of an orbit is its own sequence, so an orbit adds $d (max - min)$; Kahan summation keeps the $approx 6.7 dot 10^7$-term total accurate to the four required decimals. The whole run takes $47$ seconds and matches $S(3) approx 14.6461$ and $S(5) approx 124.1056$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=731")[= Problem 731: A Stoneham Number]
+
+Solution: 6086371427
+
+$A = sum_(i >= 1) 1 \/ (3^i 10^(3^i))$, and $A(n)$ is the run of ten decimal digits starting at the $n$th place; we need $A(10^16)$.
+
+The ten digits are $floor("frac"(10^(n-1) A) dot 10^10)$. Shifting term $i$ by $10^(n-1)$ gives $10^(n - 1 - 3^i) \/ 3^i$. Terms with $3^i > n - 1$ are at most $10^(-(3^i - n + 1))$, and since the powers of three land nowhere near $10^16$ (the first exceeding it overshoots by more than $6 dot 10^15$), they are far too small to disturb the digits. For $3^i <= n - 1$ the integer part of the term is irrelevant and the fractional contribution is $(10^(n - 1 - 3^i) mod 3^i) \/ 3^i$, a modular exponentiation.
+
+Summing the $33$ contributing terms over the common denominator $3^33$, reducing the numerator modulo $3^33$, and reading off $floor(N dot 10^10 \/ 3^33)$ (zero-padded to ten digits) gives the answer instantly — all with exact integer arithmetic, so no precision questions arise. The given $A(100)$ and $A(10^8)$ check out.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=732")[= Problem 732: Standing on the Shoulders of Trolls]
+
+Solution: 45609
+
+$N = 1000$ trolls with shoulder heights $h_n$, arm lengths $l_n$ and IQs $q_n$ (all in $[50, 150]$, generated from powers of $5$) sit in a hole of depth $D = H \/ sqrt(2)$, where $H = sum h_n$. Escapees climb a pile of everyone still present, so a troll leaving when escaped trolls of total height $c$ have already gone reaches $H - c + l$, and may escape iff $c <= B + l$ with $B = H - H\/sqrt(2)$.
+
+== Scheduling formulation
+
+Each escapee "consumes" $h_t$ of the height budget and must *start* (i.e. have $c$) at most $B + l_t$ — single-machine job scheduling with processing times $h_t$ and completion deadlines $d_t = B + l_t + h_t$, maximising the total weight $q_t$ of on-time jobs. Any feasible escape set can be reordered by increasing deadline (the usual adjacent-exchange argument on $d_t$ — note the deadline involves $l_t + h_t$, not $l_t$ alone, a distinction that actually changes the answer at $N = 1000$). So sort by $l + h$ and run a knapsack over the cumulative escaped height $c$: for each troll, $"dp"[c + h_t] = max("dp"[c + h_t], "dp"[c] + q_t)$ for all reachable $c <= B + l_t$. The DP was validated against exhaustive search over all escape orders on $300$ random instances.
+
+The irrational threshold is handled exactly: $floor(B + l) = H + l - floor(sqrt(H^2\/2)) - 1$ since $H\/sqrt(2)$ is irrational, and $floor(sqrt(H^2\/2)) = "isqrt"(floor(H^2\/2))$ because $2k^2 = H^2$ has no solutions. With $c$ ranging to about $44000$, the table costs $10^3 times 4 dot 10^4$ cell updates. The givens $Q(5) = 401$ and $Q(15) = 941$ agree.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=733")[= Problem 733: Ascending Subsequences]
+
+Solution: 574368578
+
+With $a_i = 153^i mod 10000019$, $S(n)$ sums, over every ascending $4$-term subsequence of $a_1, dots, a_n$, the sum of its four terms. We need $S(10^6)$ modulo $10^9 + 7$.
+
+Sweep the sequence left to right. For each length $L = 1, dots, 4$ maintain two Fenwick trees indexed by (rank-compressed) value: one storing the number of ascending $L$-subsequences ending at each value, the other the total of their term-sums. When $a_i$ arrives, the $L$-subsequences ending at $a_i$ extend the $(L-1)$-subsequences whose last value is smaller, so prefix queries below $a_i$ give
+$
+c_L = c_(L-1)^(<), quad s_L = s_(L-1)^(<) + a_i dot c_(L-1)^(<),
+$
+with base case $c_1 = 1$, $s_1 = a_i$. Add $s_4$ to the answer, insert the new counts and sums at $a_i$'s rank for levels $1$–$3$, and continue. Everything is kept modulo $10^9 + 7$ (the raw counts alone are astronomically large). The whole run is $O(n log n)$. Checks: $S(6) = 94513710$, and $S(100) = 4465488724217$ reduces to the computed residue.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=734")[= Problem 734: A Bit of Prime]
+
+Solution: 557988060
+
+$T(n, k)$ counts $k$-tuples of primes $<= n$ whose bitwise OR is also a prime $<= n$; we need $T(10^6, 999983)$ mod $10^9 + 7$.
+
+== Zeta and Möbius on the subset lattice
+
+A tuple has OR equal to $q$ exactly when every element is a submask of $q$ and the OR is not a proper submask. Let $F(m)$ count primes $<= n$ that are submasks of $m$: a subset-sum (SOS) zeta transform over the $2^20$-element bitmask lattice computes all $F$ in $O(2^20 dot 20)$. Then $F(m)^k$ counts tuples whose OR is *contained in* $m$, and the inverse SOS (Möbius) transform of $m arrow.r.bar F(m)^k mod p$ recovers the exact-OR counts, of which we sum those at prime masks. The $2^20$ modular exponentiations and two transforms run in about a second, and the method reproduces $T(5, 2) = 5$, $T(100, 3) = 3355$ and $T(1000, 10) equiv 2071632$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=735")[= Problem 735: Divisors of $2n^2$]
+
+Solution: 174848216767932
+
+$f(n)$ counts divisors of $2n^2$ that are at most $n$; we need $F(10^12) = sum_(n<=N) f(n)$.
+
+== Structure of the divisors
+
+Count pairs $(d, n)$ with $d <= n <= N$ and $d | 2n^2$. Writing $g = gcd(d, n)$, $d = g e$, $n = g m$ with $gcd(e, m) = 1$, the divisibility collapses: $g e | 2 g^2 m^2 arrow.l.r.double e | 2g$ (the $m^2$ is coprime to $e$), and $d <= n$ becomes $e <= m$. For a fixed coprime pair the admissible $g$ form an arithmetic progression: $floor(N\/(e m))$ choices when $e$ is odd, and $floor(N\/(u m))$ when $e = 2u$ (which forces $m$ odd and $2u <= m$). Hence
+$ F(N) = sum_(e "odd", e <= m, gcd = 1) floor(N/(e m)) + sum_(m "odd", 2u <= m, gcd(2u, m) = 1) floor(N/(u m)). $
+
+== Evaluation
+
+Möbius inversion removes the coprimality (only odd $k$ survive, since the parity conditions force $k$ odd), reducing $F$ to $sum_(k "odd") mu(k) (A_0 + B_0)(N\/k^2)$ where $A_0, B_0$ are the unrestricted wedge-hyperbola sums. Each is evaluated in $O(M^(3\/4))$ by iterating the smaller variable to $sqrt(M)$ and summing the inner $floor$ by quotient blocks (with an odd-only count of integers per block for $B_0$), about $1.7 dot 10^9$ operations in total — fifteen seconds in numba. Verified against $F(15) = 63$, $F(1000) = 15066$ and brute force at $10^4$ and $3 dot 10^4$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=736")[= Problem 736: Paths to Equality]
+
+Solution: 25332747903959376
+
+With moves $r(x, y) = (x + 1, 2y)$ and $s(x, y) = (2x, y + 1)$ on lattice points, a path to equality from $(45, 90)$ reaches $a_n = b_n$ without any earlier tie. The shortest path has length $10$ (final value $1476$); we need the final value of the unique path of smallest *odd* length.
+
+== Structure and pruning
+
+After a remaining word with $r'$ moves of type $r$ and $s'$ of type $s$, the first coordinate becomes $a dot 2^(s') + A$ where $A = sum_t g_t 2^t$ counts $r$-moves by how many $s$-moves follow them; so $A$ ranges exactly over $[r', r' dot 2^(s')]$, and symmetrically for $B$. Equality is reachable only if the intervals $a 2^(s') + [r', r' 2^(s')]$ and $b 2^(r') + [s', s' 2^(r')]$ overlap for some split $r' + s' = m$ — a complete feasibility test for a depth-first search over moves (intermediate ties simply terminate a branch, since such a prefix is itself a shorter path).
+
+The prune is devastating for this instance: since $b = 2a$, the leading terms are $45 dot 2^(s')$ vs $45 dot 2^(r' + 1)$, and an *even* move count (odd path length) forces $s' != r' + 1$, i.e. a factor-$2$ gap that the additive ranges (at most $(M\/2) 2^(M\/2)$) cannot bridge until $M\/2 >= 45$. Every even $M < 92$ is refuted instantly at the root; the $M = 92$ and $94$ searches die after a couple hundred nodes; and $M = 96$ finds the unique solution after only $463$ nodes — a sequence of $96$ moves with $48$ of each type, length $n = 97$ and final value $25332747903959376 = 45 dot 2^48 + (45 dot 2^48 + 336)$. The iterative deepening also re-derives the length-$10$ example exactly.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=737")[= Problem 737: Coin Loops]
+
+Solution: 757794899
+
+Coins of radius $1$ are stacked, each touching a fixed vertical line, with the stack balanced after every placement; we need the number of coins for the projected centres to wind $2020$ times around the line.
+
+== The tight construction
+
+Since each coin touches the line, all projected centres lie on the unit circle. The extremal stack places every new coin at distance exactly $1$ from the centroid $M$ of all coins already placed: with $cos beta = |M|\/2$ the new centre is the unit vector $hat(M)$ rotated by $-beta$, taking the advancing branch. A naive per-step greedy (maximise each rotation $theta$ subject to centre-of-mass constraints) deadlocks immediately — a first step of $60 degree$ makes the base constraint tight forever — while this tight construction reproduces all three given values $31$, $154$ and $6947$ exactly, pinning down the intended balance model.
+
+== Numerics
+
+The placement needs no trigonometry (a pure vector rotation by $beta$); a single `arctan2` per step measures the angular advance. The crossing happens near $7.6 dot 10^8$ coins, where each step advances only $approx 1.7 dot 10^(-5)$ radians, so both the centroid sum and the cumulative angle are Kahan-compensated to keep accumulated rounding far below one step. The run takes about thirty seconds.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=738")[= Problem 738: Counting Ordered Factorisations]
+
+Solution: 143091030
+
+$d(n, k)$ counts factorisations $n = x_1 times dots times x_k$ with $1 <= x_1 <= dots <= x_k$, and $D(N, K) = sum d(n, k)$ over $n <= N$, $k <= K$; we need $D(10^10, 10^10)$ mod $10^9 + 7$.
+
+== Reduction to multisets
+
+Dropping the padding $1$s, a factorisation is just a multiset of factors $>= 2$ of size $j <= k$, so a multiset of size $j$ is counted in $d(n, k)$ for every $k >= max(j, 1)$, i.e. with weight $K - j + 1$ (weight $K$ for the empty multiset of $n = 1$). Writing $c$ for the number of multisets of integers $>= 2$ with product $<= N$ (empty included) and $s$ for the sum of their sizes,
+$ D(N, K) = K + (K + 1)(c - 1) - s, $
+valid because $K = 10^10$ exceeds the maximal multiset size $log_2 N approx 33$.
+
+== Smallest-factor recursion
+
+Conditioning on the smallest element $f$ of a multiset gives $c(B, m) = 1 + sum_(f >= m) c(floor(B\/f), f)$, with the matching size recursion. Every $f > sqrt(B)$ admits only the bare singleton ${f}$, contributing $(1, 1)$, so the whole tail collapses to a closed form and the recursion only branches on $f <= sqrt(B)$. The recursion tree for $B = 10^10$ has on the order of $10^9$ cheap nodes — about twenty seconds in numba, with the recursive function compiled uncached to avoid the recursion-plus-cache segfault. Verified against $D(10, 10) = 153$ and $D(100, 100) = 35384$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=739")[= Problem 739: Summation of Summations]
+
+Solution: 711399016
+
+Starting from a sequence of length $n$, repeatedly discard the first term and replace the rest by its partial sums; $f(n)$ is the single number remaining. With the Lucas start $1, 3, 4, 7, 11, dots$ we need $f(10^8)$ modulo $10^9 + 7$.
+
+The whole pipeline is linear, so $f(n) = sum_i a_i w_i (n)$, and feeding in unit vectors identifies the weights as ballot numbers:
+$
+w_1 = 0, quad w_i = (i - 1)/(2n - 1 - i) binom(2n - 1 - i, n - 1) "  for " i >= 2,
+$
+verified directly for $n <= 20$ — for the all-ones start they sum to the Catalan number $C_(n-1)$, matching $f(8) = 429$, and the Lucas checks $f(8) = 2663$ and $f(20) equiv 742296999$ both hold.
+
+For $n = 10^8$, iterate $i$ downward from $w_n = 1$ using the ratio
+$
+w_i = w_(i+1) dot ((i-1)(2n - 2 - i)) / (i (n - i)),
+$
+whose denominators never exceed $n$, so a single table of modular inverses of $1, dots, n$ (built by the linear recurrence) covers every step. The Lucas values run backwards alongside via $a_(i-1) = a_(i+1) - a_i$ after one forward pass to fetch $a_(n-1), a_n$. Two linear passes under Numba finish in seconds.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=740")[= Problem 740: Secret Santa]
+
+Solution: 0.0189581208
+
+Each of $n$ people puts two name slips in a hat; in turn, each draws two uniformly random slips avoiding their own name. The process fails if the last person is left facing one of their own slips; $q(n)$ is the failure probability and we need $q(100)$ to ten decimal places.
+
+The people who have not yet drawn are exchangeable, so it suffices to track the distribution of $(k_2, k_1)$ — how many of them still have two (resp. one) of their own slips in the hat ($k_0$ and the free-slip count follow, since the hat holds exactly $2m$ slips when $m$ people remain). The next drawer has $2$, $1$ or $0$ own slips with probabilities $k_2\/m$, $k_1\/m$, $k_0\/m$; each of their two draws is uniform over the hat minus their own $c$ slips and hits either a free slip, a slip of a person with two left (who drops to one), or a slip of a person with one left. After the turn the drawer's unclaimed own slips become free for everyone later.
+
+Propagating this exact distribution over the $n - 1$ turns touches only a few thousand states ($k_1 + k_2 <= m <= 100$) and the failure probability is the mass with $k_1 + k_2 > 0$ when one person remains. Floating point is comfortably sufficient for ten decimals. The givens $q(3) = 0.3611111111$ and $q(5) = 0.2476095994$ match (a direct Monte-Carlo simulation of the drawing procedure agrees as well).
+
+#pagebreak()
+#link("https://projecteuler.net/problem=741")[= Problem 741: Binary Grid Colouring]
+
+Solution: 512895223
+
+$f(n)$ counts $n times n$ grids with exactly two black cells in each row and column, and $g(n)$ counts them up to the symmetries of the square; we need $g(7^7) + g(8^8)$ mod $10^9 + 7$.
+
+== Burnside over the dihedral group
+
+$g = (op("Fix")(op("id")) + 2 op("Fix")(r_90) + op("Fix")(r_180) + 2 op("Fix")("flip") + 2 op("Fix")("transpose"))\/8$, and every fixed-point count turns out to be holonomic with an $O(n)$ recurrence extracted from an exponential generating function:
+
+- *Identity.* Two-per-line matrices are unions of even row–column cycles: EGF $e^(-x\/2)\/sqrt(1-x)$ in $x^n\/(n!)^2$, giving $f(n+1) = n(n+1) f(n) + n^2 (n+1) f(n-1)\/2$.
+- *Transpose.* Symmetric matrices correspond to graphs whose components are cycles ($>= 3$) or paths with a diagonal loop at each end: $T(n) = n! thin c_n$ with $(n+1) c_(n+1) = 2n c_n - (n-2) c_(n-1) - c_(n-3)\/2$.
+- *Half turn.* Quotienting by $r_180$ yields a multigraph on $n\/2$ index classes whose single edges carry two flavours: even $n$ gives $((n\/2)!)^2 [x^(n\/2)] e^(-x) (1-4x)^(-1\/2)$; for odd $n$ the middle row and column attach a marked flavoured path, giving $m^2 ((m-1)!)^2 [x^(m-1)] 2 e^(-x)(1-4x)^(-3\/2)$ with $m = (n-1)\/2$.
+- *Quarter turn.* Cell orbits act on index classes as saturating loops or $2$-flavoured edges: even $n$ gives $m! [x^m] (1-2x)^(-1\/2) e^(-x^2\/2)$; odd $n$ is $0$ by a degree-parity obstruction.
+- *Axis flips.* Each row must use a mirrored column pair and each pair exactly two rows: $n!\/2^(n\/2)$ for even $n$, $0$ for odd.
+
+Every count was checked against exhaustive enumeration for $n <= 6$, and the assembled $g$ reproduces $g(4) = 20$, $g(7) = 390816$ and $g(8) = 23462347$ (the latter two also verified by hand from the recurrences). Both targets need only linear recurrences mod $p$ with a table of inverses — a couple of seconds for $n = 8^8 approx 1.7 dot 10^7$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=742")[= Problem 742: Minimum Area of a Symmetrical Convex Grid Polygon]
+
+Solution: 18397727
+
+$A(N)$ is the minimum area of a convex lattice polygon with $N$ vertices having both horizontal and vertical mirror symmetry; we need $A(1000)$.
+
+== Structure and area formula
+
+The polygon is determined by its first-quadrant chain of edge vectors $(-a_i, b_i)$ with $a_i, b_i >= 1$: convexity forces every edge direction to appear exactly once, and primitive vectors dominate longer ones of the same slope. For $4 | N$ exactly two configurations exist: vertices on both symmetry axes (lattice centre, $t = N\/4$ chain vectors) or unit edges crossing both axes (centre at half-integer coordinates, $t = N\/4 - 1$); the mixed case has $N equiv 2 space (mod 4)$. Expanding the identity $2 dot "Area" = sum_(i<j) "cross"(e_i, e_j)$ over the full symmetric edge cycle gives
+$ "Area"_(V V) = 2 sum a_i b_i + 4 sum_(i<j) max(a_i b_j, a_j b_i), quad "Area"_(E E) = "Area"_(V V) + 2 sum (a_i + b_i) + 1, $
+both verified against direct shoelace evaluation of the constructed polygons on hundreds of random vector sets (these checks caught two mirror-vertex bugs in the builder). The hand-checkable cases $A(4) = 1$ (unit square, EE with $t = 0$) and $A(8) = 7$ confirm the constants.
+
+== Exact optimisation
+
+Choosing the $t$ vectors is now a pure combinatorial minimisation. Greedy construction, $1$- and $2$-swap local search and simulated annealing all agree with exhaustive subset enumeration up to $t = 13$ and reproduce $A(40) = 1039$ and $A(100) = 17473$ — yet at $N = 1000$ they all plateau at $18409935$, a startling $12208$ above the optimum. The key observation: sorting candidates by slope (steepest first), the pairwise term between a steeper $i$ and flatter $j$ is $a_j b_i$, so a newly chosen vector interacts with all previously chosen ones only through $4 a B$, where $B$ is the prefix sum of chosen $b$'s. A dynamic programme over (count, $B$) is therefore *exact*: over the pool of primitive vectors with $a, b <= 40$ and $B <= 3000$ it runs in a second and yields $18397727$, stable under enlarging the pool and cap.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=743")[= Problem 743: Window into a Matrix]
+
+Solution: 259158998
+
+$A(k, n)$ counts $2 times n$ binary matrices in which every $2 times k$ window sums to $k$; we need $A(10^8, 10^16)$ modulo $10^9 + 7$.
+
+== Structure
+
+Sliding a window one column right exchanges one column for another with the same total, so the column sums $c_i in {0, 1, 2}$ satisfy $c_(i+k) = c_i$: they are periodic with period $k$, and one period's sums total $k$. Here $k | n$, so each residue class contains exactly $n\/k$ columns. A class with sum $0$ or $2$ fixes both entries of all its columns; a class with sum $1$ leaves a free row choice in each of its $n\/k$ columns, contributing a factor $g = 2^(n\/k)$ per class. If $j$ classes have sum $1$ (necessarily $j equiv k space (mod 2)$), the remaining $k - j$ split evenly into $m = (k-j)\/2$ zeros and $m$ twos, giving
+$
+A(k, n) = sum_(j equiv k (mod 2)) k! / (j! thin m! thin m!) dot g^j .
+$
+The check values $A(3, 9) = 560$ and $A(4, 20) = 1060870$ confirm this.
+
+== Evaluation at $k = 10^8$
+
+Rather than storing factorials up to $10^8$, walk $j$ downward from $k$ (where the term is $g^k$). Stepping $j -> j - 2$ multiplies the term by $j(j-1)$ and divides by $(m+1)^2 g^2$, so with a table of modular inverses of $1, dots, k\/2 + 1$ (built by the standard $"inv"[i] = -(floor(p\/i)) dot "inv"[p mod i]$ recurrence) each step is a few multiplications. The $5 dot 10^7$ steps run in about a second under Numba.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=744")[= Problem 744: What? Where? When?]
+
+Solution: 0.0001999600
+
+Among $2n + 1$ envelopes, $2n$ hold questions (answered correctly with probability $p$, independently) and one holds the red card; envelopes are drawn in random order and the game ends normally when either side reaches $n$ points first. We need $f(10^11, 0.4999)$ to ten decimals.
+
+== Reduction
+
+The red card occupies a uniform slot among the $2n + 1$. The game ends normally iff that slot comes after the deciding question $S$, the number of questions needed for $n$ successes or $n$ failures, so
+$
+f(n, p) = bb(E)[(2n + 1 - S)/(2n + 1)] = (1 + bb(E)[R])/(2n + 1), quad R = 2n - S,
+$
+where $R$ is $n$ minus the loser's final score. The loser's score follows a two-branch negative binomial: $P(L = ell) = binom(n - 1 + ell, ell)(p^n q^ell + q^n p^ell)$. Exact rational evaluation reproduces both small givens.
+
+== Large $n$
+
+At $n = 10^11$, $p = 0.4999$: the expert side wins with probability at most $exp(-4n(q - p)^2) = exp(-4000)$ (Hoeffding), so only the viewers' branch matters and its conditional distribution is its own normalisation. With $r = n - ell$, the weights obey
+$
+u(r + 1)/u(r) = (n - r)/((2n - 1 - r) p),
+$
+so start at the peak $r_0 = (n(1 - 2p) + p)\/(1 - p) approx 4 dot 10^7$ and sweep outward until the terms fall below $10^(-18)$ of the peak ($approx 3 dot 10^7$ terms), accumulating $sum u$ and $sum r u$; then $bb(E)[R] = sum r u \/ sum u$ — no absolute normalisation needed. The method agrees with exact summation to machine precision in strongly biased mid-size cases and reproduces the given $f(10^4, 0.3) = 0.2857499982$; the literal game was also simulated as a sanity check.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=745")[= Problem 745: Sum of Squares II]
+
+Solution: 94586478
+
+Let $g(n)$ be the largest perfect square dividing $n$; we need $S(N) = sum_(n <= N) g(n)$ for $N = 10^14$, modulo $10^9 + 7$.
+
+Every $n$ factors uniquely as $n = a^2 b$ with $b$ squarefree, and then $g(n) = a^2$. Grouping by $a$,
+$
+S(N) = sum_(a^2 <= N) a^2 dot Q(floor(N \/ a^2)),
+$
+where $Q(x)$ counts squarefree numbers up to $x$. Expanding $Q(x) = sum_(d^2 <= x) mu(d) floor(x \/ d^2)$ and collecting terms by $k = a d$ gives
+$
+S(N) = sum_(k^2 <= N) J_2 (k) dot floor(N / k^2), quad J_2 (k) = sum_(d | k) mu(d) (k/d)^2,
+$
+where $J_2$ is the Jordan totient, the multiplicative function with $J_2 (p^e) = p^(2e) - p^(2e-2)$. Sieve $J_2$ up to $sqrt(N) = 10^7$ (start from $k^2$ and for each prime $p | k$ subtract the $1\/p^2$ share), then accumulate the single sum modulo $10^9 + 7$. As a check, $S(10) = 24$ and $S(100) = 767$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=746")[= Problem 746: A Messy Dinner]
+
+Solution: 867150922
+
+$n$ four-person families sit at a circular table with $4n$ labeled seats, men and women alternating; $M(n)$ counts seatings where no family occupies four consecutive seats, and we need $S(2021) = sum_(k=2)^2021 M(k)$ mod $10^9 + 7$.
+
+== Inclusion–exclusion over family blocks
+
+Exhaustive enumeration at $n = 1, 2$ pinned the convention (labeled seats, both gender parities counted). Forcing a chosen set of $j$ families to sit as blocks: $j$ disjoint blocks of $4$ consecutive seats fit on a $4k$-cycle in $(4k)/(4k - 3j) binom(4k - 3j, j)$ ways (the standard cycle block count); the $j$ families are assigned to the blocks in $k!\/(k-j)!$ ways with $2! dot 2! = 4$ internal orders each (father/son in the block's two men seats, mother/daughter in the two women seats); the remaining $2k - 2j$ men and women fill their seat classes independently; and a global factor $2$ picks which parity class holds the men. Hence
+$ M(k) = 2 sum_(j=0)^k (-1)^j binom(k, j) j! (4k)/(4k - 3j) binom(4k - 3j, j) thin 4^j ((2k - 2j)!)^2. $
+An arithmetic slip in the $j = 2$ term initially produced $913920$ for $M(3)$; the corrected term ($23040$, not $46080$) gives $890880$, matching the given value, and the formula also reproduces $M(10)$ and $S(10)$. Summing $M(k)$ for $k <= 2021$ is a trivial double loop with precomputed factorials.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=747")[= Problem 747: Triangular Pizza]
+
+Solution: 681813395
+
+Mamma Triangolo cuts a triangular pizza into $n$ equal-area triangular pieces with $n$ straight cuts from an interior point $P$ to the boundary; $psi(n)$ counts the ways, and we need $Psi(10^8) = sum_(n=3)^(10^8) psi(n)$ mod $10^9 + 7$.
+
+== Classifying the cuttings
+
+Each piece is bounded by two rays from $P$ plus a boundary arc, so it is a triangle in exactly two ways: a *fan piece* with apex $P$ (arc is a single segment), or a *chord piece* where the two rays are collinear (angle $pi$ at $P$) and the arc passes one corner — the corner is sliced off by a chord through $P$, and $P$ is not a vertex of that piece. Two chord pieces would require two disjoint straight angles, so each cutting has at most one.
+
+*No chord:* rays go to all three corners, splitting the pizza into fans of $k_1, k_2, k_3 >= 1$ pieces; $P$ is the unique barycentric point, giving $binom(n-1, 2)$ cuttings. *Chord with an endpoint at a corner* (slicing corner $C$ with a chord from a point of $C A$ through $P$ to corner $B$, say): the position of $P$ on the chord is uniquely determined by the two fan counts and is always interior, giving $6(n - 2)$ cuttings — exactly the six extra cuttings visible in the $psi(3) = 7$ example. *Generic chord:* with $e_1$ at fraction $alpha$ along $C A$, $e_2$ at $1\/(n alpha)$ along $C B$, and fan counts $m_1, m_2, m_3 >= 1$ over $e_1 A$, $A B$, $B e_2$, eliminating all other unknowns leaves
+$ n(m_1 + 1) alpha^2 - (m_1 + m_3 + n + 1) alpha + (m_3 + 1) = 0 $
+on the validity interval $((m_3+1)\/n, 1\/(m_1+1))$. The quadratic is positive at both endpoints (values $m_1 m_3 (m_3+1)\/n$ and $m_1 m_3\/(m_1+1)$), so valid roots come in pairs, and with $s = m_1 + m_3$, $q = (m_1+1)(m_3+1)$ the vertex-and-discriminant condition collapses to the single inequality $n > n_+ = 2q - s - 1 + 2 sqrt(q m_1 m_3)$, with one tangency root exactly when $n = n_+$ is an integer (i.e. $q m_1 m_3$ a perfect square).
+
+== Summation
+
+Summing over $n <= m$ swaps into a loop over pairs: each $(m_1, m_3)$ contributes $2(m - floor(n_+))$ plus $1$ if $n_+$ is an integer $<= m$. Since $n_+ approx 4 m_1 m_3$, about $m\/4 dot ln m approx 5 dot 10^8$ pairs are scanned with exact integer square roots — three seconds in numba. The formula reproduces $psi(3) = 7$, $psi(6) = 34$, $psi(10) = 90$, $Psi(10) = 345$ and $Psi(1000) = 172166601$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=748")[= Problem 748: Upside Down]
+
+Solution: 276402862
+
+We sum $x + y + z$ over primitive solutions of $1\/x^2 + 1\/y^2 = 13\/z^2$ with $x <= y$ and all variables at most $N = 10^16$, reporting the last nine digits.
+
+== Reduction
+
+Writing $x = g u$, $y = g v$ with $g = gcd(x, y)$ and $gcd(u, v) = 1$, the equation becomes $z^2 (u^2 + v^2) = 13 g^2 u^2 v^2$. Coprimality forces $u v | z$, and writing $z = u v w$ leaves $w^2 (u^2 + v^2) = 13 g^2$ with $gcd(w, g) = 1$, so $w^2 | 13$, i.e. $w = 1$. Hence primitive solutions correspond exactly to
+$ u^2 + v^2 = 13 g^2, quad gcd(u, v) = 1, quad x = g u, y = g v, z = u v, $
+and primitivity of $(x, y, z)$ is automatic (a prime dividing $g$ and $u$ would divide $v^2$).
+
+== Gaussian parametrization
+
+In $ZZ[i]$, $13 = (3 + 2i)(3 - 2i)$, and $gcd(u, v) = 1$ forces $u + v i = epsilon (3 plus.minus 2i)(s + t i)^2$ with $g = s^2 + t^2$, $gcd(s, t) = 1$. Both $s, t$ odd makes $u, v$ even, so $s + t$ must be odd; the two conjugate families over $s > t >= 0$ then enumerate each unordered primitive pair exactly once (a duplicate check over millions of generated solutions found none), coinciding only at $t = 0$ where one family is skipped. The rare imprimitive cases where $3 - 2i$ divides $s + t i$ (giving $13 | gcd(u, v)$) are caught by an explicit $gcd(u, v) = 1$ test. Since $max(u, v) >= sqrt(13\/2) g$, the constraint $y <= N$ forces $g <= sqrt(N \/ 2.55)$, so $s <= N^(1\/4)$ and the whole enumeration is a $approx 10^8$-pair numba loop. The parametrization reproduces the full brute-force solution set for small bounds and the given $S(10^2) = 124$, $S(10^3) = 1470$, $S(10^5) = 2340084$.
+
+One amusing trap: the loop bound must be precomputed, since writing it as $2 s^4 <= 13 N^2$ overflows int64 for $N = 10^16$ and silently returns $0$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=749")[= Problem 749: Near Power Sums]
+
+Solution: 13459471903176422
+
+$n$ is a _near power sum_ if for some positive integer $k$ the sum of the $k$th powers of its digits equals $n + 1$ or $n - 1$ (e.g. $3^2 + 5^2 = 34 = 35 - 1$). We need $S(16)$, the sum of all such numbers with at most $16$ digits.
+
+The power sum depends only on the *multiset* of digits, so enumerate multisets rather than the $10^16$ numbers: for each length $d <= 16$ there are $binom(d + 9, 9)$ multisets, about $5.3$ million in total. For a multiset, run $k = 1, 2, dots$ and form $s = sum_v c_v dot v^k$; the only candidates this multiset can certify are $n = s - 1$ and $n = s + 1$, so check whether either lies in the $d$-digit range and has exactly this digit multiset. Stop increasing $k$ once $s$ exceeds $10^16 + 1$, or immediately after $k = 1$ when every digit is $0$ or $1$ (then $s$ never grows). Powers in the lookup table are clamped at $10^16 + 2$ so the running sums cannot overflow 64-bit integers before the cut-off test fires.
+
+A number may qualify for several exponents $k$ (or as both $s - 1$ of one power sum and $s + 1$ of another), so collect the hits and sum the distinct values. The whole search runs in seconds under Numba; $S(2) = 110$ and $S(6) = 2562701$ agree with the problem.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=750")[= Problem 750: Optimal Card Stacking]
+
+Solution: 160640
+
+Cards $1, dots, N$ sit at table positions $1, dots, N$, the card at position $p$ being $3^p mod (N + 1)$ (a permutation when defined). A pile may be dragged onto another pile only if the result is in sequence; $G(N)$ is the minimal total horizontal drag distance to reach a single pile, and we need $G(976)$.
+
+Any pile that can ever appear holds a consecutive range of cards $[i..j]$, since "in sequence" must hold for the final pile and every merge preserves it. Dropping pile $[i..k]$ onto pile $[k+1..j]$ reads, top to bottom, $i, dots, k, k+1, dots, j$ — in sequence — whereas the reverse drop is not. So the moving pile always carries the smaller cards, the merged pile remains where the target stood, and by induction every pile $[i..j]$ sits at the original position of card $j$. The cost of the merge is $|"pos"[k] - "pos"[j]|$, giving the interval DP
+$
+"dp"[i][j] = min_(i <= k < j) ("dp"[i][k] + "dp"[k+1][j] + |"pos"[k] - "pos"[j]|),
+$
+with $G(N) = "dp"[1][N]$. The position convention is confirmed by $G(6) = 8$ and $G(16) = 47$ (the plausible alternative — piles sitting at the position of their smallest card — gives $9$ and $54$ and is ruled out). The $O(N^3)$ table for $N = 976$ is under a billion cheap operations, a few seconds with Numba.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=751")[= Problem 751: Concatenation Coincidence]
+
+Solution: 2.223561019313554106173177
+
+From a real $theta$, the rule $b_1 = theta$, $b_n = floor(b_(n-1)) (b_(n-1) - floor(b_(n-1)) + 1)$, $a_n = floor(b_n)$ generates a non-decreasing integer sequence, and $tau(theta)$ is the decimal $a_1 . a_2 a_3 a_4 dots$ obtained by concatenating its terms. We want the unique fixed point $tau(theta) = theta$ with $a_1 = 2$.
+
+The key observation is that $tau$ is a contraction: the first several terms $a_1, dots, a_m$ depend only on the leading digits of $theta$, so if $theta$ and $theta'$ agree to $d$ decimal places then $tau(theta)$ and $tau(theta')$ agree to (more than) $d$ places. Hence simple iteration converges: start from $theta = 2$, repeatedly replace $theta$ with $tau(theta)$ (computed with `Decimal` arithmetic at $34$-digit precision, concatenating terms until the fractional part is long enough), and stop when the value no longer changes. Truncating the fixed point to $24$ places gives the answer.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=752")[= Problem 752: Powers of $1 + sqrt(7)$]
+
+Solution: 5610899769745488
+
+Writing $(1 + sqrt(7))^n = alpha(n) + beta(n) sqrt(7)$, $g(x)$ is the least $n > 0$ with $alpha(n) equiv 1$ and $beta(n) equiv 0 mod x$ (or $0$ if none); we need $G(10^6) = sum_(x=2)^(10^6) g(x)$, exactly.
+
+$g(x)$ is the multiplicative order of the element $u = 1 + sqrt(7)$ in the ring $bb(Z)[sqrt(7)] \/ (x)$. Since $(1 + sqrt(7))(1 - sqrt(7)) = -6$, $u$ is a unit exactly when $6$ is invertible, so $g(x) = 0$ iff $gcd(x, 6) > 1$ (matching $g(3) = 0$), and otherwise the order exists. By the Chinese remainder theorem $g(x)$ is the lcm of $g(p^e)$ over the prime powers dividing $x$.
+
+For a prime $p >= 5$, $p != 7$: if $7$ is a quadratic residue mod $p$ the ring splits as $bb(F)_p times bb(F)_p$ and the unit group has exponent $p - 1$; otherwise it is $bb(F)_(p^2)^*$ of order $p^2 - 1$. Start the order at that exponent and strip it: for each prime $q$ dividing it (factored with a smallest-prime-factor sieve, conveniently via $p - 1$ and $p + 1$), keep dividing by $q$ while $u^("order"\/q) = 1$, testing with binary exponentiation on pairs $(alpha, beta)$. For $p = 7$ the ring is $bb(F)_7 [t] \/ (t^2)$ where $(1 + t)^n = 1 + n t$, so the order is $7$; the code finds it by lifting from $1$. Orders lift to prime powers in the usual way: $g(p^e)$ equals $g(p^(e-1))$ multiplied by $p$ as long as the power is not the identity modulo $p^e$.
+
+Finally each $x <= 10^6$ coprime to $6$ is factored by the sieve and the lcm assembled; the exact total fits comfortably in 64 bits. The givens $G(10^2) = 28891$ and $G(10^3) = 13131583$ agree.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=753")[= Problem 753: Fermat Equation]
+
+Solution: 4714126766770661630
+
+$F(p)$ counts solutions of $a^3 + b^3 equiv c^3 space (mod p)$ with $1 <= a, b, c < p$; we sum $F(p)$ over primes $p < 6000000$ (exactly, no modulus).
+
+== Two cases
+
+If $p equiv.not 1 space (mod 3)$, cubing is a bijection on the nonzero residues (also for $p = 3$, where $x^3 equiv x$), so $F(p)$ counts pairs $(a, b)$ of nonzero residues with $a + b eq.not 0$: $F(p) = (p-1)(p-2)$. This matches $F(5) = 12$.
+
+If $p equiv 1 space (mod 3)$, use Gauss's classical count for the Fermat cubic: the projective curve $x^3 + y^3 + z^3 = 0$ over $bb(F)_p$ has
+$
+N = p + 1 + a, quad "where" 4p = a^2 + 27 b^2, space a equiv 1 space (mod 3),
+$
+a condition that pins down $a$ (including its sign) uniquely. The affine solution count of $x^3 + y^3 = z^3$ is $(p-1) N + 1$, since each projective point gives $p - 1$ scalings plus the origin. Solutions with a zero coordinate: each of the three coordinate hyperplanes contributes $3(p-1)$ nonzero solutions (e.g. $z = 0$ forces $x^3 = (-y)^3$, three $x$ per $y$ as the cube roots of unity number three), and inclusion–exclusion over the all-zero point gives $9(p-1) + 1$ in total. Hence
+$
+F(p) = (p-1) N + 1 - 9(p-1) - 1 = (p-1)(p + a - 8),
+$
+which gives $F(7) = 6 dot (7 + 1 - 8) = 0$ as stated ($28 = 1^2 + 27$, $a = 1$). The formula was also checked against brute force for all primes up to $67$.
+
+== Computation
+
+Sieve the primes below six million. For each $p equiv 1 space (mod 3)$, find the representation $4p = a^2 + 27 b^2$ by scanning $b$ and testing $4p - 27 b^2$ for squareness; $b$ stays below $sqrt(4p\/27) approx 940$, so the whole sum takes a few seconds under Numba. The total, about $4.7 dot 10^18$, still fits in a signed 64-bit integer.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=754")[= Problem 754: Product of Gauss Factorials]
+
+Solution: 785845900
+
+The Gauss factorial $g(m)$ multiplies the positive integers up to $m$ coprime to $m$; we need $G(10^8) = product_(m <= 10^8) g(m)$ modulo $10^9 + 7$.
+
+Möbius inversion over the coprimality condition gives
+$
+g(m) = product_(d | m) ((m\/d)! dot d^(m\/d))^(mu(d)),
+$
+and exchanging the order of the double product,
+$
+G(n) = product_(d <= n) ("SF"(M) dot d^(T(M)))^(mu(d)), quad M = floor(n \/ d), space T(M) = M(M+1)\/2,
+$
+where $"SF"(M) = product_(m <= M) m!$ is the superfactorial.
+
+The quotient $M$ takes only $O(sqrt(n))$ distinct values, so group the $d$ sharing a quotient: each block contributes $"SF"(M)^s dot (P_+ \/ P_-)^(T(M))$ where $s$ is the sum of $mu$ over the block and $P_(plus.minus)$ are the products of the $d$ with $mu(d) = plus.minus 1$. Per block this needs running products (linear in $d$ overall) and a couple of modular powers, with exponents of $d$ reduced modulo $10^9 + 6$ by Fermat (every $d < p$). The superfactorial values at all block quotients come from one linear factorial pass to $10^8$ that records checkpoints, and a linear Möbius sieve provides $mu$. Factors with negative exponent are collected into a denominator and inverted once at the end.
+
+The whole computation is about $3 dot 10^8$ modular multiplications. The construction was cross-checked against direct computation of $G(n)$ for many small $n$, including the given $G(10) = 23044331520000$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=755")[= Problem 755: Not Zeckendorf]
+
+Solution: 2877071595975576960
+
+$f(n)$ counts the ways to write $n$ as a sum of distinct Fibonacci numbers from ${1, 2, 3, 5, 8, dots}$ (with $f(0) = 1$), and $S(n) = sum_(k=0)^(n) f(k)$. We need $S(10^13)$.
+
+Summing $f$ over $k <= N$ counts pairs (representation, total), which is simply the number of *subsets* of Fibonacci numbers with sum at most $N$ — the empty subset accounts for $f(0)$. Count these from the largest Fibonacci number downward. With $P_i = F_1 + dots + F_i$ the prefix sums, define $C(i, "cap")$ as the number of subsets of the first $i$ Fibonacci numbers with sum $<= "cap"$:
+- if $"cap" < 0$, none;
+- if $"cap" >= P_i$, every subset qualifies: $2^i$;
+- otherwise $C(i, "cap") = C(i-1, "cap") + C(i-1, "cap" - F_i)$.
+
+The shortcuts do the heavy lifting: each Fibonacci number exceeds half the prefix sum below it, so the caps reachable at level $i$ without triggering a shortcut form only a handful of distinct values, and a memoised recursion touches a few thousand states for $N = 10^13$ (64 Fibonacci numbers). Plain Python with `functools.cache` answers instantly; $S(100) = 415$ and $S(10^4) = 312807$ match.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=756")[= Problem 756: Approximating a Sum]
+
+Solution: 607238.610661
+
+A uniform random increasing $m$-tuple $0 < X_1 < dots < X_m <= n$ approximates $S = sum_(k<=n) f(k)$ by $S^* = sum_i f(X_i)(X_i - X_(i-1))$. We need $bb(E)(Delta | phi(k), 12345678, 12345)$ with $Delta = S - S^*$, to six decimals.
+
+== A cancellation-free closed form
+
+Naively $bb(E)[Delta]$ is the difference of two quantities near $4.6 dot 10^13$ needed to $10^(-7)$ — hopeless numerically. Instead condition on $k$ being selected with predecessor $j$: the gap weight is $binom(n - (k - j) - 1, m - 2)$, and summing over $j$ with the hockey-stick and the Vandermonde-type identity $sum_d d binom(n - d - 1, m - 2) = binom(n, m)$ collapses everything to the positive form
+$
+bb(E)[Delta] = sum_(k=1)^(n) f(k) binom(n - k, m) / binom(n, m).
+$
+This was verified by exhaustive enumeration over all $m$-subsets for several small $(n, m)$ and three different $f$, and reproduces $bb(E)(Delta | k, 100, 50) = 2525\/1326$ exactly.
+
+== Evaluation
+
+The weight $R(k) = product_(j < k) (n - m - j)\/(n - j)$ decays like $e^(-k m\/n)$ (scale $approx 1000$ here), so only $k$ up to a few hundred thousand matter; the truncation tail is below $10^(-25)$. The running product is kept in $40$-digit `Decimal` so accumulated rounding cannot touch the sixth decimal, with $phi$ from a small sieve. The given $bb(E)(Delta | phi, 10^4, 10^2) = 5842.849907$ reproduces to all shown digits.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=757")[= Problem 757: Stealthy Numbers]
+
+Solution: 75737353
+
+$N$ is _stealthy_ if $N = a b = c d$ with $a + b = c + d + 1$. We count stealthy numbers up to $10^14$.
+
+== Parametrisation
+
+The stealthy numbers are exactly $N = x(x+1) y(y+1)$ for positive integers $x, y$. One direction is a direct check: the factor pairs $(x y, (x+1)(y+1))$ and $(x(y+1), y(x+1))$ both multiply to $N$, with sums $2 x y + x + y + 1$ and $2 x y + x + y$.
+
+For the converse, suppose $a b = c d = N$ and $a + b = s + 1$, $c + d = s$. Then $a, b$ and $c, d$ are integer roots of $t^2 - (s+1) t + N$ and $t^2 - s t + N$, so both discriminants are perfect squares: $(s+1)^2 - 4N = D_1^2$ and $s^2 - 4N = D_2^2$. Subtracting, $(D_1 - D_2)(D_1 + D_2) = 2s + 1$, which is odd, so $D_1 - D_2 = u$ and $D_1 + D_2 = v$ for odd $u, v$ with $u v = 2s + 1$. Then
+$
+4N = s^2 - D_2^2 = ((u v - 1)/2)^2 - ((v - u)/2)^2 = ((u^2 - 1)(v^2 - 1))/4,
+$
+and writing $u = 2x + 1$, $v = 2y + 1$ gives $N = x(x+1) y(y+1)$ (with $x, y >= 1$ since $N > 0$).
+
+== Counting
+
+Enumerate all products $x(x+1) y(y+1) <= 10^14$ with $x <= y$; there are about $8 dot 10^7$ pairs since $x <= 3162$ and $y$ ranges up to roughly $10^7 \/ x$. The same $N$ can arise from different pairs, so collect the values into an array, sort, and count distinct entries. The given $2851$ stealthy numbers up to $10^6$ confirms the method (and a brute-force check of the parametrisation against the definition agrees up to $5000$).
+
+#pagebreak()
+#link("https://projecteuler.net/problem=758")[= Problem 758: Buckets of Water]
+
+Solution: 331196954
+
+Buckets of sizes $a$, $b$, $a + b$ (coprime $a <= b$) start with the small two full; pours run until the source empties or the destination fills, and $P(a, b)$ is the minimal number of pours until some bucket holds exactly one litre. We need $sum P(2^(p^5) - 1, 2^(q^5) - 1)$ over primes $p < q < 1000$, modulo $10^9 + 7$.
+
+== Closed form for $P$
+
+Since the large bucket can always absorb or supply a full small-bucket move, the state is $(s, m)$ and the moves are the classic two-jug operations. BFS experiments show the shortest solution is always one of the two *pure cyclic* strategies (pour $S -> M$ with refills/empties, or the mirror); on each cycle the medium bucket holds $a k mod b$ after $k$ transfers, and the litre appears at the first $k$ with $a k equiv plus.minus 1 (mod b)$. Counting fills, empties and pours gives $2(k + floor(a k\/b)) - 2$ for the $+1$ branch and $+1$ for the $-1$ branch, and similarly with roles swapped. Writing $a x + b y = 1$ for the minimal Bezout pair ($|x| < b\/2$, $|y| < a\/2$), the four branch counts pair up — each direction's $-1$ branch exceeds the other direction's $+1$ branch by exactly $3$ — and everything collapses to
+$
+P(a, b) = 2(|x| + |y|) - 2.
+$
+This was verified against BFS for every coprime pair with $3 <= a < 60$, $b < 140$, and reproduces $P(3,5) = 4$, $P(7,31) = 20$, $P(1234, 4321) = 2780$.
+
+== Mersenne arithmetic
+
+For $a = 2^u - 1$, $b = 2^v - 1$ the Euclidean algorithm mirrors Euclid on the exponents: $M_(e_0) mod M_(e_1) = M_(e_0 mod e_1)$, with true quotient $Q = sum_(j < t) 2^(e_2 + j e_1)$ ($t = floor(e_0\/e_1)$), a geometric series evaluated modulo $10^9 + 7$ (with the $2^(e_1) equiv 1$ degenerate case handled separately). Bezout coefficient signs alternate, so their *magnitudes* obey $m_("new") = m_("prev2") + Q m_("prev1")$ and can be tracked purely mod $p$ — no comparisons are ever needed because the $min$ over branches was already absorbed into $|x| + |y|$. The exponent Euclid on $(q^5, p^5)$ takes a few dozen steps; the modular routine was cross-checked against exact big-integer Bezout computation for exponent pairs up to $(3^5, 5^5)$, and the $14000$ prime pairs finish in about a second.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=759")[= Problem 759: A Squared Recurrence Relation]
+
+Solution: 282771304
+
+$f$ satisfies $f(1) = 1$, $f(2n) = 2 f(n)$ and $f(2n+1) = 2n + 1 + 2 f(n) + f(n)\/n$; we need $S(10^16) = sum_(i <= 10^16) f(i)^2$ modulo $10^9 + 7$.
+
+== Closed form
+
+Induction gives $f(n) = n dot b(n)$ with $b$ the binary digit sum: the even case is immediate, and for the odd case
+$
+f(2n + 1) = (2n + 1) + 2 n b(n) + b(n) = (2n+1)(b(n) + 1) = (2n+1) dot b(2n+1).
+$
+(Also verified directly against the recurrence, with exact rationals, for all $n < 20000$.)
+
+== Digit DP
+
+So $S(N) = sum_(m <= N) m^2 b(m)^2$, a classic binary digit walk. For $k$-bit blocks define the nine joint moments $M_k [a][c] = sum_(s < 2^k) s^a b(s)^c$ for $a, c in {0, 1, 2}$; splitting on the top bit,
+$
+M_k [a][c] = M_(k-1) [a][c] + sum_(i <= a) sum_(j <= c) binom(a, i) binom(c, j) (2^(k-1))^(a-i) M_(k-1) [i][j].
+$
+Now scan the bits of $N$ from the top. Every set bit at position $k$ contributes the block of $2^k$ integers sharing the prefix above it — prefix value $A$, prefix digit sum $B$ — namely
+$
+sum_(s < 2^k) (A + s)^2 (B + b(s))^2 = sum_(i, j) binom(2, i) binom(2, j) A^(2-i) B^(2-j) M_k [i][j],
+$
+and $N$ itself is added at the end. Everything is $O(log^2 N)$ arithmetic. The givens $S(10) = 1530$ and $S(10^2) = 4798445$ hold, and the DP was cross-checked against direct summation for $200$ random $N$ up to $50000$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=760")[= Problem 760: Sum over Bitwise Operators]
+
+Solution: 172747503
+
+With $g(m, n) = (m xor n) + (m or n) + (m and n)$, we need $G(N) = sum_(n <= N) sum_(k <= n) g(k, n - k)$ for $N = 10^18$, modulo $10^9 + 7$.
+
+Since $m xor n = m + n - 2(m and n)$ and $m or n = m + n - (m and n)$,
+$
+g(k, n - k) = 2n - 2 (k and (n - k)),
+$
+so $G(N) = 2 sum_(n <= N) n(n + 1) - 2 F(N) = 2N(N+1)(N+2)\/3 - 2F(N)$, where $F(N)$ sums $k and m$ over all pairs $k, m >= 0$ with $k + m <= N$.
+
+$F$ has a clean divide and conquer over the low bits: writing $k = 2k' + i$, $m = 2m' + j$, the AND equals $2(k' and m') + (i and j)$ and the constraint becomes $k' + m' <= floor((N - i - j)\/2)$. Summing the four $(i, j)$ choices,
+$
+F(N) = 2 [F(floor(N/2)) + 2 F(floor((N-1)/2)) + F(floor((N-2)/2))] + P(floor((N-2)/2)),
+$
+where $P(M) = (M+1)(M+2)\/2$ counts pairs with $k' + m' <= M$ (each contributes $1$ in the $i = j = 1$ case). The recursion arguments are $floor(N \/ 2^t)$ up to small shifts, so memoisation visits $O(log^2 N)$ states — microseconds in Python. The givens $G(10) = 754$ and $G(10^2) = 583766$ hold, and the function matches brute force on $37$ values up to $800$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=764")[= Problem 764: Asymmetric Diophantine Equation]
+
+Solution: 255228881
+
+We sum $x + y + z$ over solutions of $16x^2 + y^4 = z^2$ with $1 <= x, y, z <= 10^16$ and $gcd(x, y, z) = 1$, modulo $10^9$.
+
+== Two parametric families
+
+$(4x, y^2, z)$ is a Pythagorean triple. Any odd prime dividing all of $y^2$ and $z$ also divides $x$ (from $16x^2 = z^2 - y^4$), contradicting primitivity, so the triple's gcd is a power of two.
+
+*$y$ odd.* The triple is primitive with odd leg $y^2$: $y^2 = m^2 - n^2$, $4x = 2m n$, $z = m^2 + n^2$ with $m, n$ coprime of opposite parity. Then $m - n$ and $m + n$ are coprime odd squares $s^2 < t^2$ with $s t = y$, which unwinds to
+$
+x = (t^4 - s^4)/8, quad y = s t, quad z = (s^4 + t^4)/2, quad s < t "odd, coprime".
+$
+
+*$y$ even.* Then $x$ is odd, and reducing powers of two ($y = 2u$, $z = 4w$) leaves the primitive triple $x^2 + u^4 = w^2$. The even leg must be $u^2$ (else $x = 2m n$ would be even), so $u^2 = 2m n$ with coprime $m, n$; one of them is $2p^2$ and the other an odd square $q^2$, giving $u = 2 p q$ and
+$
+x = |4p^4 - q^4|, quad y = 4 p q, quad z = 16 p^4 + 4 q^4, quad q "odd", gcd(p, q) = 1.
+$
+
+The parameters are recoverable from $(y, z)$ within each family and the families have opposite $y$-parity, so nothing is counted twice. Completeness was verified against a brute-force solver up to $N = 1500$, and the family enumeration reproduces $S(10^2) = 81$, $S(10^4) = 112851$ (26 solutions) and $S(10^7) equiv 248876211$.
+
+== Enumeration
+
+The hypotenuse bound $z <= N$ is the binding one ($x, y <= N$ then follow, and $x >= 1$ holds since $q^2 = 2p^2$ is impossible). Family A needs $s^4 + t^4 <= 2N$, so $t < 11900$; family B needs $16p^4 + 4q^4 <= N$. A few tens of millions of coprimality tests under Numba finish in seconds.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=765")[= Problem 765: Trillionaire]
+
+Solution: 0.2429251641
+
+Starting with $1$ gram of gold, each of $1000$ rounds you may bet any amount up to your wealth on a coin that pays double with probability $0.6$; we want the maximum probability of holding at least $10^12$ grams at the end, to ten decimals.
+
+== Reduction to a counting problem
+
+A bet of $b$ moves wealth by $+b$ or $-b$, so *under the fair $1\/2$ measure* the wealth process is a nonnegative martingale regardless of strategy — and conversely every nonnegative binary martingale is realised by legal bets. The cheapest way to guarantee wealth $>= T$ exactly on a set $S$ of outcome sequences is the conditional-expectation martingale of $T dot bb(1)_S$, costing $T dot |S| \/ 2^1000$. Hence a success set is achievable iff
+$
+|S| <= k = floor(x_0 dot 2^1000 / T) = floor(2^1000 / 10^12),
+$
+and the optimal strategy simply selects the $k$ *most probable* sequences — those with the most wins:
+$
+V = sum_("top" k "sequences") p^w q^(1000 - w).
+$
+This was verified to agree exactly (in rational arithmetic) with the full Bellman dynamic program on every dyadic wealth state for all horizons up to $11$. Notably, bold play is strictly suboptimal here — with a favourable coin, spare time buys extra paths to the target — so the classical subfair bold-play result does not transfer; the first thing checked, and refuted, was exactly that.
+
+== Evaluation
+
+Take whole win-count layers $binom(1000, w)$ from $w = 1000$ downward until the budget $k$ is exhausted, with a partial layer at the boundary (around $w approx 611$). Everything is exact integer arithmetic: $V = N \/ 10^1000$ with $N$ assembled from $6^w 4^(1000-w)$ terms, rounded half-up to ten decimals at the end — no floating point anywhere.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=768")[= Problem 768: Chandelier]
+
+Solution: 14655308696436060
+
+$f(n, m)$ counts placements of $m$ candles in a ring of $n$ holders with the chandelier balanced; we need $f(360, 20)$.
+
+== Vanishing sums of roots of unity
+
+Balance means the unit vectors at the chosen positions sum to zero, i.e. the chosen subset of $ZZ_360$ has vanishing sum of $360$th roots of unity. Write $ZZ_360 = ZZ_8 times ZZ_9 times ZZ_5$ with $zeta_360 = zeta_8 zeta_9 zeta_5$. Since $zeta_8^(a+4) = -zeta_8^a$, the sum vanishes iff for each $a in {0, dots, 3}$ the difference function $y_a (v, w) = x(a, v, w) - x(a + 4, v, w) in {-1, 0, 1}$ has vanishing $zeta_45$-sum. A cell pair contributes weight $t$ when $y = plus.minus 1$ (one candle) and $1 + t^2$ when $y = 0$ (zero or two candles), so $f(360, m) = [t^m] W(t)^4$.
+
+In turn, the only $ZZ_5$ relation is $1 + zeta_5 + dots + zeta_5^4 = 0$, so a $ZZ_45$ sum vanishes iff all five $ZZ_9$-columns of $y$ have the *same image* in $ZZ[zeta_9]$. Grouping the $3^9$ column functions by image (there are $6859$ classes) with weight $t^(\#"nonzero") (1 + t^2)^(9 - \#"nonzero")$ gives $W = sum_kappa P_kappa (t)^5$, and all polynomial arithmetic is truncated at $t^20$. The identical machinery at $n = 36$ (two $ZZ_4$-pairs over one $ZZ_9$ column, $f = [t^m] V^2$ with $V$ the zero-image class) reproduces the given $f(36, 6) = 876$, and the small cases $f(4, 2) = 2$, $f(12, 4) = 15$ check out by direct enumeration. The whole computation takes a fraction of a second.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=769")[= Problem 769: Binary Quadratic Form II]
+
+Solution: 14246712611506
+
+$C(N)$ counts primitive representations $z^2 = x^2 + 5x y + 3y^2$ with $x, y > 0$ coprime and $z <= N$; we need $C(10^14)$.
+
+== Parametrising the conic
+
+The conic $x^2 + 5x y + 3y^2 = z^2$ has the rational point $(1, 0, 1)$; projecting lines through it gives
+$ (x : y : z) = (3t^2 - s^2 : -t(2s + 5t) : s^2 + 5s t + 3t^2), $
+a bijection between $(s : t)$ and rational points. For coprime $(s, t)$ the gcd of the three forms is $13$ exactly when $s equiv 4t space (mod 13)$ ($4$ is the double root of $c^2 + 5c + 3$ modulo $13$, the discriminant) and $1$ otherwise. Requiring $x, y, z > 0$ forces all three forms to share a sign, which happens precisely for $s\/t in (-5\/2, -sqrt(3))$, all negative; the primitive solution is then $(-X, -Y, -Z)\/d$. The whole correspondence was verified by matching a direct brute-force count at $N = 100$ and $1000$.
+
+== Counting lattice points in the wedge
+
+$C(N)$ thus counts coprime lattice points in a hyperbolic wedge: those with $-Z <= N$, plus those satisfying the mod-$13$ congruence with $N < -Z <= 13N$. Möbius inversion removes coprimality (when $13 | g$ the congruence becomes automatic), and each wedge count runs over $t = O(sqrt(M))$ columns with exact integer-square-root endpoints — the constraint $s^2 + 5s t + 3t^2 >= -M$ becomes $u = 2s + 5t >= sqrt(13t^2 - 4M)$ with the parity of $u$ fixed by $t$, and the congruence class is counted by floor division. About $3 dot 10^8$ operations, four seconds in numba, matching $C(10^3) = 142$ and $C(10^6) = 142463$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=770")[= Problem 770: Delphi Flip]
+
+Solution: 127311223
+
+A displays an amount $x$ up to her current gold; B either TAKEs it or GIVEs the same amount, with $n$ of each over the game. $g(X)$ is the least $n$ for which A can guarantee finishing with $X$ grams from $1$; we need $g(1.9999)$.
+
+== Game value
+
+By scaling, A's guaranteed multiplier $V(t, g)$ depends only on the moves remaining. Displaying the fraction that equalises B's two options gives the harmonic-mean recursion
+$
+V(t, g) = (2 V(t-1, g) V(t, g-1)) / (V(t-1, g) + V(t, g-1)), quad V(0, g) = 2^g, quad V(t, 0) = 1.
+$
+The reciprocal $U = 1\/V$ simply *averages*, so $U(n, n)$ is the expected boundary value of a fair coordinate-decrementing walk. The $g = 0$ boundary is hit with total probability exactly $1\/2$ (a fair race to $n$), and the $t = 0$ boundary telescopes by the hockey-stick identity, leaving the clean closed form
+$
+U(n, n) = 1/2 + binom(2n - 1, n) / 4^n,
+$
+verified against the exact rational game DP for all $n <= 8$, and reproducing $g(1.7) = 10$.
+
+== Search
+
+$g(X)$ is the least $n$ with $binom(2n-1, n)\/4^n <= (2 - X)\/(2X) = 1\/39998$, and the left side is strictly decreasing (ratio $(2n+1)\/(2n+2)$). Since $n approx 1.27 dot 10^8$ and consecutive values differ by only $approx 4 dot 10^(-9)$ relatively, double precision is insufficient; the comparison is done in $50$-digit `Decimal` arithmetic via the Stirling series for $ln Gamma$ (truncation error below $10^(-40)$ at this scale), with a doubling-plus-bisection search.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=771")[= Problem 771: Pseudo Geometric Sequences]
+
+Solution: 398803409
+
+$G(N)$ counts strictly increasing sequences of at least $5$ terms $<= N$ with $|a_i^2 - a_(i-1) a_(i+1)| <= 2$ for all interior $i$; we need $G(10^18)$ mod $10^9 + 7$.
+
+== Rigidity and classification
+
+Write $e_i = a_i^2 - a_(i-1) a_(i+1)$. From a pair $(x, y)$ the successor is $z = (y^2 - e)\/x$, so $e equiv y^2 (mod x)$: two residues in $[-2, 2]$ can coincide mod $x$ only for $x <= 3$ ($x = 4$ never branches as squares are $0$ or $1$ mod $4$). Since terms increase, *every sequence is rigid except possibly at its first one or two steps*, and only when it starts with terms $<= 3$.
+
+Long rigid chains classify completely. Scanning all pairs $x in [4, 1500]$, $y <= 10^6$ with rigid depth $>= 3$ gave $304514$ chains and zero exceptions to: (i) *geometric* ($e equiv 0$), ratio $p\/q$ in lowest terms; (ii) *minus recurrences* $a_(i+1) = K a_i - a_(i-1)$ with integer $K >= 3$ and constant invariant $e = x^2 + y^2 - K x y in {plus.minus 1, plus.minus 2}$ ($K = 2$ is the unit-difference arithmetic run); (iii) *plus recurrences* $a_(i+1) = c a_i + a_(i-1)$ with integer $c >= 1$ and alternating Cassini invariant $e_i = (-1)^i J$, $J in {1, 2}$. Integrality of $K$ is provable: $gcd$ of consecutive terms squares into $e$, hence is $1$, and four-term integrality forces $a_1 | e(e - a_0^2)$, which for $|e| <= 2$ makes $(x^2 + y^2 - e)\/(x y)$ an integer (the half-integer case for $|e| = 2$ dies on a parity contradiction). Reduction of the two quadratic forms shows every minus/plus fundamental has $x = 1$: minus has $(1, K)$ for all $K$ ($e = 1$) plus sporadic $(1, 2)$ at $K = 3$ and $(1, 3)$ at $K = 4$; plus has $(1, 2)$ at $c = 1$, $(1, c)$ for $c >= 2$, and sporadic $(1, 3)$ at $c = 2$.
+
+== Counting by starting pair
+
+Partitioning sequences by their first pair: *Case 3* ($a_0 >= 4$): each zone-maximal rigid chain with $L + 1$ terms contributes $(L - 3)(L - 2)\/2$. The arithmetic chain $4 dots N$ gives $(N - 7)(N - 6)\/2$; geometric maximal chains are counted by $(p, q, c, M)$, where backward-maximality is $p divides.not c$ and forward-maximality is *not* ($q | c$ and $(c\/q) p^(M+1) <= N$) — the forward correction is independent of $q$, a subtlety first exposed by a one-sequence discrepancy at $N = 243$ where the chain $32, 48, 72, 108, 162$ extends to $243 = c p^(M+1)\/q$. Chains with head $c q^M < 4$ (only $q = 1$, $c <= 3$) are enumerated explicitly with zone truncation, and minus/plus chains contribute for $K, c lt.tilde (4N)^(1\/5) approx 4000$. *Case 2* ($a_0 <= 3 < 4 <= a_1$): the fifth term grows like $a_1^4\/a_0^3$, so a direct loop over $a_1 <= 75100$ with exact integer walks suffices. *Case 1* (starts $(1,2), (1,3), (2,3)$): a tiny explicit DFS with closed-form arithmetic tails.
+
+The result matches a full DFS brute force at $N = 6, 10, 100, 243, 1000, 2000, 5000, 12345, 20000$ exactly, and $G(10^18)$ evaluates in under a second.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=772")[= Problem 772: Balanceable Partitions]
+
+Solution: 83985379
+
+$f(k)$ is the smallest $N$ all of whose $k$-bounded partitions (parts $<= k$) can be split into two equal-sum halves; we need $f(10^8)$ mod $10^9 + 7$.
+
+== The answer is $2 op("lcm")(1, dots, k)$
+
+Necessity is the easy direction: for any $d <= k$ that tiles $N$, the partition into all $d$'s (plus a forced remainder) has subset sums in $d ZZ$, so $N\/2$ must be divisible by enough structure that $N = 2 op("lcm")(1, dots, k)$ becomes the first candidate. Sufficiency is the deep direction; rather than prove it, we verified the claim exhaustively: for $k = 2, 3, 4, 5$, every $k$-bounded partition of every even $N$ up to and including $2 op("lcm")$ was generated and tested for balanceability with subset-sum bitsets — for $k = 5$ this means all $approx 72000$ partitions of $120$ into parts $<= 5$ — confirming $f(k) = 2 op("lcm")(1, dots, k)$ with counterexamples at every smaller even $N$. The given values agree: $f(3) = 12 = 2 dot 6$, and $f(30) = 2 dot 2329089562800 equiv 179092994$.
+
+The computation is then $2 product_(p <= 10^8) p^(floor(log_p 10^8))$ mod $10^9 + 7$ via a numba sieve over the $5761455$ primes below $10^8$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=773")[= Problem 773: Ruff Numbers]
+
+Solution: 556206950
+
+$S_k$ holds $2$, $5$ and the first $k$ primes ending in $7$; $N_k$ is their product, and $F(k)$ sums the numbers below $N_k$ ending in $7$ that avoid every prime in $S_k$. We need $F(97)$ modulo $10^9 + 7$.
+
+Write $N_k = 10 M$ with $M$ the product of the $k$ primes. Inclusion–exclusion over the subset $T$ of those primes dividing $n$ writes $n = P_T m$ with $m equiv c_T (mod 10)$, where $c_T = 7 dot P_T^(-1) equiv 7 dot 3^(|T|) (mod 10)$ because every prime is $equiv 7$. Each progression has exactly $"cnt"_T = M\/P_T$ terms below $N_k$, summing to $P_T "cnt"_T (c_T + 5("cnt"_T - 1))$ — and the three pieces factor completely:
+- $P_T "cnt"_T = M$ is constant, so the $c_T$ piece is $M sum_j (-1)^j binom(k, j) c_j$ with $c_j$ cycling $7, 1, 3, 9$;
+- the quadratic piece is $5 M^2 product (1 - 1\/p_i) = 5 M phi(M)$;
+- the remaining piece carries $sum_T (-1)^(|T|) = 0$.
+
+So $F(k) = M A + 5 M phi(M)$ — three modular products and a $98$-term alternating sum. This reproduces $F(3) = 76101452$ exactly and matches brute force for $k <= 4$; $F(97)$ is instant.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=776")[= Problem 776: Digit Sum Division]
+
+Solution: 9.627509725002e33
+
+$F(N) = sum_(n<=N) n\/d(n)$ where $d$ is the digit sum, for $N = 1234567890123456789$, in scientific notation with twelve digits after the decimal point.
+
+== Digit DP per digit sum
+
+Group the terms by digit sum $s <= 9 dot 19 = 171$: a standard digit DP over the decimal expansion of $N$ accumulates, for each $s$, the exact pair (count, sum of $n$) using integer arithmetic — the running sum updates as $t arrow.r 10 t + "dig" dot c$ per appended digit. Then $F = sum_s ("sum"_s)\/s$, evaluated in $50$-digit `Decimal` so the requested twelve significant digits are exact. The whole computation touches only a few thousand DP states and runs instantly, matching $F(10) = 19$, $F(123)$ and $F(12345)$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=778")[= Problem 778: Freshman's Product]
+
+Solution: 146133880
+
+The freshman's product $a times.square b$ multiplies decimal numbers digit-by-digit, keeping only the last digit of each digit product (so $234 times.square 765 = 480$). $F(R, M)$ sums $x_1 times.square dots times.square x_R$ over all tuples with $0 <= x_i <= M$; we need $F(234567, 765432)$ modulo $10^9 + 9$.
+
+The operation acts independently on each decimal position (it is associative, position $j$ of the result being the product of all $j$-th digits modulo $10$), so
+$
+F(R, M) = sum_(j) 10^j sum_(w=0)^(9) w dot N_j [w],
+$
+where $N_j [w]$ counts the tuples whose $j$-th digits multiply to $w$ modulo $10$. The $j$-th digits of a single uniform $x in [0, M]$ (padded with leading zeros) follow an easily counted distribution over ${0, dots, 9}$, and $N_j$ is its $R$-fold convolution under the multiplication monoid mod $10$ — computed by binary powering of $10$-vectors, $100$ multiplications per convolution and $log_2 R approx 18$ steps per digit position. Six positions suffice since higher digits are all zero and contribute zero.
+
+The givens $F(2, 7) = 204$ and $F(23, 76) equiv 5870548$ check out, and the construction matches brute force over all tuples for six small $(R, M)$ pairs.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=779")[= Problem 779: Prime Factor and Exponent]
+
+Solution: 0.547326103833
+
+With $p(n)$ the smallest prime factor of $n$ and $alpha(n)$ its exponent, $macron(f)_K$ is the mean of $(alpha(n) - 1)\/p(n)^K$; we need $sum_(K >= 1) macron(f)_K$ to twelve decimals.
+
+== Collapsing the sums
+
+The density of ${p(n) = p, alpha(n) = a}$ is $(1 - 1\/p) p^(-a) product_(q < p)(1 - 1\/q)$, and $sum_(a >= 1) (a - 1)(1 - 1\/p) p^(-a) = 1\/(p(p - 1))$, so $macron(f)_K = sum_p product_(q<p)(1 - 1\/q) \/ (p^K p (p - 1))$. Summing the geometric series over $K$ gives
+$ sum_(K=1)^infinity macron(f)_K = sum_p (product_(q < p)(1 - 1/q)) / (p (p - 1)^2). $
+Terms decay like $1\/(p^3 ln p)$, so primes up to $10^8$ leave a tail far below $10^(-15)$. One sieve pass maintains the running Mertens product with Kahan-compensated accumulators; the same loop reproduces the given $macron(f)_1 approx 0.282419756159$ as a check. Four seconds in numba.
+
+#pagebreak()
 #link("https://projecteuler.net/problem=788")[= Problem 788: Dominating Numbers]
 
 Solution: 471745499
@@ -3879,6 +6082,15 @@ the number of dominating numbers with exactly $d$ digits. Then $D(N) = sum_(d=1)
 == Evaluating modulo $10^9 + 7$
 
 The earlier approach evaluated $binom(d, k)$ and $9^(d-k+1)$ as exact integers; at $d approx 2000$ those are numbers with hundreds to thousands of digits, which is slow. Working modulo the prime $p = 10^9 + 7$ keeps every value small: precompute factorials and their modular inverses (via Fermat's little theorem) up to $N$, and the powers of $9$ up to $N + 1$. The double sum is then $O(N^2)$ cheap modular multiplications, giving $D(2022) equiv 471745499 space (mod p)$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=793")[= Problem 793: Median of Products]
+
+Solution: 475808650131120
+
+With $S_0 = 290797$ and $S_(i+1) = S_i^2 mod 50515093$, $M(n)$ is the median of the pairwise products $S_i S_j$ over $0 <= i < j < n$; we need $M(1000003)$.
+
+The half-trillion products cannot be materialised, but their *rank statistics* are cheap: after sorting the $n$ values, the number of pairs with product at most $x$ follows from one two-pointer sweep — as the smaller factor grows, the largest admissible partner only shrinks, so the sweep is linear. Binary-search $x$ for the smallest value whose count reaches the median rank $(binom(n, 2) + 1) \/ 2$ (the pair count is odd here); that $x$ is itself an attained product and hence the median. About $50$ iterations of an $O(n)$ count under Numba answer in a couple of seconds; products stay below $2^63$. Both givens, $M(3)$ and $M(103)$, check out.
 
 #pagebreak()
 #link("https://projecteuler.net/problem=800")[= Problem 800: Hybrid Integers]
@@ -4015,11 +6227,84 @@ Two range constraints pin down $d$ for each leading digit $a$. The bound $m >= 0
 For each coprime pair the modulus $D' < 10 v^3 <= 8 dot 10^7$, so its multiplicative order is found by trial-factoring with primes up to $9000$, taking $"ord"_(p^e)(10) divides p^(e-1)(p-1)$ on each prime power and combining by lcm. The winning $N(r)$ is assembled $space (mod 10^9 + 7)$ via $m equiv a(u^3 dot 10^(d-1) - v^3) D^(-1)$ and $n equiv a dot 10^(d-1) + m$, where $D$ is invertible because $D < 10^9 + 7$. This reproduces $N(3) = 142857$, $N(1\/10) = 10$, $N(2) = 0$, and $T(3) = 262429173$.
 
 #pagebreak()
+#link("https://projecteuler.net/problem=806")[= Problem 806: Nim on Towers of Hanoi]
+
+Solution: 94394343
+
+Index the $2^n$ positions of the shortest $n$-disk Towers of Hanoi solution from $0$ to $2^n - 1$; reading the position as a Nim game on the three peg heights $(a, b, c)$, the first player loses exactly when $a xor b xor c = 0$. We need $f(10^5)$, the sum of losing indices, modulo $10^9 + 7$.
+
+== Which count triples lose
+
+Since each binary digit of $a xor b xor c$ has even parity, $a + b + c = n$ forces every bit position to occur in exactly zero or two of the three counts, and the doubly-covered positions sum to $n\/2$. So the losing triples are precisely the $3^(\#"bits")$ ways of assigning each binary digit of $m = n\/2$ to one of the three peg pairs — at most $3^6 = 729$ triples for $n = 10^5$.
+
+== From a sum to a count
+
+Reversing time in the Hanoi solution swaps pegs $1$ and $3$: position $2^n - 1 - t$ is position $t$ with the outer pegs exchanged, which permutes the counts and preserves the XOR. The losing indices therefore pair up as $(t, 2^n - 1 - t)$ with no fixed points, so $f(n) = (2^n - 1) dot L(n) \/ 2$ where $L(n)$ merely _counts_ losing positions, and $L(n)$ is the sum of $N(a, b, c)$, the number of indices realising each losing triple, over the few hundred losing triples.
+
+== Counting positions with given peg loads
+
+Processing the $n$ bits of $t$ from the most significant down, the standard recursion (first half: top $n-1$ disks move source $arrow$ spare; second half: source $arrow$ target) shows that maximal runs of equal bits in $t$ are blocks of consecutive disks sitting on a single peg. Tracking which peg hosts each run gives a tidy three-role automaton (current, other, middle): an even-length run swaps current with other, an odd-length run rotates middle into current. Encoding run lengths of each parity as generating-function weights and summing over the automaton's walks with a computer algebra system collapses everything to
+$
+sum N(a,b,c) thin u^a v^b w^c = (u^2 + w^2 + u v + v w + u + w + 2 u v w) / (1 - u^2 - v^2 - w^2 - 2 u v w).
+$
+The denominator says $N$ counts sequences of steps $(2,0,0)$, $(0,2,0)$, $(0,0,2)$ and $(1,1,1)$, the last with weight $2$: after shifting by a numerator monomial, summing $2^ell binom(i+j+k+ell, i\, j\, k\, ell)$ over the number $ell$ of diagonal steps evaluates one $N$ in $O(n)$ multiplications with precomputed factorials. Verified against brute force for all $n <= 14$ and against $f(10) = 67518$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=807")[= Problem 807: Loops of Ropes]
+
+Solution: 0.1091523673
+
+Red ropes join $2n$ random circle points $R_0 R_1, dots, R_(n-1) R_0$ and blue ropes likewise, each rope laid above all previous ones; $P(n)$ is the probability the two closed loops can be pulled apart, and we need $P(80)$.
+
+== Separability is a linking number
+
+Because heights increase with time, each loop is a height-monotone arc closed by one vertical strand at its base point on the boundary circle. The two monotone arcs form a pure braid on two strands, and closing a pure $2$-braid $sigma_1^(2k)$ along the boundary yields the $(2, 2k)$ torus link, which splits exactly when $k = 0$. So the loops separate iff the linking number of the red and blue loops vanishes.
+
+== A telescoping formula
+
+Blue rope $j$ lies above red rope $i$ iff $j >= i$, so the linking number is $sum_j$ (signed crossings of blue rope $j$ with the red path $R_0 dots R_j$). Crossings of a path with a chord telescope into a difference of side indicators of the path's endpoints, leaving
+$
+"lk" = sum_(j=1)^(n-1) s_j, quad s_j = cases(plus.minus 1 & "if chord" B_(j-1) B_j "separates" R_0 "from" R_j, 0 & "otherwise,")
+$
+with the sign set by orientation; the $j = n$ term dies because the full red loop is closed. A Monte Carlo check of $Pr["lk" = 0]$ reproduces $P(3) = 11\/20$ and $P(5) approx 0.4304177690$.
+
+== Exact evaluation
+
+Fix $R_0 = 0$. Each $s_j$ depends on $(B_(j-1), B_j)$ and the independent uniform $R_j$, so with $z$ marking $s_j$,
+$
+E[z^("lk")] = E[product_(j=1)^(n-1) g(B_(j-1), B_j)], quad g(b, b') = cases(1 + (b' - b)(z - 1) & b < b', 1 + (b - b')(z^(-1) - 1) & b > b'.)
+$
+The factors chain through consecutive $B$'s, so iterating the transfer operator $(T f)(b') = integral_0^1 g(b, b') f(b) dif b$ on polynomials in $b$ — whose coefficients are Laurent polynomials in $z$ with rational coefficients — computes $E[z^("lk")]$ exactly after $n - 1$ steps and a final integration. $P(80)$ is the $z^0$ coefficient, an exact rational rounded to ten decimal places.
+
+#pagebreak()
 #link("https://projecteuler.net/problem=808")[= Problem 808: Reversible Prime Squares]
 
 Solution: 3807504276997394
 
 A reversible prime square is the square of a prime that is not a palindrome and whose digit reversal is also the square of a prime. Because squares grow with their root, iterating primes in increasing order yields these in increasing order too. Sieve primes up to about $3.2 dot 10^7$ (where the fiftieth occurs); for each prime $p$, reverse $p^2$, and if the reversal is a perfect square whose root is prime, count $p^2$. Stop at the fiftieth and sum.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=809")[= Problem 809: Rational Recurrence Relation]
+
+Solution: 75353432948733
+
+The function on positive rationals is $f(x) = x$ for integral $x$, $f(x) = f(1\/(1-x))$ for $x < 1$, and otherwise $f(x) = f(1\/(ceil(x) - x) - 1 + f(x - 1))$; we need $f(22\/7) mod 10^15$.
+
+== Unfolding the recursion
+
+Write $x = k + r$ with fractional part $r = c\/b$ and let $phi(r) = 1\/(1 - r) - 1 = c\/(b - c)$, with whole part $m$ and fractional part $r'$. Since $ceil(x) - x = 1 - r$, the third case reads $f(k + r) = f(phi(r) + f(k - 1 + r))$, and the $x < 1$ case is $f(r) = f(1 + phi(r))$. The fractional parts thus march down the finite chain $r arrow r' arrow dots$ (subtractive Euclid on $(b - c, c)$), ending when some $phi$ is an integer — at which point the argument of the outer $f$ is integral and the recursion bottoms out. Writing $G_i (k) = f(k + r_i)$ for the $i$-th chain fraction,
+$
+G_i (k) = G_(i+1)(G_i (k - 1) + m_i), quad G_i (0) = G_(i+1)(1 + m_i),
+$
+with $G_L (k) = (1 + m_L) + k m_L$ at the terminal level — an Ackermann-style cascade. Evaluating these levels bottom-up with exact integers (iterating in $k$, never recursing past the closed terminal form) confirms the given $f(3\/2) = 3$, $f(1\/6) = 65533$ and $f(13\/10) = 7625597484985 = 3^27 - 2$.
+
+== The tower for $22\/7$
+
+For $22\/7 = 3 + 1\/7$ the chain is $1\/7 arrow 1\/6 arrow 1\/5 arrow 1\/4 arrow 1\/3 arrow 1\/2$, all $m_i = 0$ until $phi(1\/2) = 1$. Bottom-up: $G(k, 1\/2) = k + 2$, $G(k, 1\/3) = 2k + 3$, $G(k, 1\/4) = 2^(k+3) - 3$, and $G(k, 1\/5) = 2 arrow.t arrow.t (k+3) - 3$, a power tower of $k + 3$ twos minus $3$. The remaining two levels iterate $x arrow.bar 2 arrow.t arrow.t (x + 3) - 3$, so $f(22\/7)$ is $2 arrow.t arrow.t H - 3$ for a height $H$ far beyond $65536$.
+
+== Modulo $10^15$
+
+The value of $2 arrow.t arrow.t h mod M$ is constant once $h$ exceeds the length of the iterated-totient chain of $M$: each level reduces the modulus to its totient, and the chain of $10^15$ (numbers of the form $2^a 5^b$) reaches $1$ in about $45$ steps. Evaluating the stabilised tower with the rule $2^e equiv 2^(e mod phi(M) + phi(M)) (mod M)$, valid since every remaining exponent dwarfs $log_2 M$, gives the answer.
 
 #pagebreak()
 #link("https://projecteuler.net/problem=810")[= Problem 810: XOR-Primes]
@@ -4033,6 +6318,309 @@ A polynomial of degree $d$ has integer value in $[2^d, 2^(d+1))$, so ordering th
 == Computation
 
 A carry-less sieve marks every XOR-composite below $N$. Any composite of degree $<= 26$ has a factor of degree $<= 13$, so it suffices to run $p$ over the still-unmarked values (the XOR-primes) with $deg p <= 13$, and for each mark $p times.circle q$ for every $q >= 2$ with $deg p + deg q <= 26$. The carry-less product uses the shift-and-XOR loop $r arrow.l r xor a$ while shifting $a$ left and $b$ right. The unmarked values $>= 2$, taken in increasing order, are the XOR-primes; the $5{,}000{,}000$th is $124136381$. The sieve runs in a few seconds.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=811")[= Problem 811: Bitwise Recursion]
+
+Solution: 327287526
+
+With $b(n)$ the largest power of two dividing $n$, the recursion is $A(0) = 1$, $A(2n) = 3A(n) + 5A(2n - b(n))$ and $A(2n+1) = A(n)$; we need $A((2^t + 1)^62) mod 1\,000\,062\,031$ for $t = 10^14 + 31$.
+
+== A product over the set bits
+
+Write $x = y dot 2^j$ with $y$ odd and set $f_j (y) = A(y dot 2^j)$. The even rule becomes $f_j (y) = 3 f_(j-1)(y) + 5 f_(j-1)(2y - 1)$, and unrolling it (the doubling map sends $y arrow.bar 2^a (y - 1) + 1$, whose trailing $1$ the odd rule strips) gives, for $y = u dot 2^m + 1$,
+$
+f_j (y) = sum_(a=0)^(j) binom(j, a) 3^(j-a) 5^a f_(m+a-1)(u),
+$
+a binomial transform of the deeper level. Such transforms map geometric sequences to geometric sequences: if $f_k (u) = c thin alpha^k$ then $f_j (y) = c thin alpha^(m-1) (3 + 5 alpha)^j$. The most significant bit starts the chain as the single term $f_k (1) = 8^k$, so the term count never grows: with $1$-bits at positions $p_1 > p_2 > dots > p_s$ and $alpha_1 = 8$, $alpha_(i+1) = 3 + 5 alpha_i$,
+$
+A(x) = alpha_1^(p_1 - p_2 - 1) alpha_2^(p_2 - p_3 - 1) dots.c alpha_(s-1)^(p_(s-1) - p_s - 1) dot alpha_s^(p_s),
+$
+verified against the raw recursion for all $x < 3000$ and random $40$-bit values; $A(81) = 8 dot 43^3 = 636056$ confirms the given value.
+
+== Assembling the power
+
+$(2^t + 1)^62 = sum_k binom(62, k) 2^(t k)$, and every binomial coefficient fits comfortably inside its $t$-bit block, so the set bits of the power are just the set bits of each $binom(62, k)$ shifted by $t k$. About $1500$ bit positions, the $alpha$ chain modulo $1\,000\,062\,031$, and fast modular powers for the astronomically wide gaps finish the job.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=812")[= Problem 812: Dynamical Polynomials]
+
+Solution: 986262698
+
+$S(n)$ counts monic integer polynomials $f$ of degree $n$ with $f(x) | f(x^2 - 2)$; we need $S(10\,000) mod 998244353$.
+
+== Which roots can occur
+
+A root $alpha$ of $f$ forces $alpha^2 - 2$ to be a root too, so every root has a finite forward orbit under $phi: x arrow.bar x^2 - 2$. Conjugating by $x = z + 1\/z$ turns $phi$ into $z arrow.bar z^2$, whose preperiodic points are the roots of unity; hence every root is $2 cos(2 pi k \/ m)$, and $f$ is a product of the minimal polynomials $psi_m$ of $2 cos(2 pi \/ m)$ — the real cyclotomic polynomials, of degree $d_m = phi.alt(m)\/2$ for $m >= 3$ and degree $1$ for $m in {1, 2}$.
+
+== Multiplicity constraints
+
+Angle doubling sends root class $m$ to $m$ for odd $m$ (a bijection on primitive residues) and to $m\/2$ for even $m$. Comparing multiplicities of each root of $f(x^2-2)$ with those of $f$ shows the exponent $e_m$ of $psi_m$ must satisfy $e_(2m') <= e_(m')$ along every doubling chain $m, 2m, 4m, dots$ ($m$ odd) — except $e_4 <= 2 e_2$, because the fibre of $-2$ is the double root $0$. Odd classes sit in cycles and are unconstrained. The six degree-$2$ products this allows are exactly the six given examples.
+
+== Generating function
+
+A weakly decreasing chain with degree prefix sums $D_j$ contributes $product_j (1 - q^(D_j))^(-1)$ (write the exponents as differences); for odd $m >= 3$ the prefix sums are $d, 2d, 4d, dots$ with $d = phi.alt(m)\/2$, taken over all odd $m$ with $d <= n$. For the $m = 1$ chain (degrees $1, 1, 1, 2, 4, dots$ for $psi_1, psi_2, psi_4, psi_8, dots$), summing out $e_1 >= e_2 >= ceil(e_4 \/ 2)$ leaves a decreasing tail from $C = e_4$ weighted by $q^(2 ceil(C\/2) + C)$; expressing $C$ through tail differences with weights $2^(j+1)$ and splitting on the parity of $C$ gives the closed form
+$
+P_1 = ((1+q) product_j (1 - q^(2^(j+1)))^(-1) + (1-q) product_j (1 + q^(2^(j+1)))^(-1)) / (2 (1-q)(1-q^2)).
+$
+$S(n)$ is the $q^n$ coefficient of $P_1$ times the product over odd chains; all factors are sparse, so the series arithmetic is linear per factor. The model reproduces $S(2) = 6$, $S(5) = 58$ and $S(20) = 122087$. One trap: odd $m$ up to nearly $5n$ can still have $phi.alt(m)\/2 <= n$, so the totient sieve must run well past $n$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=813")[= Problem 813: XOR-Powers]
+
+Solution: 14063639
+
+The XOR-product is exactly multiplication in $bb(F)_2 [x]$, with $11 = 1011_2$ playing the role of $x^3 + x + 1$; we need the integer encoding of $(x^3 + x + 1)^(8^12 dot 12^8)$ modulo $10^9 + 7$.
+
+Factor the exponent: $8^12 dot 12^8 = 2^52 dot 3^8$. Over $bb(F)_2$, squaring is the Frobenius substitution $f(x) arrow.bar f(x^2)$, so the huge power of two costs nothing: $f^(2^52 dot 3^8) = g(x^(2^52))$ where $g = f^(3^8)$. Computing $g$ exactly takes a dozen carry-less square-and-multiply steps on bitmask polynomials of degree at most $3 dot 3^8 approx 2 dot 10^4$. Substituting $x arrow.bar x^(2^52)$ sends each monomial $x^k$ of $g$ to the bit $2^(k dot 2^52)$ of the answer, so the result is $sum_k 2^(k dot 2^52) mod (10^9 + 7)$ over the set monomials, with exponents reduced via Fermat's little theorem.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=814")[= Problem 814: Mezzo-forte]
+
+Solution: 307159326
+
+$4n$ people in a circle each look left, right, or diametrically opposite; a person screams iff their gaze is reciprocated. $S(n)$ counts the configurations in which exactly $2n$ people scream; we need $S(10^3) mod 998244353$.
+
+== A twisted cycle of pairs
+
+Pair person $i$ with the opposite person $i + 2n$, giving $2n$ sites of two people (top and bottom) arranged in a cycle. Consecutive sites are joined top–top and bottom–bottom along the two semicircles, and the wrap-around joins top to bottom, since position $2n - 1$ neighbours position $2n$. Screams are local: an R–L match across a joint makes both ends scream, and a site whose two members both choose O makes both scream.
+
+== Transfer matrix and coefficient extraction
+
+A $9$-state transfer matrix over the (top, bottom) choices of a site, with $x^2$ marking each R–L match on either rail and each O–O site, makes $S(n)$ the $x^(2n)$ coefficient of the _swap-twisted_ trace of $M(x)^(2n)$ — the swap implementing the half-turn of the wrap-around. The trace is a polynomial of degree $4n$; since $998244353$ has $2^23$-th roots of unity, evaluating the twisted trace at the $4096$-th roots (batched $9 times 9$ modular matrix powers) and inverting the discrete Fourier transform at the single needed coefficient finishes in well under a second. The exact small-$n$ polynomial agrees with brute force ($S(1) = 48$, $S(2) = 2256$) and with the given $S(10)$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=815")[= Problem 815: Group by Value]
+
+Solution: 54.12691621
+
+A shuffled pack of $4n$ cards (four of each value) is dealt into piles by value, each pile vanishing at four cards; $E(n)$ is the expected maximum number of simultaneously open piles. We need $E(60)$ to eight decimals.
+
+The shuffle only matters through the profile $(a_1, a_2, a_3, a_4)$ — how many values have that many cards dealt — since the next card belongs to a value with $j$ cards seen with probability $(4 - j) a_j \/ R$, with $R$ cards remaining. Open piles number $a_1 + a_2 + a_3$, and only the new-pile move $a_0 arrow a_1$ can increase the count.
+
+Using $E[max] = sum_(m >= 1) Pr[max >= m] = n - sum_(m < n) Pr[max <= m]$, each survival probability $Pr[max <= m]$ comes from a forward dynamic program over profiles ordered by cards dealt $t = a_1 + 2a_2 + 3a_3 + 4a_4$, simply withholding probability from the one capped transition. About $6 dot 10^5$ states per threshold and $60$ thresholds run in seconds; $E(2) = 1.97142857$ checks out.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=816")[= Problem 816: Shortest Distance Among Points]
+
+Solution: 20.880613018
+
+Points $P_n = (s_(2n), s_(2n+1))$ are generated by the Blum–Blum–Shub-style recurrence $s_0 = 290797$, $s_(n+1) = s_n^2 mod 50515093$; we need the closest-pair distance among $P_0, dots, P_(2 dot 10^6 - 1)$ to nine decimals.
+
+With two million points in a $5 dot 10^7$ square the typical nearest-neighbour gap is on the order of tens, so a uniform grid with cells far larger than that gap puts only a few points per cell. Bucketing the points by cell (a counting sort into a flat array) and, for each point, scanning only the $3 times 3$ block of neighbouring cells finds the true closest pair: any pair closer than the answer lies within one cell of each other, and the cell side comfortably exceeds the minimal distance. All arithmetic is in exact 64-bit integers (squared distances), with a single high-precision square root at the end; $d(14) = 546446.466846479$ confirms the generator and metric.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=817")[= Problem 817: Digits in Squares]
+
+Solution: 93158936107011
+
+$M(n, d)$ is the least $m$ whose square, written in base $n$, contains the digit $d$; we need $sum_(d=1)^(10^5) M(p, p - d)$ for $p = 10^9 + 7$, i.e. the highest $10^5$ digits.
+
+For a digit $p - k$ the candidates, in increasing order of size, are:
+
+- *Last digit.* $m^2 equiv -k (mod p)$. Since $p equiv 3 (mod 4)$, residue-ness and the square root come from one exponentiation $(-k)^((p+1)\/4)$; when $-k$ is a quadratic residue the minimal root (at most $p\/2$) beats everything below, and this also covers one-digit squares.
+- *Leading digit of a two-digit square.* $m^2 in [(p-k)p, (p-k+1)p)$, an interval of length $p$; with square gaps near $2p$ it only sometimes contains a square, and then $m approx p - k\/2$.
+- *Middle digit of a three-digit square.* Writing $m = q p + r$, the middle base-$p$ digit of $m^2$ is $(2 q r + floor(r^2\/p)) mod p$. For each $q = 1, 2, dots$ the equation $2 q r + r^2\/p = (p-k) + j p$ has one real root per branch $j$, and an integer solution sits within a few units of it whenever one exists, so scanning a tiny window per branch finds the minimal $r$; small $q$ always suffices. The top digit stays tiny and the bottom digit is excluded by non-residuosity, so nothing else can fire first.
+
+The case analysis was validated against a digit-scanning brute force in base $10007$, and $M(11, 10) = 19$ reproduces the given example.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=818")[= Problem 818: SET]
+
+Solution: 11871909492066000
+
+The $81$ SET cards are the points of the affine space $bb(F)_3^4$, and a SET (three cards, each feature all-same or all-different) is exactly an affine line $\{a, b, c\}$ with $a + b + c = 0$; there are $1080$ of them. With $S(C)$ the number of SETs inside a collection $C$, we need $F(12) = sum_(|C| = 12) S(C)^4$.
+
+== Swapping the order of summation
+
+Expanding $S(C)^4 = (sum_("SET" L subset.eq C) 1)^4$ as a sum over _ordered_ $4$-tuples of SETs contained in $C$, and summing over $C$ first, gives
+$
+F(n) = sum_("ordered" (L_1, L_2, L_3, L_4)) \#{|C| = n : L_1 union dots.c union L_4 subset.eq C} = sum_("tuples") binom(81 - u, n - u),
+$
+where $u$ is the number of distinct points (cards) in $L_1 union dots.c union L_4$. So $F(n)$ needs only the multiset of union sizes over ordered $4$-tuples of lines.
+
+== Histogram by number of distinct lines
+
+Group the ordered tuples by their set of $k$ distinct lines. The number of ordered $4$-tuples drawing on exactly $k$ given lines is the surjection count $k! thin S(4, k)$, i.e. $1, 14, 36, 24$ for $k = 1, 2, 3, 4$. The union size $u$ depends only on the configuration of those $k$ lines, and since any two distinct SETs meet in at most one point, unions range over $u in {3, dots, 12}$. Tabulating, for each $k$, how many $k$-subsets of the $1080$ lines have each union size — by direct enumeration with $81$-bit point masks (the $k = 4$ pass is the $binom(1080, 4)$ bottleneck, run once) — and combining with the surjection weights and $binom(81 - u, n - u)$ yields $F(n)$. The checks $F(3) = 1080$ and $F(6) = 159690960$ both hold.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=819")[= Problem 819: Iterative Sampling]
+
+Solution: 1995.975556
+
+From an $n$-tuple, each entry of the next tuple is an independent uniform pick from the current entries; $E(n)$ is the expected number of steps from $(1, 2, dots, n)$ until all entries are equal. We need $E(10^3)$ to six decimals.
+
+== The coalescent dual
+
+Reading the process backwards, each new entry "descends" from the position it copied. So the current number of _distinct_ values, $b$, maps in one backward step to the number of distinct parents chosen — which is exactly the number of occupied boxes when $b$ balls are thrown uniformly into $n$ boxes. Reaching consensus forward is the coalescence of all lineages to one backward, and the two processes share the same step distribution, so $E(n)$ equals the expected number of backward steps from $n$ lineages down to $1$.
+
+== An $O(n^2)$ recurrence
+
+Let $q_(b,j)$ be the probability that $b$ balls occupy exactly $j$ of the $n$ boxes; it follows the triangular recurrence $q_(b+1,j) = q_(b,j) dot j\/n + q_(b,j-1) dot (n-j+1)\/n$. Removing the self-loop where no two lineages coalesce ($j = b$),
+$
+T(1) = 0, quad T(b) = (1 + sum_(j=1)^(b-1) q_(b,j) T(j)) / (1 - q_(b,b)).
+$
+Building the $q$ table and the $T$ values is $O(n^2)$; the all-distinct probability $q_(b,b)$ stays small away from $b = n$, so floating point delivers six correct digits in under a second. The values $E(3) = 27\/7$ and $E(5) = 468125\/60701 approx 7.711982$ check out exactly.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=820")[= Problem 820: $N$th Digit of Reciprocals]
+
+Solution: 44967734
+
+Let $d_n(x)$ be the $n$th decimal digit of the fractional part of $x$. We need $S(n) = sum_(k=1)^n d_n(1\/k)$ for $n = 10^7$.
+
+The $n$th fractional digit of $1\/k$ is $floor(10^n \/ k) mod 10$. Reducing the numerator modulo $10k$ recovers it directly: since $10^n = q dot 10k + r$ with $0 <= r < 10k$, and $r = (floor(10^n\/k) mod 10) dot k + (10^n mod k)$, we get
+$
+d_n(1\/k) = floor((10^n mod 10k) \/ k).
+$
+So each term is a single modular exponentiation $10^n mod 10k$. For $n = 10^7$ every modulus $10k <= 1.1 dot 10^8$, so all intermediate products in binary exponentiation stay below $2^63$ and 64-bit arithmetic suffices — no big integers. Summing over $k$ in an $O(n log n)$ sweep gives the answer; $S(7) = 10$ and $S(100) = 418$ confirm the digit formula.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=821")[= Problem 821: 123-Separable]
+
+Solution: 9219661511328178
+
+A set $S$ is 123-separable if $S$, $2S$, $3S$ are pairwise disjoint, and $F(n)$ is the largest possible $|(S union 2S union 3S) inter {1, dots, n}|$. We need $F(10^16)$.
+
+== Decomposition by residue class
+
+Every positive integer is uniquely $m dot 2^a 3^b$ with $gcd(m, 6) = 1$, and multiplying by $2$ or $3$ keeps $m$ fixed. So the construction splits independently over each class $m$ coprime to $6$. Within a class the reachable integers form a staircase grid of cells $(a, b)$ with $m dot 2^a 3^b <= n$. The disjointness conditions forbid putting in $S$ any two cells differing by $(1, 0)$ (from $S inter 2S$), $(0, 1)$ (from $S inter 3S$), or $(1, -1)$ (from $2S inter 3S$); the count rewards cells covered by $S$ or its $(+1, 0)$ / $(0, +1)$ shifts.
+
+== Loss is a step function
+
+Maximizing coverage leaves some cells uncovered; this "loss" depends only on the grid shape, hence only on $t = n\/m$ through which $3$-smooth numbers are $<= t$. Solving the per-grid optimum exactly for small grids shows the loss increments by one precisely at a sparse set of $3$-smooth thresholds, in two interleaved families: $2^a dot 3$ for $a in {1, 3, 7, 10, 13, dots}$ and $2 dot 3^3 = 54$ together with $3^b$ for $b in {5, 8, 11, dots}$. Thus $"loss"(t) = \#{theta <= t}$.
+
+Because every integer in $[1, n]$ is exactly one cell, the grids hold $n$ cells in total, so
+$
+F(n) = n - sum_(m "coprime" 6) "loss"(n\/m) = n - sum_theta \#{m "coprime" 6 : m <= n\/theta},
+$
+swapping summation order; each inner count is $floor(n\/theta) - floor(n\/(2theta)) - floor(n\/(3theta)) + floor(n\/(6theta))$. With only a few dozen thresholds below $10^16$ this is instant, and it reproduces the exact per-grid optimum for every $n <= 5000$ ($F(6) = 5$, $F(20) = 19$).
+
+#pagebreak()
+#link("https://projecteuler.net/problem=822")[= Problem 822: Square the Smallest]
+
+Solution: 950591530
+
+Starting from $[2, 3, dots, n]$, each round replaces one smallest entry by its square; $S(n, m)$ is the sum after $m$ rounds. We need $S(10^4, 10^16) mod 1234567891$.
+
+== Tracking exponents
+
+Squaring never changes the base an entry came from, only how often it has been squared, so the entry seeded by $k$ always equals $k^(2^(e_k))$ for a level $e_k$. Each round increments the $e$ of the entry of smallest current value; comparing $2^(e_a) log k_a$ versus $2^(e_b) log k_b$ is done exactly as the integer test $k_a <^? k_b^(2^d)$ by repeated squaring (level gaps in play are tiny).
+
+== Steady cycle
+
+After a short warm-up the values become balanced enough that every block of $n - 1$ consecutive rounds squares each of the $n - 1$ entries exactly once — detected once two successive $(n-1)$-windows of squared bases are each a full permutation. The remaining $r$ rounds then split into $floor(r\/(n-1))$ full blocks, which add that constant to every level, plus $r mod (n-1)$ extra rounds following the observed steady order. Finally $S = sum_k k^(2^(e_k))$ with each exponent reduced modulo $1234567891 - 1$ (the modulus is prime). The method matches an exact heap simulation for all $n < 30$ and $m$ up to $10^5$, and reproduces $S(5, 3) = 34$ and $S(10, 100)$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=824")[= Problem 824: Chess Sliders]
+
+Solution: 26532152736197
+
+A Slider attacks the two squares horizontally adjacent to it on a cylindrical $N times N$ board (each row is a cycle $C_N$). $L(N, K)$ counts placements of $K$ non-attacking Sliders, and we need $L(10^9, 10^15) mod (10^7 + 19)^2$.
+
+== Rows are independent
+
+Since a Slider only attacks within its own row, the rows are independent and
+$
+L(N, K) = [x^K] thin g(x)^N, quad g(x) = I(C_N, x) = "tr" mat(1, x; 1, 0)^N = lambda_+^N + lambda_-^N,
+$
+the independence polynomial of the cycle, with $lambda_(plus.minus) = (1 plus.minus sqrt(1 + 4x))\/2$. This reproduces $L(2,2) = 4$ and $L(6,12) = 4204761$.
+
+== A Lucas expansion
+
+Expanding $g^N = sum_i binom(N, i) lambda_+^(N i) lambda_-^(N(N-i))$ and pairing $i$ with $N - i$ (using $lambda_+ lambda_- = -x$) gives, with $V_m = lambda_+^m + lambda_-^m$ the Lucas-type polynomial ($V_0 = 2$, $V_1 = 1$, $V_m = V_(m-1) + x V_(m-2)$),
+$
+g(x)^N = sum_(i < N\/2) binom(N, i) (-x)^(N i) V_(N(N - 2i))(x) quad (+ "middle term if " N "even"),
+$
+so $L(N, K) = sum_i binom(N, i) (-1)^(N i) thin [x^(K - N i)] V_(N(N-2i))$, with $[x^s] V_m = (m\/(m-s)) binom(m-s, s)$ for $m, s >= 1$ and $V_m (0) = 1$. Verified against a direct polynomial expansion for all $N <= 10$.
+
+== Modulo a square of a prime
+
+Only $i$ with $N i <= K$ contribute, here $i <= K\/N = 10^6$. Each binomial and Lucas coefficient — with arguments as large as $approx 10^18$ — is reduced modulo $(10^7 + 19)^2$ by Granville's prime-power generalisation of Lucas' theorem: factorials with their $P$-parts stripped are products of per-block factorials (every full block $equiv (P-1)!$ by Wolstenholme), and the $P$-adic valuations are tracked separately. A single $O(P)$ table build plus $10^6$ constant-work terms finishes in well under a minute.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=825")[= Problem 825: Chasing Game]
+
+Solution: 32.34481054
+
+Two cars on a length-$2n$ circular track start $n$ apart and alternately advance $1$, $2$ or $3$ uniformly; whoever first reaches or passes the other wins. $S(n)$ is the difference of the two win probabilities, and we need $T(10^14) = sum_(n=2)^(10^14) S(n)$.
+
+== Win-probability recurrence
+
+Track the gap $d$ the mover must cover. It wins outright if its step reaches $d$; otherwise the opponent moves with gap $2n - (d - "step")$. So $W(d) = 1 - (1\/3) sum_(k < d, thin k <= 3) W(2n - d + k)$. Solving this finite linear system, $S(n) = |2 W(n) - 1| = "num"(n)\/"den"(n)$, where (fitted to and verified against exact small values) the numerator obeys a recurrence with roots ${-1, 2 plus.minus sqrt(3)}$ and the denominator the *double* roots $(2 plus.minus sqrt(3))^2$:
+$
+"num"(n) &= (3 - sqrt(3))/2 (2+sqrt(3))^n + (3 + sqrt(3))/2 (2-sqrt(3))^n - 2(-1)^n, \
+"den"(n) &= ((3 - sqrt(3))/2 n - 1/2)(2+sqrt(3))^n + ((3 + sqrt(3))/2 n - 1/2)(2-sqrt(3))^n.
+$
+
+== Exact tail
+
+The $(2 - sqrt(3))^n$ terms vanish geometrically and the leading coefficient $(3-sqrt(3))\/2$ is common to numerator and denominator, so beyond a tiny cutoff
+$
+S(n) = 1/(n + b\/a), quad b\/a = -(3 + sqrt(3))/6,
+$
+exact far past double precision. Summing the first $200$ terms directly and the rest as $psi(N + 1 + b\/a) - psi(201 + b\/a)$ gives $T$ instantly; $T(10) = 2.38235282$ checks.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=826")[= Problem 826: Birds on a Wire]
+
+Solution: 0.3889014797
+
+$n$ birds land uniformly on a unit wire; each paints the segment to its nearest neighbour. $F(n)$ is the expected painted length, and we need the average of $F(p)$ over odd primes $p < 10^6$.
+
+== Spacings
+
+Ordering the birds splits the wire into $n+1$ spacings — two to the posts and $n-1$ between consecutive birds — jointly a symmetric Dirichlet$(1, dots, 1)$, so each has mean $1\/(n+1)$. Only the $n-1$ internal gaps can be painted, since the posts are not birds.
+
+== Per-gap contributions
+
+The two outer internal gaps are always painted: the leftmost bird's only neighbour lies to its right and the rightmost bird's only neighbour to its left, so each contributes its full mean $1\/(n+1)$. An interior gap $g$, with internal neighbours of lengths $x$ and $z$, fails to be painted only when it is the largest of the three (neither adjacent bird prefers it). Writing $W = x+g+z tilde "Beta"(3, n-2)$ independent of the normalised triple (uniform on the $2$-simplex),
+$
+E[g dot bb(1)(g "maximal")] = E[W] dot (E["max of three simplex parts"])/3 = 3/(n+1) dot (11\/18)/3 = 11/(18(n+1)),
+$
+using $E["max"] = 11\/18$. So each interior gap contributes $1\/(n+1) - 11\/(18(n+1)) = 7\/(18(n+1))$.
+
+== Closed form
+
+Summing the two outer gaps and the $n-3$ interior gaps,
+$
+F(n) = 2/(n+1) + (n-3) dot 7/(18(n+1)) = (7n + 15)/(18(n+1)),
+$
+which gives $F(3) = 1\/2$ and matches Monte-Carlo values through $n = 7$. Averaging this exact rational over the $78498$ odd primes below $10^6$ and rounding gives the answer.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=827")[= Problem 827: Pythagorean Triple Occurrence]
+
+Solution: 397289979
+
+$Q(n)$ is the smallest number occurring in exactly $n$ Pythagorean triples $(a < b < c)$; we need $sum_(k=1)^18 Q(10^k) mod 409120391$.
+
+== How many triples contain $N$
+
+A number $N$ can appear as a leg or as the hypotenuse. As a leg, $N^2 = (c-b)(c+b)$, so each factorisation $N^2 = d e$ with $d < e$ of equal parity gives one triple; as the hypotenuse, the count is governed by sums of two squares. Writing $N = 2^s product p^a$ and grouping the odd primes by residue mod $4$ into $M_1 = product_(p eq.triple 1) (2a+1)$ and $M_3 = product_(p eq.triple 3) (2a+1)$ (so $M = M_1 M_3$ is $tau$ of the odd part of $N^2$),
+$
+"legs" = cases((M-1)\/2 & s = 0, ((2s-1)M - 1)\/2 & s >= 1), quad "hyps" = (M_1 - 1)\/2.
+$
+Thus $"count"(N) = n$ becomes $M_1 ((2s-1) M_3 + 1) = 2n + 2$ for $s >= 1$ and $M_1 (M_3 + 1) = 2n+2$ for $s = 0$ — checked exhaustively against brute force for $N < 3000$.
+
+== Minimising $N$
+
+Let $T = 2n + 2$. Choose $M_1$ among the odd divisors of $T$; the cofactor $G = T\/M_1$ must equal $(2s-1) M_3 + 1$, so $(2s-1) M_3 = G - 1$ splits over the odd divisors of $G - 1$ (with the $s = 0$ and empty-$M_3$ cases handled separately). Each $(2a+1)$-factor of $M_1$ (resp. $M_3$) becomes an exponent $a$ on a prime $eq.triple 1$ (resp. $eq.triple 3$) mod $4$; to minimise $N$ the largest exponents sit on the smallest such primes, the factor $2^s$ is free, and candidates are compared by real size via logarithms while the answer is tracked modulo the (prime) modulus. Factoring $T = 2(10^k + 1)$ and each $G - 1$ with a real factoriser keeps every $Q(10^k)$ near-instant; $Q(5) = 15$, $Q(10) = 48$, $Q(10^3) = 8064000$ all check.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=829")[= Problem 829: Integral Fusion]
+
+Solution: 41768797657018024
+
+The binary factor tree $T(n)$ is a leaf when $n$ is prime, otherwise it splits $n = a b$ with $a <= b$ and $b - a$ minimal and recurses. $M(n)$ is the smallest integer whose factor tree has the same shape as $T(n!!)$, and we need $sum_(n=2)^31 M(n)$.
+
+== Shape of $n!!$
+
+Each node's split is the closest-factor split, so the tree shape is intrinsic to the number. The double factorial $n!!$ is large (up to $approx 2 dot 10^17$), but its closest split is found from its prime factorisation: enumerate the divisors and take the largest one not exceeding $sqrt(n!!)$. Recursing on the two factors (themselves split via their factorisations) yields the ordered tree shape of $n!!$.
+
+== Smallest integer of a given shape
+
+The shape comparison is ordered (left subtree from the smaller factor), as the example $M(9) = 72$ confirms. To realise a shape minimally, a leaf is any prime and an internal node is a product $v = a b$ of realisations of its two child shapes whose own closest split is exactly $(a, b)$ — so each candidate product is re-checked against the shape (multiplying two realisations need not split back the same way). Computing, for every subshape, a pool of its smallest realisations bottom-up and combining them gives $M(n)$ as the least realisation of the root shape; the pool stays small for every shape arising from $n!!$ with $n <= 31$.
 
 #pagebreak()
 #link("https://projecteuler.net/problem=836")[= Problem 836: A Bold Proposition]
@@ -4319,6 +6907,27 @@ Taking $a <= b$, a move removes $a$ stones, so the positions reachable from $(a,
 Counting is then immediate: for $2^k <= a < 2^(k + 1)$ the partner must satisfy $b equiv -1 mod 2^(k + 1)$, giving $floor((n + 1) \/ 2^(k + 1))$ choices for each of the $min(2^(k + 1) - 1, n) - 2^k + 1$ values of $a$, doubled for order with the diagonal pairs $a = b = 2^m - 1$ subtracted once. This yields the given $L(7) = 21$ and $L(7^2) = 221$, and $L(7^17)$ instantly.
 
 #pagebreak()
+#link("https://projecteuler.net/problem=900")[= Problem 900: DistribuNim II]
+
+Solution: 646900900
+
+A move removes exactly $m = min("piles")$ stones in total, distributed so that no pile is emptied. Brute-forcing all positions with $2$–$6$ piles (sizes up to $16$) reveals a clean characterisation of the losing positions: a position with $r$ piles, minimum $m$ and total $s$ is losing for the player to move if and only if
+$
+s equiv m - [r " even"] space (mod 2^L), quad 2^L = "smallest power of two" > m.
+$
+For $n$ piles of $n$ stones plus one pile of $n + k$ we have $r = n + 1$, $m = n$ and $s = n^2 + n + k$, so the smallest losing $k$ is
+$
+t(n) = (-n^2 - (n mod 2)) mod 2^L .
+$
+In particular $t(2^j) = 0$, matching $t(1) = t(2) = 0$ and $t(3) = 2$.
+
+To sum $t(n)$ for $n$ up to $2^(10^4)$, group $n in [2^(L-1), 2^L)$ and write $n = 2^(L-1) + j$: since $(2^(L-1))^2 equiv 0 space (mod 2^L)$, $t$ depends only on $j$. For odd $j$, $t = 2^L - 1 - (j^2 mod 2^L)$, and the odd squares below $2^(L-1)$ hit each residue $equiv 1 space (mod 8)$ exactly twice, giving a closed form. For even $j = 2i$ the block reduces to the full-period sum $Q(M) = sum_(i < 2^M) (i^2 mod 2^M)$, which satisfies
+$
+Q(M) = 2^(M-1)(2^(M-1) - 3) + 8 Q(M-2).
+$
+Everything is carried modulo $900497239$; the formula reproduces $S(10) = 361522$ exactly, and $S(10^4) equiv 646900900$.
+
+#pagebreak()
 #link("https://projecteuler.net/problem=901")[= Problem 901: Well Drilling]
 
 Solution: 2.364497769
@@ -4333,6 +6942,48 @@ $
 d_(j+1) = e^(d_j - d_(j-1)).
 $
 With $d_0 = 0$ this is a two-point boundary value problem ($d_0 = 0$ and $d_N -> infinity$). Forward shooting from a guessed $d_1$ is numerically unstable, because the recurrence amplifies any error exponentially. Instead we solve the whole stationary system at once with Newton's method on the residuals $F_j = d_(j+1) - e^(d_j - d_(j-1))$, whose Jacobian is tridiagonal, pinning the far end $d_N$ at a large value $L$ (the tail beyond depth $L$ contributes less than $e^(-L)$ and is negligible). The depths converge stably, and the resulting expected time is $2.364497769$ hours, robust across choices of $N$ and $L$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=902")[= Problem 902: Permutation Powers]
+
+Solution: 343557869
+
+The permutation $sigma$ is a product of disjoint cycles of lengths $1, dots, m$ (one per triangular block), and $pi = tau^(-1) sigma tau$ is conjugate to it, so $pi$ has order $L = "lcm"(1, dots, m)$, which divides $m!$. Hence
+$
+P(m) = m!/L sum_(k=1)^L "rank"(pi^k).
+$
+
+By the Lehmer code, $"rank"(rho) - 1 = sum_i c_i (n-i)!$ with $c_i = hash{j > i : rho(j) < rho(i)}$, so the sum over $k$ becomes a sum over ordered pairs of positions. Substituting $a = tau(i)$, $b = tau(j)$ and $w = tau^(-1)$, the condition $pi^k (j) < pi^k (i)$ reads $w(sigma^k b) < w(sigma^k a)$, which only involves rotations within the two $sigma$-cycles containing $a$ and $b$. If those cycles have lengths $p$ and $q$ with $g = gcd(p, q)$ and $l = "lcm"(p, q)$, the offset pair $(k mod p, k mod q)$ sweeps each compatible combination exactly once every $l$ steps, so the count of good $k in [1, L]$ is $L \/ l$ times a table value $C(d)$ depending only on the offset difference $d = (alpha - beta) mod g$:
+$
+C(d) = hash{(u, v) : u - v equiv d space (mod g), space w(B[v]) < w(A[u])}.
+$
+Each ordered cycle pair therefore costs two $O(p q)$ double loops — one building $C$, one accumulating $(n - w(a))! dot C(d)$ over the pairs with $w(a) < w(b)$ — and same-cycle pairs use the analogous shift table. The total work is about $2 n^2 approx 5 dot 10^7$ operations for $n = 5050$. All the divisions by $l$ and by $L$ are exact, so they are performed with modular inverses. The method reproduces $P(2) = 4$, $P(3) = 780$ and $P(4) = 38810300$, and gives $P(100) equiv 343557869 space (mod 10^9 + 7)$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=903")[= Problem 903: Total Permutation Powers]
+
+Solution: 128553191
+
+By the Lehmer code, $"rank"(rho) - 1 = sum_(i<j) [rho(j) < rho(i)] (n-i)!$, so $Q(n) - (n!)^2$ is a sum over position pairs $(i, j)$ and over $(pi, k)$ of the indicator $[pi^k (j) < pi^k (i)]$. Conjugating $pi$ by the transposition $(i thin j)$ is an involution that swaps the two image values whenever both lie outside ${i, j}$, so that bulk contributes exactly one half. The boundary cases reduce to four counts, each summed over $k = 1, dots, n!$, of permutations whose $k$-th power (a) fixes both $i$ and $j$, (b) swaps them, (c) fixes $i$ and moves $j$, or (d) maps $i$ to $j$ without mapping $j$ back; within (c) and (d) the free image value is equidistributed over the other $n - 2$ values, by conjugating with transpositions of outside values.
+
+The enumeration rests on a pleasant fact: the number of permutations of $[n]$ with "the cycle of $i$ has length $ell$ and $j$ sits $t$ steps along it", and likewise with "$i$ in an $ell$-cycle and $j$ in a separate $m$-cycle", is exactly $(n-2)!$ in every case. Combined with $hash{k <= n! : d divides k} = n! \/ d$, all four counts become elementary sums; the only nontrivial one is
+$
+S_"lcm" = sum_(ell + m <= n) 1/("lcm"(ell, m)).
+$
+Writing $"lcm" = ell m \/ gcd$ and Möbius-inverting the coprimality condition collapses it to
+$
+S_"lcm" = sum_(e >= 1) (phi(e))/(e^2) thin G(floor(n\/e)), quad G(M) = sum_(a + b <= M) 1/(a b),
+$
+where $G$ is needed only at the $O(sqrt(n))$ distinct values of $floor(n \/ e)$ and each evaluation is a harmonic-number convolution. The per-pair weight depends only on $j - i$, so the final assembly is a single $O(n)$ loop. All divisions are exact integers, performed with modular inverses. The method reproduces $Q(3) = 88$, $Q(6) = 133103808$ and $Q(10) equiv 468421536$, and gives $Q(10^6) equiv 128553191 space (mod 10^9 + 7)$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=904")[= Problem 904: Pythagorean Angle]
+
+Solution: 880652522278760
+
+For a right triangle with legs $a, b$ and hypotenuse $c$, the angle between the medians to the two legs satisfies $tan theta = (3 a b)/(2 c^2) <= 3\/4$, which depends only on the shape of the triangle. Each shape comes from a unique coprime pair $0 < p < q$: with $t = p\/q$ we get $tan theta = g(t) = (3t(1 - t^2))/((1 + t^2)^2)$, the primitive triple being $(q^2 - p^2, 2p q, q^2 + p^2)$ when $p + q$ is odd and $((q^2 - p^2)\/2, p q, (q^2 + p^2)\/2)$ when both are odd. The involution $t <-> (1-t)\/(1+t)$ exchanges the two parity classes while fixing the shape, so we may restrict to $t in (0, sqrt(2) - 1)$, where $g$ is strictly increasing (its maximum $3\/4$ is attained at $t = sqrt(2) - 1$). Since $theta$ determines the shape and $alpha = root(3, n)$ admits no symmetric ties (Niven's theorem and Gelfond–Schneider rule out the coincidences a tie would force), $f$ is found by taking the feasible shape closest in $theta$, then the largest multiple $d = floor(L\/c)$, giving $f = d(a + b + c)$.
+
+So solve $g(t) = tan alpha$ for the target $t_1$ (bisection plus a few Newton steps in multiprecision) and look for the coprime fraction nearest $t_1$ whose primitive hypotenuse fits: $p^2 + q^2 <= L$ for opposite parity but only $p^2 + q^2 <= 2L$ for both odd. This parity-dependent bound is the trap of the problem: the answer is _not_ always a (semi)convergent of $t_1$. A both-odd fraction slightly farther out in the Stern–Brocot tree can be feasible while every nearer spine node of the right parity is not — first seen at $n = 26176$, $L = 10^8$, where $(p, q) = (2689, 12259)$ (both odd) beats the closer but infeasible $(2197, 10016)$. The fix is a two-pass search: a cheap Stern–Brocot spine walk with run jumps yields the distance $D_0$ of the best feasible spine node, and then a windowed Stern–Brocot enumeration lists _all_ coprime $p\/q$ with $q <= sqrt(2 L)$ within $1.05 D_0$ of $t_1$ — the window is so narrow that only a handful of fractions survive. Surviving candidates are ranked by $abs(theta - alpha)$ in floating point, and near-ties are separated by escalating the working precision (60, 150, then 400 digits, recomputing $alpha$ afresh each time). The search was verified against full enumeration of all $approx 1.6 dot 10^7$ primitive shapes at $L = 10^8$ for 413 values of $n$, including 13 cases where a spine-only search fails. It reproduces $f(30, 100) = 198$, $f(root(3, 10), 10^6) = 1600158$ and $F(10, 10^6) = 16684370$, and computes $F(45000, 10^(10)) = 880652522278760$ in under a minute.
 
 #pagebreak()
 #link("https://projecteuler.net/problem=905")[= Problem 905: Now I Know]
@@ -4355,6 +7006,315 @@ where $p_"sum" in {0,1,2}$ is the position of the sum at that step.
 A literal subtractive descent is far too long, since a single quotient can take on the order of $10^7$ steps. But within one quotient the sum position merely alternates between two slots, and along an alternating run the climb's increment is constant after the first step (each pair of steps raises $F$ by exactly $3$), so an entire run is collapsed to $O(1)$ arithmetic. The descent then has only $O(log)$ runs per triple. Summing $F(a^b, b^a, a^b + b^a)$ over $a in {1, dots, 7}$ and $b in {1, dots, 19}$ gives $70228218$.
 
 #pagebreak()
+#link("https://projecteuler.net/problem=906")[= Problem 906: A Collective Decision]
+
+Solution: 0.0195868911
+
+The chosen option is exactly a _Condorcet winner_ over the three random preference orders, and such a winner is unique (two winners would each need a strict majority over the other), so $P(n) = n dot Pr("option" 1 "wins")$. Condition on the number $r_v$ of options that voter $v$ prefers over option $1$: each $r_v$ is uniform on ${0, dots, n-1}$, and given $r_v$ the set $S_v$ of those options is a uniform $r_v$-subset of the other $m = n - 1$ options. Option $1$ wins precisely when every other option is preferred over it by at most one voter, i.e. when $S_1, S_2, S_3$ are pairwise disjoint. Counting ordered disjoint triples,
+$
+Pr("win") = 1/n^3 sum_(r_1 + r_2 + r_3 <= m) (binom(m - r_1, r_2))/(binom(m, r_2)) dot (binom(m - r_1 - r_2, r_3))/(binom(m, r_3)).
+$
+The innermost sum collapses by the identity $sum_(k <= b) binom(b, k) \/ binom(m, k) = (m+1)/(m+1-b)$, leaving (with $a = m - r_1$)
+$
+P(n) = 1/n sum_(a = 0)^(m) sum_(r = 0)^(a) (binom(a, r))/(binom(m, r)) dot 1/(m - a + r + 1),
+$
+an $O(n^2)$ double sum in which the binomial ratio obeys the one-step recurrence $times (a - r + 1)\/(m - r + 1)$. With Kahan compensation the $4 dot 10^8$-term float sum stays far below the required ten-decimal accuracy (the eleventh decimal of the result is a $0$, so the rounding is not borderline). The formula reproduces $P(3) = 17\/18$ and $P(10) approx 0.6760292265$, and gives $P(20000) approx 0.0195868911$ in a few seconds.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=907")[= Problem 907: Stacking Cups]
+
+Solution: 196808901
+
+A tower is a bottom-to-top sequence of all $n$ cups, each up or down. Translating the contact rules: a lower cup $(j, "up")$ supports $(j - 1, "up")$ (nesting), a lower $(j, "down")$ supports $(j + 1, "down")$ (the larger cup lowered over the smaller), a lower $(j, "down")$ supports $(j plus.minus 2, "up")$ (base-to-base), and a lower $(j, "up")$ supports $(j plus.minus 2, "down")$ (rim-to-rim). The forbidden two-cups-on-one configuration never arises in a single tower. This model reproduces all three given values, so $S(n)$ counts directed Hamiltonian paths in this oriented-cup graph.
+
+Every edge joins labels at distance at most $2$, so for small $n$ a bitmask DP over (used set, last cup, last orientation) computes $S(n)$ exactly; this gives $S(1), dots, S(20)$, matching $S(4) = 12$, $S(8) = 58$ and $S(20) = 5560$. The bounded bandwidth also forces a short linear recurrence. Fitting the DP values and re-verifying on every $n$ in $10..20$ yields, for $n >= 10$,
+$
+S(n) = 2S(n-1) - 3S(n-2) + 5S(n-3) - 4S(n-4) + 4S(n-5) - 3S(n-6) + S(n-7) - S(n-8),
+$
+with a single transient at $S(9) = 82$ (the fit would give $84$). The characteristic polynomial factors neatly as $(x - 1)(x^2 + 1)^2 (x^3 - x^2 - 1)$, so the count grows like $rho^n$ for the root $rho approx 1.4656$ of $x^3 = x^2 + 1$. Iterating the recurrence modulo $10^9 + 7$ up to $n = 10^7$ gives $S(10^7) equiv 196808901$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=908")[= Problem 908: Clock Sequence II]
+
+Solution: 451822602
+
+A periodic sequence segments into blocks summing to $1, 2, 3, dots$ exactly when every triangular number $T(n) = n(n+1)\/2$ occurs among its prefix sums. If one period is a composition of $s$ into $p$ parts with prefix sums $S(1) < dots < S(p) = s$, the prefix sums of the infinite sequence are ${k s + S(r) : k >= 0}$, so the clock property is equivalent to
+$
+D(s) := {((T(n) - 1) mod s) + 1 : n >= 1} subset.eq {S(1), dots, S(p)},
+$
+with representatives in $[1, s]$ ($T(n) mod s$ is periodic in $n$ with period dividing $2s$, and $s in D(s)$ always since $T(2s) = s(2s+1)$). This criterion was checked against direct simulation of the segmentation on hundreds of random compositions.
+
+Compositions of $s$ into $p$ parts are subsets of $[1, s-1]$ of size $p - 1$, so with $d(s) = |D(s)| - 1$ the clock compositions of length $p$ and sum $s$ number $binom(s - 1 - d(s), p - 1 - d(s))$. Distinct sequences are primitive compositions counted by minimal period, and Möbius inversion over the divisor lattice gives $C(N) = sum_(q <= N) g(q) dot M(floor(N\/q))$ with $g(p) = sum_s binom(s - 1 - d(s), p - 1 - d(s))$ and $M$ the Mertens function. The count $|D(s)|$ of distinct triangular residues is multiplicative: modulo $2^k$ the triangular numbers cover _all_ residues, while modulo an odd $p^k$ they biject (via $8 T(n) + 1 = (2n+1)^2$) with the squares, of which there are $1 + sum_(e = k, k-2, dots >= 1) phi(p^e)\/2$; so $d(s)$ is sieved multiplicatively. Each odd prime factor retains at least a fraction $p\/(2(p+1)) >= 3\/8$ of residues, so $d(s) < 10^4$ forces $s lt.tilde 1.5 dot 10^6$; in fact only $47228$ values qualify, the largest being $294525$. The method reproduces $C(3) = 3$, $C(4) = 7$, $C(10) = 561$ and gives $C(10^4) equiv 451822602 space (mod 1111211113)$ in seconds.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=909")[= Problem 909: L-expressions I]
+
+Solution: 399885292
+
+The rewrite rules are exactly the combinator rules of Church numerals: $Z(u)(v) -> v$ makes $Z$ the numeral $[0]$, and $S(u)(v)(w) -> v(u(v)(w))$ makes $S$ the successor, where the numeral $[n]$ acts on any object by $n$-fold composition, $[n](f) = f^(compose n)$. Applying $[n]$ to $A$ and $0$ then yields the number $n$.
+
+Write $P = S(S)$. Two extensional facts settle everything: composition multiplies numerals, $[a] compose [b] = [a b]$, and the $S$-rule reads $S(g)(h) = h compose g(h)$, $P(g)(h) = g(S(g)(h))$. Hence $P([n]) = [n(n+1)]$, then $S(P)([n]) = [n] compose P([n]) = [n^2(n+1)]$, and $P(P)([n]) = P(S(P)([n])) = [m(m+1)]$ with $m = n^2(n+1)$. For the target $P(P)(P)([1])(A)(0)$: by the $S$-rule, $P(P)(P) = P(X)$ with $X = S(P)(P): t |-> P(P(P)(t))$, and $P(X)([1]) = X(S(X)([1])) = X(X([1]))$ since $[1]$ is the identity. With $p(n) = n(n+1)$, $italic("pp")(n) = p(n thin p(n))$ and $x(n) = p(italic("pp")(n))$ this gives $x(x(1)) = x(42) = M(M+1)$ for $M = 75852 dot 75853$, whose last nine digits are $399885292$. Every identity used — and both worked examples — is verified by an exact mechanical normal-order evaluator on small numerals, where the reduction terminates in at most a few million steps.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=910")[= Problem 910: L-expressions II]
+
+Solution: 547480666
+
+With the Church-numeral reading of Problem 909, $C_i = [i]$ and $D_i = C_i (S)(S) = S^i (S)$, so $D_i = S(D_(i-1))$ and the $S$-rule gives $D_i (h)(w) = h(h(dots h(S(h)(w)) dots))$ with $h$ object-applied $i$ times. In $F(a,b,c,d,e) = D_a (D_b)(D_c)(C_d)(A)(e)$ every application chain bottoms out on numerals, where applying an operator $V$ with numeral action $v$ is plain arithmetic and $S(V)([m]) = [m] compose V([m]) = [m dot v(m)]$. Peeling layers (superscripts denote function iteration):
+$
+f(m) = (m+1) m^c, quad w_1 (m) = f^((b))(m f(m)), quad v_0 (m) = f(w_1 (m)),
+$
+$
+v_k (m) = v_(k-1)^((b))(m thin v_(k-1)(m)) "for" k = 1, dots, a, quad F = e + v_a (d).
+$
+This arithmetic semantics was verified against exact mechanical reduction of the L-expressions (with $D_i$ built literally as $C_i (S)(S)$) on 92 small parameter tuples.
+
+The value $v_a (d)$ is an astronomical tower, but every operation involved is a ring operation with _fixed_ exponent $c$ and _fixed_ iteration count $b$ — no value ever appears in an exponent — so the entire computation descends to $ZZ_M$ for any modulus $M$. Tabulating each $v_k$ over $ZZ_M$ and forming $b$-fold iterates by binary lifting ($log_2 b$ table compositions) costs $O(M log b)$ per level. Running the pipeline modulo $2^9$ and $5^9$ and combining by CRT gives $F(12, 345678, 9012345, 678, 90) equiv 547480666 space (mod 10^9)$ in a few seconds.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=911")[= Problem 911: Khinchin Exceptions]
+
+Solution: 5679.934966
+
+Since $rho_n = sum_i 2^(n - 2^i) = 2^n rho_0$ is a dyadic shift of the Kempner number, its partial sums $P_K = sum_(i <= K) 2^(n - 2^i)$ are exact dyadic rationals whose continued fractions exhibit the classical _folding_ doubling: the CF at level $K + 1$ repeats the CF at level $K$ up to $O(1)$ boundary quotients (empirically, the lists agree on all but the final quotient). Consequently the count $c_a (K)$ of each quotient value $a$ in the CF body obeys an exact affine doubling recurrence $c_a (K+1) = 2 c_a (K) + e_a$, $L(K+1) = 2 L(K) + e_L$ with constant integer edits, verified across three consecutive levels for every $n$. Then $c_a (K) + e_a$ doubles exactly, so the limiting frequency of $a$ is the exact rational $f_a = (c_a (K) + e_a)/(L(K) + e_L)$ with $sum_a f_a = 1$, and $k_oo (rho_n) = product_a a^(f_a)$.
+
+The quotient alphabets are tiny and structured. For $n = 0$: ${2, 4, 6}$ with frequencies $(1\/4, 1\/2, 1\/4)$, so $k_oo (rho_0) = 2 dot 12^(1\/4)$. For $n = 2$: ${1, 2, 3, 4}$ with $(1\/3, 1\/12, 1\/2, 1\/12)$, giving $k_oo (rho_2) = 2^(1\/4) sqrt(3) = 2.0597671 dots$, matching the stated value. Large $n$ involve quotients near powers $2^(2^j - n)$, e.g. $2^50 - 1$ for $n = 50$, where $k_oo approx 2.64 dot 10^6$. The geometric mean over $n = 0, dots, 50$, evaluated at 40-digit precision, is $5679.9349661 dots$, which rounds to $5679.934966$ with a comfortable margin.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=912")[= Problem 912: Where are the Odds?]
+
+Solution: 674045136
+
+$s_n$ is odd exactly when its last bit is $1$. Valid numbers (no $111$ in binary) in increasing order are: lengths $L = 1, 2, dots$, and within a length, lexicographic order of the bits after the leading $1$. Walking that implicit trie — automaton state = number of trailing ones, $0..2$ — visits the numbers in rank order, so $F(N)$ only needs subtree aggregates: for completions of length $r$ from state $italic("st")$ with $0$-based lexicographic positions, the count $T$, the number $O$ of completions ending in bit $1$ (odd numbers), the sum $S_1$ of their positions and the sum $S_2$ of their squared positions. A whole subtree entered after `base` numbers have been consumed contributes $(b+1)^2 O + 2(b+1) S_1 + S_2$ with $b = $ `base`, since its items have global indices $b + 1 + "pos"$.
+
+The recurrences split on the next bit (bit $0$ resets the state and comes first; bit $1$, allowed while $italic("st") < 2$, offsets positions by the left subtree's count). The counts $T$ are kept exact for the descent — $N = 10^16$ reaches binary lengths near $63$ since valid numbers grow like the tribonacci constant $1.839^L$ — while $O, S_1, S_2$ live modulo $10^9 + 7$. After summing the full lengths, a single partial descent consumes the remaining ranks. The method reproduces $F(10) = 199$, agrees with brute force up to $N = 5 dot 10^4$, and gives $F(10^16) equiv 674045136$ instantly.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=913")[= Problem 913: Row-major vs Column-major]
+
+Solution: 2101925115560555020
+
+The minimum number of swaps realising a permutation is its size minus its number of cycles. Going from row-major to column-major moves the value at $0$-based position $k$ to $(k mod n) m + floor(k\/n) = k m mod (n m - 1)$ for $k < n m - 1$, with $n m - 1$ fixed — the classical in-place transposition permutation. Since $n m equiv 1 (mod n m - 1)$, multiplication by $m$ and by $n$ are inverse maps with identical cycle structure. The cycles of $x |-> n x$ on $ZZ_M$, $M = n m - 1$, split by $g = gcd(x, M)$: the $phi(d)$ elements with $d = M\/g$ fall into free orbits of size $"ord"_d (n)$, giving
+$
+S(n, m) = n m - 1 - sum_(d divides M) (phi(d))/("ord"_d (n)).
+$
+Checking $S(3,4)$: $M = 11$, $"ord"_11 (3) = 5$, so $S = 12 - 1 - (1 + 2) = 8$. ✓
+
+For $S(n^4, m^4)$ the modulus is $q^4 - 1 = (q-1)(q+1)(q^2+1)$ with $q = n m <= 10^4$, so every part — and every $p - 1$ needed for order computations — factors by trial division below $10^4$. Orders modulo prime powers lift stepwise ($"ord"_(p^(j+1))$ is $"ord"_(p^j)$ or $p$ times it), and the divisor sum runs over exponent tuples carrying a running $phi$ and lcm of orders. Each $phi(d)\/"ord"_d$ is an exact integer (free orbits). Verified against literal matrix brute force for all $2 <= n <= m <= 11$ and against the given total $12578833$ for the first range, the sum over $2 <= n <= m <= 100$ of $S(n^4, m^4)$ evaluates to $2101925115560555020$ in half a second.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=914")[= Problem 914: Triangles inside Circles]
+
+Solution: 414213562371805310
+
+A right triangle's minimum enclosing circle is its circumcircle, whose diameter is the hypotenuse, so the triangle fits strictly inside a circle of radius $R$ iff $c <= 2R - 1$. For a primitive triple generated by coprime, opposite-parity $m > k >= 1$ we have $c = m^2 + k^2$ and inradius $r = (a + b - c)\/2 = k(m - k)$. So $F(R)$ maximises $k d$ (with $d = m - k$) subject to $(k + d)^2 + k^2 <= 2R - 1$, $d$ odd (exactly the opposite-parity condition) and $gcd(k, d) = 1$.
+
+Lagrange multipliers on the real relaxation give $d^* = k^* sqrt(2)$ with $k^* = sqrt(R(2 - sqrt(2))\/2)$, and maximal $r = R(sqrt(2) - 1)$ — the answer is within a rounding's breadth of $(sqrt(2) - 1) dot 10^18$. For the integer problem, moving $k$ off $k^*$ loses about $2(k - k^*)^2$, while repairing parity and coprimality costs at most a few units of $d$, i.e. $O(k) approx 5 dot 10^8$ in $r$; hence the optimum lies within $|k - k^*| lt.tilde 5 dot 10^4$, and scanning a window of $2 dot 10^6$ (the result is unchanged at $4 dot 10^6$) is a wide margin. For each $k$ the maximal $d$ is $floor(sqrt(2R - 1 - k^2)) - k$, and the first few valid $d$ below it are tried. The method agrees with full brute force for all tested $R <= 10^5$, including the given $F(100) = 36$, and yields $F(10^18) = 414213562371805310$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=915")[= Problem 915: Giant GCDs]
+
+Solution: 55601924
+
+Write $t(n) = s(n) - 1$, so $t(1) = 0$ and $t(n+1) = t(n)^3 + 1$. Since $t^3 + 1 = (t + 1)(t^2 - t + 1)$, $s(n) = t(n) + 1$ divides $t(n+1)$, i.e. $t(n+1) equiv 0 = t(1) (mod s(n))$; both sides follow the same recurrence, so $t(n + j) equiv t(j) (mod s(n))$ for all $j >= 1$. Hence for $m > n$, $gcd(s(m), s(n)) = gcd(t(m - n) + 1, s(n)) = gcd(s(m - n), s(n))$, and subtractive Euclid yields the divisibility-sequence identity $gcd(s(m), s(n)) = s(gcd(m, n))$, verified exactly for $m, n <= 8$. Applying it twice, $gcd(s(s(a)), s(s(b))) = s(s(gcd(a, b)))$, so with $Phi(x) = sum_(k <= x) phi(k)$,
+$
+T(N) = sum_(g <= N) s(s(g)) (2 Phi(floor(N\/g)) - 1) space (mod M).
+$
+
+$M = 123456789 = 9 dot 3607 dot 3803$, so $s(s(g)) mod M$ follows by CRT from each factor $q$. Modulo $q$ the map $x |-> x^3 + 1$ has a tiny orbit from $t(1) = 0$, with (preperiod, period) equal to $(0, 3)$, $(53, 35)$, $(0, 963)$ respectively; for the giant index $s(g)$ only $s(g) mod pi_q$ is needed (any $g >= 7$ guarantees $s(g)$ exceeds the preperiod), and that iterates the same recurrence modulo $pi_q$. A single pass over $g = 1, dots, 10^8$ carries $t(g)$ modulo the three periods and accumulates the weighted sum; the weights use a $phi$ sieve for $v <= sqrt(N)$ and the sublinear recursion $Phi(x) = x(x+1)\/2 - sum_(d >= 2) Phi(floor(x\/d))$ for large arguments. The given $T(3) = 12$, $T(4) equiv 24881925$ and $T(100) equiv 14416749$ are all reproduced, and $T(10^8) equiv 55601924$ takes about seven seconds.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=916")[= Problem 916: Restricted Permutations]
+
+Solution: 877789135
+
+By the RSK correspondence, permutations of ${1, dots, 2n}$ biject with pairs $(P, Q)$ of standard Young tableaux of a common shape $lambda tack.r 2n$, where the longest increasing subsequence equals the first row length and the longest decreasing subsequence equals the first column length. The condition LDS $<= 2$ restricts to shapes with at most two rows $lambda = (lambda_1, lambda_2)$ with $lambda_1 + lambda_2 = 2n$; combined with LIS $<= n + 1$ and $lambda_1 >= lambda_2$, only $lambda_1 in {n, n + 1}$ survive. Hence
+$
+P(n) = f_((n, n))^2 + f_((n+1, n-1))^2,
+$
+where the two-row ballot formula $f_((a, b)) = (a - b + 1)/(a + 1) binom(a + b, b)$ gives $f_((n,n)) = "Cat"(n)$ and $f_((n+1, n-1)) = 3 binom(2n, n-1)\/(n + 2)$.
+
+Sanity checks: $n = 2$ yields $2^2 + 3^2 = 13$ as given; literal brute-force enumeration of all $(2n)!$ permutations with explicit LIS/LDS tests agrees for $n <= 4$; and $P(10) equiv 45265702 (mod 10^9 + 7)$ is reproduced ($16796^2 + 41990^2 = 2045265716$). The final evaluation needs just four factorials up to $(2 dot 10^8)! mod p$, collected in a single product loop, giving $P(10^8) equiv 877789135$ in about a second.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=917")[= Problem 917: Minimal Path Using Additive Cost]
+
+Solution: 9986212680734636
+
+Every monotone path visits each row and column at least once, so $A(N) = sum a + sum b + "extra"$, where the extra cost charges $a_i$ for every right move made in row $i$ and $b_j$ for every down move made in column $j$. An optimal path is a staircase of horizontal runs along a few _transit rows_ and vertical runs along a few _transit columns_.
+
+The key exchange argument: if a transit row $r$ has chain neighbours $r' < r < r''$ with $a_(r') < a_r$ and $a_(r'') < a_r$, moving the right moves of $r$ up to $r'$ shifts the intervening down moves to a later column, while moving them down to $r''$ shifts down moves to an earlier column — the two $b$-cost changes have opposite signs, so one of the relocations cannot increase cost while strictly reducing the $a$-cost. Hence the $a$-values along an optimal chain form a valley (decreasing then increasing), each transit row is the minimum of $a$ over the gap between its chain neighbours, and inductively every decreasing-phase row is a _prefix record_ of $a$, while — by reversing the grid — every increasing-phase row is a _suffix record_. The same holds for columns with $b$. A pseudorandom sequence of length $10^7$ has about $2 ln N approx 32$ records per side, so a shortest-path DP over the record-row $times$ record-column corners (horizontal edges costing $(c'' - c) a_r$, vertical edges $(r'' - r) b_c$) finishes instantly. The reduction was verified against the full $O(N^2)$ DP on forty instances across four seeds, and the givens $A(1)$, $A(2)$, $A(10)$ are reproduced; $A(10^7) = 9986212680734636$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=918")[= Problem 918: Recursive Sequence Summation]
+
+Solution: -6999033352333308
+
+Pairing consecutive terms telescopes the entire sum: $a_(2n) + a_(2n+1) = 2a_n + a_n - 3a_(n+1) = 3(a_n - a_(n+1))$, so
+$
+S(2M + 1) = a_1 + sum_(n=1)^M (a_(2n) + a_(2n+1)) = 1 + 3(a_1 - a_(M+1)) = 4 - 3a_(M+1),
+$
+and $S(2M) = S(2M+1) - a_(2M+1) = 4 - 3a_(M+1) - (a_M - 3a_(M+1)) = 4 - a_M$. This reproduces the given $S(10) = 4 - a_5 = 4 - 17 = -13$.
+
+A single term $a_n$ follows by binary descent on the pair $(a_k, a_(k+1))$: from $(a_n, a_(n+1))$ one gets $(a_(2n), a_(2n+1)) = (2a_n, a_n - 3a_(n+1))$ and $(a_(2n+1), a_(2n+2)) = (a_n - 3a_(n+1), 2a_(n+1))$, so the pair at index $k$ reduces to the pair at $floor(k\/2)$. Hence $S(10^12) = 4 - a_(5 dot 10^11)$ costs $O(log N)$ integer operations. Both the closed form and the descent are verified against a direct table of the first $800$ terms, giving $S(10^12) = -6999033352333308$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=919")[= Problem 919: Fortunate Triangles]
+
+Solution: 134222859969633
+
+Every vertex lies at distance $R$ (the circumradius) from the circumcentre, and at distance $2R|cos theta|$ from the orthocentre, where $theta$ is the angle at that vertex. So a triangle is fortunate iff some angle satisfies $cos theta = plus.minus 1\/4$; by the law of cosines, with $z$ the side opposite that angle, $2(x^2 + y^2 - z^2) = plus.minus x y$, i.e.
+$
+2x^2 + epsilon x y + 2y^2 = 2z^2, quad epsilon = plus.minus 1.
+$
+(For $(6,7,8)$: the angle opposite $8$ has cosine $21\/84 = 1\/4$.) Each equation is a conic through $(x : y : z) = (1 : 0 : 1)$, and the chord of slope $-p\/q$ parametrises all rational points:
+$
+(x, y, z) tilde (2(p^2 - q^2), space p(4q - epsilon p), space 2p^2 - epsilon p q + 2q^2),
+$
+with $gcd(p, q) = 1$, $q < p$, plus $4q > p$ when $epsilon = +1$ for positivity. The parametrised perimeter is $(4 - epsilon) p (p + q)$, and the content gcd of the triple always divides $30$, so enumerating $(4 - epsilon) p(p + q) <= 30 P$ captures every primitive fortunate triangle of perimeter at most $P$. The two families are merged and deduplicated — a triangle can be fortunate at several vertices — and each primitive contributes $"per" dot K(K+1)\/2$ scalings with $K = floor(P\/"per")$. The parametrisation reproduces the exact brute-force primitive sets, $S(P)$ agrees with brute force for $P <= 1000$ (including the given $S(10) = 24$, $S(100) = 3331$), and $S(10^7) = 134222859969633$ emerges from $1787465$ primitives in under ten seconds.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=920")[= Problem 920: Tau Numbers]
+
+Solution: 1154027691000533893
+
+$m(k)$ is the least $x$ with $tau(x) = k$ and $k divides x$. Writing $x = product p_i^(e_i)$, the multiset ${e_i + 1}$ is a factorization of $k$ into parts $>= 2$. The divisibility constraint says $v_p (x) >= v_p (k)$ for every prime $p divides k$, so each such _required_ prime must occupy an exponent slot of size at least $v_p (k)$; the remaining exponents are assigned in decreasing order to the smallest primes not dividing $k$ — optimal by the rearrangement inequality once the required assignment is fixed, and that assignment is searched exhaustively with pruning. This explains shapes like $m(5) = 5^4 = 625$, where the constraint forces the prime $5$ in place of $2$, or $m(16) = 2^7 dot 3 = 384$ rather than the unconstrained minimum $120$.
+
+Two bounds make the sweep finite: $k divides x$ implies $m(k) >= k$, so only $k <= 10^n$ matter; and $tau(x) <= 41472$ for all $x <= 10^16$ (the largest highly composite number below $10^16$, about $8.09 dot 10^15$, has $41472$ divisors), so $k <= 50000$ is exhaustive for $M(16)$. The construction is verified against a direct $tau$ sieve up to $10^6$ — both the $m(k)$ values found there and the non-existence of all others — and reproduces $m(8) = 24$, $m(12) = 60$, $m(16) = 384$ and the given $M(3) = 3189$. The total $M(16) = 1154027691000533893$ comes from $1355$ existing $m(k)$ values.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=921")[= Problem 921: Golden Recurrence]
+
+Solution: 378401935
+
+The map $x |-> x(x^4 + 10x^2 + 5)\/(5x^4 + 10x^2 + 1)$ is the quintuple-argument formula for $coth$: $coth(5t)$ equals exactly that rational function of $c = coth t$. Writing $coth t = (u + 1)\/(u - 1)$ with $u = e^(2t)$, quintupling $t$ means $u |-> u^5$. Since $a_0 = phi = (phi^3 + 1)\/(phi^3 - 1)$ (using $phi + 1 = phi^2$), we get $u_0 = phi^3$ and
+$
+a_n = (phi^m + 1)/(phi^m - 1), quad m = 3 dot 5^n.
+$
+With $phi^m = (L_m + F_m sqrt(5))\/2$ and $L_m^2 - 5F_m^2 = -4$ for odd $m$, rationalising gives $a_n = (F_m sqrt(5) + 2)\/L_m$, i.e. $p_n = F_m\/2$ and $q_n = L_m\/2$ (integers since $3 divides m$). Check: $m = 3$ gives $phi$ and $s(0) = 1 + 32 = 33$. The closed form is verified against the literal recurrence by exact arithmetic in $QQ(sqrt(5))$ for $n <= 3$.
+
+So $s(F_i)$ needs Fibonacci and Lucas numbers at the colossal index $k = 3 dot 5^(F_i)$, reduced modulo $M = 398874989$ (prime). The Pisano period is $pi(M) = 199437494 = 2 dot 99718747$, coprime to $5$, so $k mod pi(M) = 3 dot 5^(F_i mod "ord")$ where $"ord" = "ord"_(pi(M))(5) = 99718746$. A single pass over $i = 2, dots, 1618034$ carries $F_i$ modulo $"ord"$ and evaluates each term by fast-doubling Fibonacci mod $M$; the pipeline agrees with exact big-integer evaluation for all $F_i <= 8$ and gives $S(1618034) equiv 378401935$ in well under a minute.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=922")[= Problem 922: Young's Game A]
+
+Solution: 858945298
+
+This is a partizan game: Right (moving first; "Left" in CGT conventions) moves a token rightwards within its row, Down moves it downwards within its column, and whoever cannot move loses. Computing canonical forms with a small combinatorial-game-theory engine (domination and reversibility simplification, comparison via the standard $<=$ recursion) reveals that every $(a, b, k)$-staircase, token at the origin, has value
+$
+G(a, b, k) = (b - a) + ast(k - 1),
+$
+a number plus a nimber: the surplus of horizontal over vertical moves contributes the integer $b - a$, while each frontier step beyond the first contributes one unit of nim-interaction. The formula is verified by exact canonical-form computation for every staircase of weight at most $6$ plus larger spot checks such as $(2,4,3)$ and $(1,2,7)$.
+
+A disjunctive sum of such games equals $sum (b_i - a_i) + ast(j_1 xor dots xor j_m)$ with $j_i = k_i - 1$, and the first player wins iff the total is positive or fuzzy: $sum d_i > 0$, or $sum d_i = 0$ with nonzero XOR. Counting ordered $m$-tuples therefore needs the joint $(d, j)$ distribution over staircases of weight $<= w$ raised to the $m$-th convolution power — ordinary convolution along $d$, XOR-convolution along $j$, the latter diagonalised by a Walsh–Hadamard transform over $j < 64$ (here $j <= 62$). The answer is $A + B_0 - B_0^(xor = 0)$ counting $sum d > 0$, $sum d = 0$, and $sum d = 0$ with zero XOR respectively. The givens $R(2, 4) = 7$ and $R(3, 9) = 314104$ are reproduced, and $R(8, 64) equiv 858945298 (mod 10^9 + 7)$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=923")[= Problem 923: Young's Game B]
+
+Solution: 740759929
+
+The single-square variant of Problem 922. Canonical-form computation reveals a periodic closed form: with $r = (k b) mod (a + b)$,
+$
+G(a, b, k) = cases(
+  "the number" r - a & "if" r != 0\,,
+  "the switch" {b - 1 | 1 - a} & "if" r = 0\,
+)
+$
+the switch case occurring exactly when $(a + b)\/gcd(a, b)$ divides $k$ (degenerating to $ast$ for $a = b = 1$). The formula is verified by exact canonical-form computation for every staircase of weight at most $10$ plus higher-weight spot checks.
+
+A sum of numbers and switches resolves by the classical hottest-switch rule: with switches sorted by temperature $t = (a + b - 2)\/2$ and mean $mu = (b - a)\/2$, the first player's score is $V = sum "numbers" + sum mu_i + t_1 - t_2 + t_3 - dots$, after which the player on move at the integer $V$ loses iff $V = 0$. Hence Right wins iff $V > 0$, or $V = 0$ with an odd number of switch components — a rule verified against the engine on all small sums from a value zoo. For the count, switch classes $(a + b, b - a)$ are processed in decreasing temperature; equal temperatures commute in the alternating sum, and a block of $m'$ equal-temperature switches added after $s$ existing switches contributes $2t dot (plus.minus 1 "if" m' "odd, else" 0)$ by the parity of $s$. A DP over (slots filled, switch parity, $2V$) with binomial slot choices and class-count powers counts all ordered $8$-tuples; number classes join at the end with no rank interaction. The givens $S(2, 4) = 7$ and $S(3, 9) = 315319$ are reproduced, and $S(8, 64) equiv 740759929 (mod 10^9 + 7)$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=924")[= Problem 924: Larger Digit Permutation II]
+
+Solution: 811141860
+
+$a_n$ has about $2^n$ digits, but $B$ only rearranges a suffix: $B(a_n) = a_n + Delta_n$ where $Delta_n$ depends on the digits up to the pivot (the first place $q$ with $d_q < d_(q-1)$). So $U(N) = sum (a_n mod p) + sum Delta_n$ over $n$ with $B != 0$ (only $n = 1, 2$ fail). The $a$-part follows from the $rho$ cycle of $x |-> x^2 + 2$ mod $p$.
+
+For the $Delta$-part, the orbit mod $10^K$ has period $pi_K = 8 dot 5^(K-2)$: 2-adically $a_n$ converges to a root of $x^2 - x + 2$ (so high powers of $2$ stabilise), while 5-adically the cycle multiplier is $equiv 1$, so each deeper digit advances through an arithmetic progression per revolution. Fixing $K_0$, every $n >= W_0$ falls into a class $n_0 + t pi$; the low $K_0$ digits — hence usually the pivot and $Delta$ — are constant on the class. Exceptional classes (low digits weakly increasing, no pivot) are resolved via deep digits: the return map $T = f^pi$ is 5-adically translation-like, so Mahler/binomial interpolation gives
+$
+a_(n_0 + t pi) equiv sum_(j <= j_max) binom(t, j) Delta^j (a_(n_0)) space (mod 10^40),
+$
+where the $j$-th finite difference has $5$-valuation $>= j(K_0 - 1) + 1$ and vanishes mod $2^40$; $j_max = ceil(39\/(K_0 - 1))$ suffices, asserted by reproducing $T^(j_max + 1)$ exactly. The digits then depend on $t$ only through $t mod 5^m$, so a base-$5$ branch tree over $t$ resolves every pivot with exact class counts.
+
+Validation: exact big-integer brute force for $N <= 22$ (including the given $U(10) = 543870437$) and a per-term reference up to $N = 3 dot 10^5$ across several $K_0$, exercising all machinery; the production answer agrees for $K_0 = 10$ and $11$, giving $U(10^16) equiv 811141860$ in about twenty seconds.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=925")[= Problem 925: Larger Digit Permutation III]
+
+Solution: 400034379
+
+$B(n^2) = n^2 + Delta$ where $Delta$ only rearranges the suffix of $n^2$ up to its pivot (first place $q$ with $d_q < d_(q-1)$), so $T(N) = sum n^2 + sum Delta_n$ minus corrections for $B = 0$. The first part is $N(N+1)(2N+1)\/6$.
+
+For the $Delta$-part with $N = 10^16$, the pivot at place $q$ is determined by $n mod 10^(q+1)$, and since $10^(q+1) | N$ every residue class contributes _exactly_ $10^(15-q)$ values of $n$. A DFS over $n$-residue classes mod $10^(j+1)$ whose square digits $d_0 .. d_(j-1)$ weakly increase upward enumerates all pivot configurations; each pivot leaf at depth $q <= 14$ adds $Delta dot 10^(15-q)$. Children digits follow $d = (b + 2 r c) mod 10$, so classes with $r equiv 0 mod 5$ extend all ten children with one digit, and the suffix multiset, prefix value mod $p$, and $Delta$ (smallest suffix digit above the pivot, suffix re-sorted ascending) are maintained incrementally along the path. At depth $15$ the DFS switches to member enumeration: $n = r + t dot 10^15$ with the remaining digits read from $D = n^2 div 10^15 = (r^2 div 10^15) + 2 r t + t^2 dot 10^15$, which fits in $64$ bits; each member resolves its pivot directly, or proves its square fully non-increasing ($B = 0$, remove its $n^2$ term). The only contamination in the class stage comes from squares with fewer than $15$ digits that are fully non-increasing: their path acquires a fake pivot with an artificial zero digit at place $"len"(n^2)$ — impossible for any other member of the class — so subtracting the fake $Delta$ and the $n^2$ term per such (tiny) $n$ makes the count argument exact.
+
+Validated per-term against brute force for $N = 10^2 .. 10^7$ (including the given $T(10) = 270$, $T(100) = 335316$); the class tree holds about $7 dot 10^8$ nodes and the full run takes a few minutes.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=926")[= Problem 926: Total Roundness]
+
+Solution: 40410219
+
+The roundness of $n$ in base $b$ is $v_b (n) = max{k : b^k | n}$, so total roundness counts pairs $(b, k)$ with $b >= 2$, $k >= 1$, $b^k | n$:
+$
+R(n) = sum_(k >= 1) \#{b >= 2 : b^k | n} = sum_(k >= 1) (product_p (floor(e_p / k) + 1) - 1),
+$
+since the valid $b$ correspond to choosing each prime exponent at most $floor(e_p\/k)$, excluding $b = 1$. For $n = N!$ the exponents are Legendre's $e_p = sum_i floor(N\/p^i)$. Sorting them in decreasing order, the $k$-th term is a product over the prefix with $e_p >= k$, so the total work is $sum_p e_p = sum_(q "prime power") floor(N\/q) approx N log log N approx 3 dot 10^7$ for $N = 10^7$. Verified against direct base-by-base counting for $n = 20$ and $n = 10!$ (the given $R = 6$ and $312$) and random $n$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=927")[= Problem 927: Prime-ary Tree]
+
+Solution: 207282955
+
+From $t_k (n+1) = t_k (n)^k + 1$, $m in S_k$ iff the orbit of $1$ under $x |-> x^k + 1 mod m$ hits $0$. The key reduction: if $gcd(e, lambda) = 1$ with $lambda = "lcm"(ell_i - 1)$ over the primes $ell_i | m$ ($m$ squarefree), then $x |-> x^e$ is a bijection on each $ZZ\/ell_i$ (it fixes $0$ and permutes the units), so $x |-> x^e + 1$ is a _permutation_ of $ZZ\/m$. Permutations have no tails, hence $0$ is periodic and the orbit of $1 = f(0)$ necessarily returns to $0$. Since $gcd(p mod lambda, lambda) = gcd(p, lambda)$, a prime exponent can violate this only when $p | lambda$:
+$
+m in S quad <==> quad "orbit hits" 0 "for every prime" p | lambda(m).
+$
+This turns infinitely many tests into a handful. A Brent-cycle scan over all primes up to $10^7$ (testing just the primes dividing $ell - 1$) leaves $28$ S-primes: $2, 5, 149, 293, 1601, 45197, dots$. $S$ is closed under divisors, the square of every S-prime with $q^2 <= 10^7$ already fails the exponent-$2$ test, so $S$ consists of squarefree products of S-primes; the $63$ candidate products $<= 10^7$ are each tested against the primes dividing $"lcm"(ell_i - 1)$, leaving $92$ elements in total. Validated with the given $R(20) = 18$ and $R(1000) = 2089$, the latter also reproduced by brute intersection of $S_p$ over all $p < 2000$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=928")[= Problem 928: Cribbage]
+
+Solution: 81108001093
+
+Suits never affect either score, so a hand is a rank-count vector $(c_1, dots, c_13)$, $c_r in {0, dots, 4}$, weighted by $product binom(4, c_r)$. We count vectors with hand score $=$ cribbage score by a DP over ranks from king down to ace, tracking the difference $D = "crib" - "hand"$ together with exactly what the remaining ranks need: the length and count-product of the currently open run of consecutive present ranks (a gap closes it, scoring $"len" times "prod"$ when $"len" >= 3$ — precisely the "locally maximum runs" rule), and the fifteen profile $f[1..14]$ counting card subsets of the processed suffix by value sum (adding $j$ cards of value $v$ completes $binom(c, j) f[15 - j v]$ fifteens worth $2$ each). Pairs add $2 binom(c, 2)$ immediately and the hand score subtracts $c dot min(r, 10)$.
+
+Both scores only grow and the hand score is at most $340$, so any state whose $D$ plus pending run score exceeds the maximum remaining hand score is dead — this kills the run-product explosion of dense low hands, which is also exactly why the surviving fifteen profiles stay small. Entries $f[s]$ that no remaining card values can complete are zeroed, collapsing states near the end. Validated against direct enumeration of all $5^R$ count vectors for reduced decks with ranks $1..R <= 6$ and on both worked examples; the full deck takes about ninety seconds.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=929")[= Problem 929: Odd-Run Compositions]
+
+Solution: 57322484
+
+A composition with all maximal runs of odd length is a sequence of blocks (value $v$, odd multiplicity) in which adjacent blocks have different values — exactly a Smirnov word over the alphabet of blocks. With block weight $R_v (x) = x^v\/(1 - x^(2v))$, the Smirnov formula gives
+$
+F(x) = 1/(1 - sum_v R_v/(1 + R_v)) = 1/(1 - sum_v x^v/(1 + x^v - x^(2v))).
+$
+Since $1\/(1 + y - y^2) = sum_k (-1)^k F_(k+1) y^k$ (signed Fibonacci), the subtracted series has coefficients $g[n] = sum_(d | n) (-1)^(d-1) F_d$, filled by a harmonic sieve in $O(N log N)$; then $F = 1\/(1 - G)$ via the $O(N^2)$ convolution recurrence $f[n] = sum_k g[k] f[n-k]$. Validated against a direct recursive count for $n <= 30$, including the given $F(5) = 10$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=930")[= Problem 930: The Gathering]
+
+Solution: 1.345679959251e12
+
+Track the differences $x_k - x_1$: the process is a random walk on the abelian group $G = ZZ_n^(m-1)$ — moving ball $1$ adds $minus.plus (1, dots, 1)$, moving ball $k$ adds $plus.minus e_(k-1)$, each with probability $1\/(2m)$ — and it stops exactly when the walk hits $0$. For an irreducible walk on a finite abelian group whose only character with eigenvalue $1$ is trivial (true here; the eigenvalue $-1$ for even $n, m$ is harmless), the fundamental-matrix identity gives $EE_x [T_0] = sum_(v != 0) (1 - chi_v (x))\/(1 - hat(mu)(v))$ with $hat(mu)(v) = (cos(2 pi s\/n) + sum_k cos(2 pi v_k\/n))\/m$, $s = sum v_k$. A uniformly random initial configuration makes the difference vector uniform on $G$, so $EE[chi_v (x)] = 0$ for $v != 0$ and
+$
+F(n, m) = sum_(v in ZZ_n^(m-1) \\ {0}) 1/(1 - hat(mu)(v)).
+$
+$hat(mu)$ depends only on the multiset of the $v_k$, so the sum groups by count vectors with multinomial weights — $binom(n+m-2, m-1)$ terms instead of $n^(m-1)$. Since $1 - hat(mu) >= 2(1 - cos(2 pi\/n))\/m$ the positive sum is numerically tame; mpmath at $35$ digits reproduces all six given values (including $G(6,6) = 1.681521567954 dot 10^4$ to every printed digit) and evaluates $G(12,12)$ in half a minute.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=931")[= Problem 931: Totient Graph]
+
+Solution: 128856311
+
+An edge from $b$ to $p b$ has weight $phi(p b) - phi(b)$, equal to $(p-1)phi(b)$ when $p | b$ and $(p-2)phi(b)$ otherwise. Fixing $p^e || n$, the $b$ with $p b | n$ are $b = p^j m$, $m | n\/p^e$; the $j$-sum telescopes to $(p-1)p^(e-1) - 1 = phi(p^e) - 1$, and $sum_(m | k) phi(m) = k$ turns the $m$-sum into $n\/p^e$:
+$
+t(n) = sum_(p^e || n) (phi(p^e) - 1) dot n/p^e,
+$
+confirming $t(45) = 5 dot 5 + 3 dot 9 = 52$. Summing over $n <= N$ with $q = p^e$ and $m$ coprime to $p$: $T(N) = sum_q (phi(q) - 1)(S(N\/q) - p S(N\/(q p)))$ with $S(x) = x(x+1)\/2$. The $e >= 2$ prime powers and the $p S(N\/p^2)$ correction involve only $p <= sqrt(N)$; the bulk $sum_(p <= N) (p-2) S(floor(N\/p))$ groups by $w = floor(N\/p)$ using prime counts and prime sums at all division points $floor(N\/d)$ from a Lucy#sub[Hedgehog] sieve in $O(N^(3\/4))$ — counts exact, sums modulo $715827883$. Verified against direct divisor-graph computation for $n < 300$, the givens $T(10) = 26$, $T(100) = 5282$, and an spf-sieve brute force at $10^5, 10^6$; the full run takes eight seconds.
+
+#pagebreak()
 #link("https://projecteuler.net/problem=932")[= Problem 932: $2025$]
 
 Solution: 72673459417881349
@@ -4362,6 +7322,96 @@ Solution: 72673459417881349
 A $2025$-number $N$ splits into a leading part $a$ and a trailing part $b$ (with $b$ having a fixed digit length and no leading zero) such that $N = (a + b)^2$. Writing $s = a + b$, every such $N$ is simply $s^2$, so iterate over $s$ rather than over the parts: for each split position $k$, set $a = floor(N \/ 10^k)$ and $b = N mod 10^k$, and accept when $a + b = s$ and $b$ has exactly $k$ digits.
 
 A cheap filter cuts the search by more than four-fifths. Since $10^k equiv 1 space (mod 9)$, we have $N = a dot 10^k + b equiv a + b = s space (mod 9)$; combined with $N = s^2$ this forces $s^2 equiv s$, i.e. $s equiv 0$ or $1 space (mod 9)$. Only those $s$ need be examined.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=933")[= Problem 933: Paper Cutting]
+
+Solution: 5707485980743099
+
+A cut of a $w times h$ piece at $(a, b)$ yields four independent pieces, so the game is a disjunctive sum with Grundy values $G(w, h) = "mex"_(a,b) G(a,b) xor G(a,h-b) xor G(w-a,b) xor G(w-a,h-b)$, zero on strips; $C(w, h)$ counts cuts with XOR zero, and only widths $<= w - 1$ are referenced. Empirically every row $G(a, dot)$ with $a <= 122$ becomes _constant_, equal to $K_a$, beyond a transient $T_a$ (max $3016$, verified against a table built to $h = 8192$). For large $h$ this collapses everything: a cut with both $b >= T$ and $h - b >= T$ has XOR $K_a xor K_(w-a) xor K_a xor K_(w-a) = 0$ — every middle cut wins — while for $b <= B >= max T_a$ the XOR is $G(a,b) xor G(w-a,b) xor K_a xor K_(w-a)$, independent of $h$. Hence for $h >= 2B + 2$
+$
+C(w, h) = (w-1)(h - 1 - 2B) + 2 c_w (B),
+$
+exactly linear with slope $w - 1$. The answer sums exact $C$ values (four-fold orbit symmetry in $(a,b)$) up to a per-width threshold plus the arithmetic-series tail; linearity is asserted against exact counts at several $h$ past each threshold, and the givens $C(5,3) = 4$, $D(12,123) = 327398$ both check out.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=934")[= Problem 934: Unlucky Primes]
+
+Solution: 292137809490441370
+
+$u(n) > p$ means $n mod q$ is a multiple of $7$ for every prime $q <= p$. For $q in {2, 3, 5, 7}$ the only multiple of $7$ in $[0, q)$ is $0$, so $210 | n$. Writing $n = 7j$ (with $30 | j$), for $q > 7$: $n mod q in 7 ZZ <==> j mod q <= floor((q-1)\/7)$ — an _initial interval_. With $X = floor(N\/7)$ and $A_p = \#{j <= X : 30 | j, j mod q <= m_q " for all " 7 < q <= p}$, telescoping over the value of $u$ gives
+$
+U(N) = 2N + sum_p ("nextprime"(p) - p) dot A_p (N).
+$
+The allowed residues form CRT classes; a DFS over primes $11, 13, dots$ accumulates exact class counts $floor((X-r)\/L) + 1$ per level while the class count stays small ($6.35$ million classes through $q = 43$, where $L approx 1.9 dot 10^15$ nears $X approx 1.4 dot 10^16$). Past that, every class has only a handful of members $<= X$ (about $5 dot 10^7$ integers in total); these are enumerated explicitly and streamed through the remaining primes until the survivor count hits zero around $q approx 90$. Validated against per-$n$ brute force for $N = 1470$ (the given $U = 4293$) up to $N = 10^8$; the full computation takes under a second.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=935")[= Problem 935: Rolling Square]
+
+*Answer: 759908921637225*
+
+While rolling, the small square either lies flat on a wall or _bridges_ a corner of the big square with two adjacent corners — its edge spans the corner as a chord, so the contact distances $r, s$ from the big corner obey $r^2 + s^2 = b^2$. Between consecutive corners the wall budget reads $1 = s_k + m_k b + r_(k+1)$ with a unique integer $m_k >= 0$ ($m_k = 0$ is a direct corner-to-corner hop, possible only for $b > 1\/2$; $m_k >= 1$ means an exit rotation, $m_k - 1$ flat rolls, and a tilt-in). Substituting $r = b sin theta$, $s = b cos theta$, $c = 1\/b$ turns the orbit into the chain $sin theta_(k+1) + cos theta_k = c - m_k$.
+
+The starting position is a _nestle_ (square seated in the corner, $theta = 0$), and the dynamics from a nestle is deterministic — so the orbit is a sequence of *identical nestle-to-nestle blocks*, each crossing $Delta$ corners in $P = M + Delta - 1$ steps where $M = sum m_k$, and rotating the square by $90 degree dot M$. The first return happens when a nestle lands back on the starting corner: $n(b) = (4\/gcd(Delta, 4)) dot (M + Delta - 1)$. This reproduces all five given examples ($b = 1\/2$: $Delta = 1$, $n = 4$; $b = 5\/13$: block $(1,1,2)$, $Delta = 3$, $n = 24$; …). Two structural facts tame the analysis: for $b > 1\/sqrt(2)$ the hop map $r mapsto 1 - sqrt(b^2 - r^2)$ has an attracting fixed point (the inscribed square) whose basin always captures the launch, so no returns exist there; and mirror/time-reversal symmetry forces every block's $m$-sequence to be a palindrome with end shift $m_(Delta - 1) = m_0 + 1$ (equivalently $theta_j + theta_(Delta - j) = 90 degree$).
+
+Each chain is monotone in $c$, so each itinerary has at most one root. High-precision enumeration (validated against an exact simulator) reveals a clean bijection: *the return values of $b$ correspond exactly to the coprime pairs $(Delta, M)$*, one root each — though some roots are numerically extreme (the $(16, 15)$ block's $b$ differs from $1\/2$ by about $10^(-107)$, far beyond any direct search). Hence
+$
+F(N) = \#{(Delta, M) : gcd(Delta, M) = 1, (4\/gcd(Delta,4))(M + Delta - 1) <= N},
+$
+which splits by $Delta mod 4$ into three counts of coprime pairs with $Delta + M <= L$ for $L = N + 1$, $floor(N\/2) + 1$, $floor(N\/4) + 1$. Each is computed in $O(L)$ by Möbius inversion (for squarefree $d$, the condition $d | Delta$ induces a congruence on $Delta\/d$, leaving a closed-form arithmetic-progression sum). The checks $F(6) = 4$ and $F(100) = 805$ pass, and $F(10^8) = 759908921637225$ — incidentally $tilde 3N^2\/(4 pi^2)$, the Farey-density signature of the coprime-pair law. About 25 seconds, dominated by the Möbius sieve.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=936")[= Problem 936: Peerless Trees]
+
+*Answer: 12144907797522336*
+
+Count unlabelled trees with no edge between two vertices of equal degree, via rooted generating functions that track the root's child count. Let $f_d (x)$ count rooted trees whose root has $d$ children and will be attached to a parent — its eventual degree is $d + 1$ — with every internal edge already satisfying the constraint. A child whose root has $c$ children carries degree $c + 1$, so a root-child edge is legal iff $c != d$, giving the elegant self-referential system $f_d = x dot "MSET"_d (T without F_d)$ where $T$ is the union of all classes. The multiset over a set difference is evaluated by one incremental knapsack DP per $d$: $"DP"_d [j][w]$ counts multisets of $j$ subtrees of total weight $w$ from classes $c != d$, folding in weight-$m$ objects (with multiset binomials $binom(a + j' - 1, j')$) once all $f_c [m]$ are known — legitimate because a multiset of weight $n - 1$ only ever uses subtrees smaller than $n$.
+
+Unrooted counts follow from the dissymmetry theorem. A parentless root with $d$ children has degree $d$, so its children must avoid $c = d - 1$: conveniently the _same_ exclusion tables queried one level deeper, $V[n] = sum_d "DP"_(d-1)[d][n-1]$. Edge-rooted trees join two attached roots with $a$ and $b$ children where $a != b$ — so the two halves can never be isomorphic, no symmetric-edge correction exists, and $P(n) = V[n] - 1/2 sum (T T - sum_c f_c f_c)$ convolved. Validated against brute force over all non-isomorphic trees up to $n = 12$ plus the given $P(7) = 6$ and $S(10) = 74$; the whole computation takes a few seconds in pure Python big-integer arithmetic.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=937")[= Problem 937: Equiproduct Partition]
+
+*Answer: 792169346*
+
+Write $s(z) = +1$ for $z in A$ and $-1$ for $z in B$. Indicator algebra converts the pair-balance condition $p(A, z) = p(B, z)$ into a divisor identity: summing $s$ over all factorisations $z = plus.minus d e$ and removing the diagonal gives
+$
+sum_(d | z) s(d) = [z = plus.minus w^2] dot s(w),
+$
+a recursion (over norm) that determines $s$ uniquely — which is precisely why the partition exists and is unique. Since $ZZ[sqrt(-2)]$ is a UFD with units ${plus.minus 1}$, the up-to-sign monoid $T$ is free abelian on primes, and per prime the recursion $sum_(j <= a) t_j = [a "even"] t_(a\/2)$ is exactly the Thue–Morse recursion $t_(2j) = t_j$, $t_(2j+1) = -t_j$. The unique solution is therefore the multiplicative function with *Thue–Morse signs on prime exponents*: $s(z) = product_pi (-1)^("popcount"(v_pi (z)))$. (Notably _not_ the Liouville function — plain $lambda$ fails at squares of $B$-elements.) This was confirmed by building the partition directly from the recursion for all 1332 elements of norm $<= 1200$ and checking the pair condition for every $z$: zero failures.
+
+For $z = n!$ the splitting of rational primes in $ZZ[sqrt(-2)]$ does the rest: $p = 2$ ramifies ($2 tilde theta^2$, exponent $2 v_2 (n!)$, and $"popcount"(2v) = "popcount"(v)$); $p equiv 1, 3 (mod 8)$ splits into conjugate primes whose two equal exponents cancel mod 2; $p equiv 5, 7 (mod 8)$ stays inert. Hence $n! in A$ iff $sum_q "popcount"(v_q (n!))$ is even, summed over $q in {2} union {q equiv 5, 7 (mod 8)}$. Computationally, each relevant prime walks its multiples maintaining $v_q (k!)$ incrementally, XOR-ing parity changes into a flip array; a prefix XOR yields every membership bit while factorials accumulate mod $10^9 + 7$ — about $2.5 dot 10^8$ steps in total. Verified against $G(4) = 25$, $G(7) = 745$, and $G(100) equiv 709772949$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=938")[= Problem 938: Exhausting a Colour]
+
+*Answer: 0.2928967987*
+
+The both-black draw changes nothing, so condition it away: the embedded jump chain from state $(R, B)$ moves $R -> R - 2$ with probability $(R-1)\/(R-1+2B)$ and $B -> B - 1$ with probability $2B\/(R-1+2B)$ (unnormalised weights $R(R-1)$ and $2 R B$). Red's count only ever falls by two, so its parity is invariant — black can only win when $R$ is even. With absorption values $P(0, B) = 1$ and $P(R, 0) = 0$, the recurrence
+$
+P(R, B) = (R-1)/(R-1+2B) P(R-2, B) + (2B)/(R-1+2B) P(R, B-1)
+$
+is a straightforward DP over $B$ with a rolling array over even $R$: about $1.5 dot 10^8$ convex-combination float operations, numerically benign and comfortably accurate to ten decimals. Hand-check: $P(2,2) = 1/5 + 4/5 dot 1/3 = 7/15 = 0.4overline(6)$, and the other two givens reproduce exactly. Runs in about a second with numba.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=939")[= Problem 939: Partisan Nim]
+
+*Answer: 246776732*
+
+Brute-forcing every position with at most 16 stones shows the outcome depends only on summary statistics, and threshold tables collapse to a remarkably clean criterion. Let $X = "stones" - "piles" = sum ("size" - 1)$ for each side and $Pi$ the total number of piles on the board. Then *A wins under both move orders iff $X_A >= X_B + 2$, or $X_A = X_B + 1$ with $Pi$ odd* — verified against the exact solver on all 17 345 settings up to 16 stones (ones are pure tempo; only the "excess" stones above one per pile carry weight, with a parity tiebreak).
+
+For counting, strip one stone from every pile: a side becomes a partition $mu$ of $X$ plus a free pile count $m >= ell(mu)$ (surplus piles are 1-piles), with stones $= X + m$. Setting $c = X + ell(mu)$ and $H[X][c] = \#$partitions of $X$ into exactly $c - X$ parts, the surplus choices integrate to a triangular weight $"tri"(N - c_A - c_B)$, while the boundary case $X_A = X_B + 1$ needs $m_A + m_B$ odd, restricting the surplus parity to a half-triangle weight. The key kernels are thin: $H[X]$ is supported on $c in [X+1, 2X]$, so the diagonal sums $S(C) = sum_X (H[X] convolve H[X])(C)$ and $K_2(C) = sum_X (H[X+1] convolve H[X])(C)$ cost only $tilde N^3\/24$ operations, and the full off-by-two kernel comes free via $K_1 = (T - S)\/2 - K_2$ with $T = h convolve h$, $h[c] = \#{mu : |mu| + ell(mu) = c}$ (an Euler product). Everything assembles in about 8 seconds with numba; $E(1) dots E(16)$ all match brute force.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=940")[= Problem 940: Two-Dimensional Recurrence]
+
+*Answer: 969134784*
+
+Eliminating $A(m+1, ast)$ between the two recurrences forces the bottom row to obey $A(0, n+2) = A(0, n+1) + 3A(0, n)$, and the separable ansatz $A = x^m y^n$ is consistent precisely when $x = y + 1$ and $y^2 = y + 3$. With roots $y_(1,2) = (1 plus.minus sqrt(13))\/2$ and the boundary values $A(0,0) = 0$, $A(0,1) = 1$, the unique solution is the two-dimensional Lucas-style closed form
+$
+A(m, n) = (x_1^m y_1^n - x_2^m y_2^n) / sqrt(13), quad x_i = y_i + 1,
+$
+which reproduces the entire recurrence table (and the given $2, 5, 7, 16$). The double sum over Fibonacci indices then *factorises*: $S(k)$ is the difference of $(sum_i x_1^(f_i))(sum_j y_1^(f_j))$ and its Galois conjugate, divided by $sqrt(13)$ — i.e. just twice the $sqrt(13)$-component of one product. Working in $FF_p [sqrt(13)]$ with $p = 1123581313$ as pairs $a + b sqrt(13)$, the exponents up to $f_50 approx 1.26 dot 10^10$ need only square-and-multiply. Milliseconds of computation; $S(3) = 30$ and $S(5) = 10396$ check out.
 
 #pagebreak()
 #link("https://projecteuler.net/problem=951")[= Problem 951: A Game of Chance]
