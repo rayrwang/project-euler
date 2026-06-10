@@ -22,18 +22,17 @@ structured, e.g. n = 0: {2, 4, 6} with frequencies (1/4, 1/2, 1/4), so
 k_inf(rho_0) = 2 * 12^(1/4); n = 2: {1, 2, 3, 4} with (1/3, 1/12, 1/2,
 1/12), giving k_inf(rho_2) = 2^(1/4) sqrt(3) = 2.0597671... matching
 the given value; large n use quotients near 2^(2^j - n) such as
-2^50 - 1.  The geometric mean over n = 0..50, computed at 40 digits, is
-5679.9349661..., with the seventh decimal far from a rounding boundary.
+2^50 - 1.  The geometric mean over n = 0..50 is computed with the
+stdlib decimal module at 40 significant digits (ln/exp are exact to
+the context precision), so the seventh decimal is far from any
+rounding boundary.
 """
 
 from collections import Counter
+from decimal import Decimal, getcontext
 from fractions import Fraction
 
-from mpmath import exp as mexp
-from mpmath import log as mlog
-from mpmath import mp, mpf
-
-mp.dps = 40
+getcontext().prec = 40
 
 
 def cf_of_fraction(p: int, q: int) -> list[int]:
@@ -53,7 +52,7 @@ def _counts(n: int, big_k: int):
     return Counter(body), len(body)
 
 
-def k_inf(n: int, k0: int = 11):
+def k_inf(n: int, k0: int = 11) -> Decimal:
     (c0, l0), (c1, l1), (c2, l2) = (_counts(n, k) for k in (k0, k0 + 1, k0 + 2))
     keys = set(c0) | set(c1) | set(c2)
     e = {a: c1[a] - 2 * c0[a] for a in keys}
@@ -63,21 +62,21 @@ def k_inf(n: int, k0: int = 11):
     assert l2 == 2 * l1 + e_len, n
     freqs = {a: Fraction(c2[a] + e[a], l2 + e_len) for a in keys}
     assert sum(freqs.values()) == 1, n
-    lg = mpf(0)
+    lg = Decimal(0)
     for a, f in freqs.items():
         if f:
-            lg += mpf(f.numerator) / f.denominator * mlog(mpf(a))
-    return mexp(lg)
+            lg += Decimal(f.numerator) / Decimal(f.denominator) * Decimal(a).ln()
+    return lg.exp()
 
 
 def solve() -> str:
-    total = mpf(0)
+    total = Decimal(0)
     for n in range(51):
-        total += mlog(k_inf(n))
-    g = mexp(total / 51)
-    return mp.nstr(g, 10)  # 5679.934966...
+        total += k_inf(n).ln()
+    g = (total / 51).exp()
+    return str(g.quantize(Decimal("0.000001")))  # 10 significant digits
 
 
 if __name__ == "__main__":
-    assert abs(k_inf(2) - mpf("2.059767")) < 1e-6  # given example
+    assert abs(k_inf(2) - Decimal("2.059767")) < Decimal("1e-6")  # given example
     print(solve())  # 5679.934966
