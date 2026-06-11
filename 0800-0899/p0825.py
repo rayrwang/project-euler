@@ -75,4 +75,4 @@ def chasing_sum(upper: int) -> float:
 if __name__ == "__main__":
     assert abs(chasing_sum(10) - 2.38235282) < 1e-8
     result = chasing_sum(10**14)
-    print(f"{result:.9f}")  # 32.34481054
+    print(f"{result:.8f}")  # 32.34481054
