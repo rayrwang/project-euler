@@ -1,5 +1,4 @@
 import numpy as np
-from sympy.ntheory.modular import crt
 
 MODULUS = 77_777_777  # = 7 * 11 * 73 * 101 * 137
 PRIMES = (7, 11, 73, 101, 137)
@@ -51,8 +50,12 @@ def solve(n: int = 10**9) -> int:
     residue at n mod p(p-1) for each prime p (one period suffices). The example a(10) with
     A(10) = 328161643 and B(10) = -652694486 confirms the recurrences."""
     residues = [_residue(p, n % (p * (p - 1))) for p in PRIMES]
-    value, _ = crt(list(PRIMES), residues)
-    return int(value) % MODULUS
+    value, mod = 0, 1
+    for p, r in zip(PRIMES, residues):  # CRT, pairwise merge (moduli coprime)
+        k = ((r - value) * pow(mod, -1, p)) % p
+        value += mod * k
+        mod *= p
+    return value % MODULUS
 
 
 if __name__ == "__main__":
