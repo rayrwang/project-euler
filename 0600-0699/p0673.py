@@ -144,6 +144,6 @@ if __name__ == "__main__":
         rb, rd = random_pairing(), random_pairing()
         assert solve(n, rb, rd, big) == solve_brute(n, rb, rd)
 
-    beds = read_pairs("assets/0673_beds.txt")
-    desks = read_pairs("assets/0673_desks.txt")
+    beds = read_pairs("0673_beds.txt")
+    desks = read_pairs("0673_desks.txt")
     print(solve(500, beds, desks, MOD))  # 700325380
