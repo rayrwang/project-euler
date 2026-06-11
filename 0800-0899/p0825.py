@@ -1,50 +1,78 @@
-from mpmath import digamma, mp, mpf, sqrt
+import numpy as np
 
-mp.dps = 40
+SQRT3 = np.sqrt(3.0)
 
 
-def chasing_difference(n: int) -> mpf:
+def digamma(x: float) -> float:
+    """psi(x) for real x > 0, accurate to ~1e-15 relative.
+
+    Uses the recurrence psi(x) = psi(x+1) - 1/x to lift the argument above 10,
+    then the standard asymptotic expansion
+        psi(x) ~ ln x - 1/(2x) - sum_k B_{2k} / (2k x^{2k}),
+    which at x >= 10 is converged to double precision after the B_14 term.
+    """
+    acc = 0.0
+    while x < 10.0:
+        acc -= 1.0 / x
+        x += 1.0
+    inv = 1.0 / x
+    inv2 = inv * inv
+    # Horner form of B_{2k}/(2k) for k = 1..7:
+    # 1/12, -1/120, 1/252, -1/240, 1/132, -691/32760, 1/12
+    series = inv2 * (
+        1.0 / 12
+        - inv2 * (
+            1.0 / 120
+            - inv2 * (
+                1.0 / 252
+                - inv2 * (
+                    1.0 / 240
+                    - inv2 * (1.0 / 132 - inv2 * (691.0 / 32760 - inv2 / 12))
+                )
+            )
+        )
+    )
+    return acc + np.log(x) - 0.5 * inv - series
+
+
+def chasing_difference(n: int) -> float:
     """S(n): exact win-probability difference for the gap-n chase.
 
-    With gap d (distance the mover must cover) the mover wins outright if its
-    step 1, 2 or 3 reaches d; otherwise the opponent moves with gap 2n-(d-step),
-    so the win probability satisfies W(d) = 1 - (1/3) sum_{k<d, k<=3} W(2n-d+k).
-    Solving this linear system, both the numerator and denominator of S(n) =
-    |2 W(n) - 1| obey constant-coefficient recurrences: the numerator has roots
-    {-1, 2 +- sqrt(3)} and the denominator the double roots (2 +- sqrt(3))^2, so
-        num(n) = ((3-r)/2)(2+sqrt3)^n + ((3+r)/2)(2-sqrt3)^n - 2(-1)^n,
-        den(n) = (((3-r)/2)n - 1/2)(2+sqrt3)^n + (((3+r)/2)n - 1/2)(2-sqrt3)^n,
-    with r = sqrt(3). (Coefficients fitted to and verified against exact small
-    values; S(2) = 7/11.)
+    Same closed form as before,
+        num(n) = ((3-r)/2)(2+r)^n + ((3+r)/2)(2-r)^n - 2(-1)^n,
+        den(n) = (((3-r)/2)n - 1/2)(2+r)^n + (((3+r)/2)n - 1/2)(2-r)^n,
+    r = sqrt(3), but with everything divided through by (2+r)^n so nothing
+    overflows: the surviving small terms involve q^n with q = (2-r)/(2+r)
+    = 7 - 4 sqrt(3) ~ 0.0718, which underflows harmlessly to 0 for large n.
     """
-    r = sqrt(3)
-    big, small = 2 + r, 2 - r
-    a = (3 - r) / 2
-    num = a * big**n + (3 + r) / 2 * small**n - 2 * (-1)**n
-    den = (a * n - mpf(1) / 2) * big**n + ((3 + r) / 2 * n - mpf(1) / 2) * small**n
+    r = SQRT3
+    a = (3.0 - r) / 2.0
+    b = (3.0 + r) / 2.0
+    q_n = ((2.0 - r) / (2.0 + r)) ** n          # (small/big)^n
+    inv_big_n = (2.0 + r) ** (-float(n))        # big^(-n), -> 0 for large n
+    sign = -1.0 if n & 1 else 1.0
+    num = a + b * q_n - 2.0 * sign * inv_big_n
+    den = (a * n - 0.5) + (b * n - 0.5) * q_n
     return abs(num / den)
 
 
-def chasing_sum(upper: int) -> mpf:
+def chasing_sum(upper: int) -> float:
     """T(N) = sum_{n=2}^N S(n).
 
-    The (2 - sqrt(3))^n terms vanish geometrically and (3 - sqrt(3))/2 is the
-    leading coefficient of both num and den, so for large n
-        S(n) = 1 / (n + b/a),   b/a = -(3 + sqrt(3)) / 6,
-    exact to far beyond double precision once n exceeds a small cutoff. Sum the
-    first terms directly and the rest as digamma(N + 1 + b/a) - digamma(cutoff +
-    1 + b/a).
+    As before: past a small cutoff S(n) = 1/(n + b/a) with b/a =
+    -(3 + sqrt(3))/6, exact to double precision, so the tail telescopes into a
+    digamma difference. The head is summed directly.
     """
     cutoff = 200
-    ratio = -(3 + sqrt(3)) / 6  # b / a
+    ratio = -(3.0 + SQRT3) / 6.0  # b / a
     if upper <= cutoff:
-        return sum((chasing_difference(n) for n in range(2, upper + 1)), mpf(0))
-    head = sum((chasing_difference(n) for n in range(2, cutoff + 1)), mpf(0))
+        return sum(chasing_difference(n) for n in range(2, upper + 1))
+    head = sum(chasing_difference(n) for n in range(2, cutoff + 1))
     tail = digamma(upper + 1 + ratio) - digamma(cutoff + 1 + ratio)
     return head + tail
 
 
 if __name__ == "__main__":
-    assert abs(chasing_sum(10) - mpf("2.38235282")) < mpf("1e-8")
+    assert abs(chasing_sum(10) - 2.38235282) < 1e-8
     result = chasing_sum(10**14)
-    print(mp.nstr(result, 10))  # 32.34481054
+    print(f"{result:.9f}")  # 32.34481054
