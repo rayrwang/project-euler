@@ -364,9 +364,6 @@ import random
 
 import numpy as np
 
-from funcs import is_prime as _is_prime_bounded
-from funcs import prime_sieve_int
-
 _TRIAL_PRIMES = [int(p) for p in prime_sieve_int(10_000)]
 _rng = random.Random(0xC0FFEE)  # fixed seed: deterministic factorizations
 
