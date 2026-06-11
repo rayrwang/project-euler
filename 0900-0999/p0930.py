@@ -18,60 +18,59 @@ difference vector uniform on G, so E[chi_v(x)] = 0 for v != 0 and
 
 mu depends only on the multiset of the v_k, so the sum is grouped by
 count vectors of values (multinomial weights), C(n+m-2, m-1) terms
-instead of n^(m-1); 1 - mu >= 2(1 - cos(2 pi / n))/m stays comfortably
-away from 0, and the positive sum is evaluated with mpmath at 35 digits.
+instead of n^(m-1).  Float64 suffices for the 13 requested digits
+because the computation is cancellation-free: 1 - mu is assembled from
+1 - cos(2 pi j / n) = 2 sin^2(pi j / n), every term of the sum is
+positive, and math.fsum accumulates exactly, so the total's relative
+error is bounded by the worst single-term error (~1e-15).
 
 The formula reproduces all six given values, including
 G(6,6) = 1.681521567954e4 to all printed digits.
 """
 
+import math
 from math import comb
 
-from mpmath import cos, floor, log10, mp, mpf, nstr, pi
 
-mp.dps = 35
+def f_nm(n: int, m: int) -> float:
+    # 1 - cos(2 pi j / n) = 2 sin(pi j / n)^2, computed without cancellation
+    omc = [2.0 * math.sin(math.pi * j / n) ** 2 for j in range(n)]
+    terms: list[float] = []
 
-
-def f_nm(n: int, m: int):
-    cosv = [cos(2 * pi * j / n) for j in range(n)]
-    total = [mpf(0)]
-
-    def rec(j, rem, mult, csum, s, iszero):
+    def rec(j, rem, mult, osum, s, iszero):
         if j == n - 1:
             if iszero and rem == 0:
                 return  # v = 0
-            cs = csum + rem * cosv[n - 1]
+            os = osum + rem * omc[n - 1]
             ss = (s + rem * (n - 1)) % n
-            mu = (cosv[ss] + cs) / m
-            total[0] += mult / (1 - mu)
+            one_minus_mu = (omc[ss] + os) / m
+            terms.append(mult / one_minus_mu)
             return
         for c in range(rem + 1):
             rec(j + 1, rem - c, mult * comb(rem, c),
-                csum + c * cosv[j], (s + c * j) % n,
+                osum + c * omc[j], (s + c * j) % n,
                 iszero and (rem - c == 0 if j == 0 else c == 0))
 
-    rec(0, m - 1, 1, mpf(0), 0, True)
-    return total[0]
+    rec(0, m - 1, 1, 0.0, 0, True)
+    return math.fsum(terms)
 
 
 def solve(n_max: int, m_max: int) -> str:
-    g = mpf(0)
-    for n in range(2, n_max + 1):
-        for m in range(2, m_max + 1):
-            g += f_nm(n, m)
-    e = int(floor(log10(g)))
-    mant = g / mpf(10) ** e
-    return f"{nstr(mant, 13, strip_zeros=False)}e{e}"
+    g = math.fsum(f_nm(n, m)
+                  for n in range(2, n_max + 1) for m in range(2, m_max + 1))
+    e = math.floor(math.log10(g))
+    mant = g / 10.0 ** e
+    return f"{mant:.12f}e{e}"
 
 
 if __name__ == "__main__":
-    assert abs(f_nm(2, 2) - mpf(1) / 2) < mpf("1e-25")  # given
-    assert abs(f_nm(3, 2) - mpf(4) / 3) < mpf("1e-25")  # given
-    assert abs(f_nm(2, 3) - mpf(9) / 4) < mpf("1e-25")  # given
-    assert abs(f_nm(4, 5) - mpf(6875) / 24) < mpf("1e-22")  # given
+    assert abs(f_nm(2, 2) - 1 / 2) < 1e-13  # given
+    assert abs(f_nm(3, 2) - 4 / 3) < 1e-13  # given
+    assert abs(f_nm(2, 3) - 9 / 4) < 1e-13  # given
+    assert abs(f_nm(4, 5) - 6875 / 24) * 24 / 6875 < 1e-13  # given
     g33 = sum(f_nm(n, m) for n in (2, 3) for m in (2, 3))
-    assert abs(g33 - mpf(137) / 12) < mpf("1e-22")  # given
+    assert abs(g33 - 137 / 12) * 12 / 137 < 1e-13  # given
     g45 = sum(f_nm(n, m) for n in range(2, 5) for m in range(2, 6))
-    assert abs(g45 - mpf(6277) / 12) < mpf("1e-20")  # given
+    assert abs(g45 - 6277 / 12) * 12 / 6277 < 1e-13  # given
     assert solve(6, 6) == "1.681521567954e4"  # given
     print(solve(12, 12))  # 1.345679959251e12
