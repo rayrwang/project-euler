@@ -222,7 +222,7 @@ def solve_puzzle(line: str) -> int:
     return answer
 
 if __name__ == "__main__":
-    path = os.path.join(os.path.dirname(__file__), "p0424_kakuro200.txt")
+    path = "assets/0424_kakuro200.txt"
     lines = [ln for ln in open(path).read().splitlines() if ln.strip()]
     assert len(lines) == 200
     answers = [solve_puzzle(ln) for ln in lines]
