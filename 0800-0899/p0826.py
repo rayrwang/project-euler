@@ -1,6 +1,6 @@
 from fractions import Fraction
 
-from sympy import primerange
+from funcs import primerange
 
 
 def painted_expectation(n: int) -> Fraction:
@@ -32,7 +32,7 @@ def painted_expectation(n: int) -> Fraction:
 
 
 def average_over_odd_primes(limit: int) -> Fraction:
-    primes = list(primerange(3, limit))
+    primes = primerange(3, limit)
     total = sum((painted_expectation(p) for p in primes), Fraction(0))
     return total / len(primes)
 

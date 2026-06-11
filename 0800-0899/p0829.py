@@ -1,11 +1,11 @@
 import math
 from functools import lru_cache
 
-from sympy import factorint, isprime, primerange
+from funcs import factorint, isprime, primerange
 
 Shape = tuple  # () for a leaf, (left, right) for an internal node
 
-_PRIMES = list(primerange(2, 2_000_000))
+_PRIMES = primerange(2, 2_000_000)
 
 
 def _closest_split(prime_factors: tuple[tuple[int, int], ...]) -> tuple[int, int]:

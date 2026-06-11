@@ -1,7 +1,9 @@
 import math
 
 import numpy as np
-from sympy import divisors, factorint, primerange
+
+from funcs import factorint, primerange
+from funcs import divisors
 
 LAST_DIGITS = 10**16
 
@@ -79,7 +81,9 @@ def solve(target: int = 100_000_000, limit: int = 140_000_000) -> str:
     struck = np.zeros(limit + 1, dtype=bool)
     for m in moduli:
         struck[m::m] = True
-    squarefree_count = np.arange(1, limit + 1) - np.cumsum(struck[1 : limit + 1])
+    # cumulative count of unstruck indices 1..k; equals
+    # arange(1, limit + 1) - cumsum(struck[1:]) without the 8-byte arange
+    squarefree_count = np.cumsum(~struck[1 : limit + 1], dtype=np.int64)
     index = int(np.searchsorted(squarefree_count, target) + 1)
 
     last16 = str(_fib_mod(index, LAST_DIGITS)).zfill(16)

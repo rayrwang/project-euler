@@ -1,7 +1,7 @@
 import math
 from functools import lru_cache
 
-from sympy import factorint, primerange
+from funcs import factorint, primerange
 
 MOD = 409120391
 _PRIME_LIMIT = 200_000

@@ -1,3 +1,5 @@
+from fractions import Fraction
+
 import numba
 import numpy as np
 
@@ -408,13 +410,116 @@ def solve(n, order):
     return cnt, total_s
 
 
+# --- exact root counting over Fraction, replacing sympy.real_roots in brute ---
+
+def _trim(p: list) -> list:
+    while len(p) > 1 and p[-1] == 0:
+        p.pop()
+    return p
+
+
+def _is_zero(p: list) -> bool:
+    return not p or (len(p) == 1 and p[0] == 0)
+
+
+def _eval(p: list, x) -> Fraction:
+    v = Fraction(0)
+    for c in reversed(p):
+        v = v * x + c
+    return v
+
+
+def _rem(a: list, b: list) -> list:
+    """Remainder of a / b; polynomials as low->high Fraction lists."""
+    a = a[:]
+    db = len(b) - 1
+    while len(a) - 1 >= db and not _is_zero(a):
+        if a[-1] == 0:
+            a.pop()
+            continue
+        f = a[-1] / b[-1]
+        s = len(a) - 1 - db
+        for i in range(db + 1):
+            a[s + i] -= f * b[i]
+        a.pop()
+    return _trim(a)
+
+
+def _sturm_chain(f: list) -> list:
+    """Canonical Sturm chain f, f', -rem(...), ... (last nonzero ~ gcd(f, f'))."""
+    chain = [f, _trim([i * f[i] for i in range(1, len(f))])]
+    while True:
+        r = _rem(chain[-2], chain[-1])
+        if _is_zero(r):
+            return chain
+        chain.append([-c for c in r])
+
+
+def _variations_at(chain: list, x) -> int:
+    signs = [1 if v > 0 else -1 for v in (_eval(p, x) for p in chain) if v != 0]
+    return sum(1 for i in range(len(signs) - 1) if signs[i] != signs[i + 1])
+
+
+def _variations_at_inf(chain: list, positive: bool) -> int:
+    signs = []
+    for p in chain:
+        s = 1 if p[-1] > 0 else -1
+        if not positive and (len(p) - 1) % 2 == 1:
+            s = -s
+        signs.append(s)
+    return sum(1 for i in range(len(signs) - 1) if signs[i] != signs[i + 1])
+
+
+def _has_n_real_roots_with_floors(coefs: list[int], n: int) -> bool:
+    """Whether the monic integer polynomial (coefs high -> low, degree n) has
+    n real roots whose sorted floors are exactly 1..n. Fully exact:
+
+    - Squarefree test: the last element of the Sturm chain is ~gcd(f, f'); a
+      repeated root would duplicate a floor, so non-squarefree f is invalid.
+    - Integer roots in 1..n+1 are divided out exactly (a root at integer k
+      has floor k, so it lands in box k; a root at n+1 fits no box). The
+      quotient h is then nonzero at every integer 1..n+1, so Sturm's theorem
+      counts its distinct roots in each open box (i, i+1) cleanly.
+    - Validity <=> every box [i, i+1) holds exactly one root and the divided
+      integer roots plus the real roots of h account for all n roots (which
+      also rules out roots outside [1, n+1), real or at stray integers).
+    """
+    f = [Fraction(c) for c in reversed(coefs)]
+    chain = _sturm_chain(f)
+    if len(chain[-1]) > 1:
+        return False  # gcd(f, f') nonconstant: repeated root
+    h = f
+    boxes = [0] * (n + 1)
+    ndiv = 0
+    for k in range(1, n + 2):
+        if _eval(h, k) == 0:
+            deg = len(h) - 1
+            q = [Fraction(0)] * deg
+            q[deg - 1] = h[deg]
+            for d in range(deg - 2, -1, -1):
+                q[d] = h[d + 1] + k * q[d + 1]
+            h = q
+            ndiv += 1
+            if k <= n:
+                boxes[k] += 1
+    if len(h) > 1:
+        ch = _sturm_chain(h)
+        var = [_variations_at(ch, k) for k in range(1, n + 2)]
+        total_h = _variations_at_inf(ch, False) - _variations_at_inf(ch, True)
+        for i in range(1, n + 1):
+            boxes[i] += var[i - 1] - var[i]
+    else:
+        total_h = 0
+    if ndiv + total_h != n:
+        return False
+    return all(boxes[i] == 1 for i in range(1, n + 1))
+
+
 def brute(n: int):
     """Independent check for tiny n: enumerate coefficients in Vieta boxes
-    and validate roots exactly with sympy."""
-    import sympy
+    and validate roots exactly with Sturm chains over Fraction."""
     from itertools import combinations
     from itertools import product as iproduct
-    x = sympy.Symbol("x")
     # elementary symmetric ranges from roots in [i, i+1)
     lo_e = [0] * (n + 1)
     hi_e = [0] * (n + 1)
@@ -428,11 +533,7 @@ def brute(n: int):
         coefs = [1]
         for k, e in enumerate(es_tuple, start=1):
             coefs.append((-1) ** k * e)
-        poly = sympy.Poly(sum(c * x ** (n - d) for d, c in enumerate(coefs)), x)
-        roots = sympy.real_roots(poly, multiple=True)
-        if len(roots) != n:
-            continue
-        if all(int(sympy.floor(roots[i - 1])) == i for i in range(1, n + 1)):
+        if _has_n_real_roots_with_floors(coefs, n):
             cnt += 1
             total += sum(abs(c) for c in coefs[1:])
     return cnt, total
