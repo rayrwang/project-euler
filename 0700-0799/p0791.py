@@ -33,6 +33,16 @@ quadratics.  Note the q-feasible set is not always an interval containing
 q = 0 (small q can fail a >= 1 while larger q succeeds), so q is swept over
 its full range rather than stopped at the first gap.  S(5), S(30) and
 S(1000) = 37048340 are asserted before the final run.
+
+Parallelism.  Each prange iteration accumulates its per-p contribution
+(already reduced mod MOD) in a local scalar and stores it in acc[p], an
+array with exactly one slot per p, so no two threads ever write the same
+element; the slots are summed serially afterwards.  (An earlier version
+wrote into a 256-slot array at index p % 256, which shares slots across
+threads -- a data race under prange that produced nondeterministic results.
+A plain scalar reduction `total += local` would also be correct, but it
+trips a Numba parfor reduction-analysis bug, "unexpected cycle in lookup()",
+when the added value is itself loop-carried, hence the per-p array.)
 """
 
 
@@ -158,7 +168,9 @@ def sum_progression(p, q, r0, r1):
 def solve(n):
     pmax = isqrt_nb(8 * n // 3) + 2
     qmax = isqrt_nb(8 * n // 4) + 2
-    acc = np.zeros(256, dtype=np.int64)
+    # One slot per p: each prange iteration writes only acc[p], so no two
+    # threads ever touch the same element and there is no data race.
+    acc = np.zeros(pmax + 1, dtype=np.int64)
     for p in prange(0, pmax + 1):  # ty: ignore[not-iterable]
         local = 0
         for q in range(0, qmax + 1):
@@ -173,9 +185,9 @@ def solve(n):
                 hi -= 1
             if lo <= hi:
                 local = (local + sum_progression(p, q, lo, hi)) % MOD
-        acc[p % 256] = (acc[p % 256] + local) % MOD
+        acc[p] = local
     tot = 0
-    for i in range(256):
+    for i in range(pmax + 1):
         tot = (tot + acc[i]) % MOD
     return tot
 
