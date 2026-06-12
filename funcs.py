@@ -1,6 +1,9 @@
-import numpy as np
+import math
+import random
 
 from functools import cache
+
+import numpy as np
 
 # TODO add arbitrary precision int for numba
 import numba
@@ -209,16 +212,6 @@ def nCr(n: int, r: int, /) -> int:
     return prod // fact(min(r, n-r))
 
 @numba.jit(cache=True)
-def divisors(n: int, /) -> list[int]:
-    divisors = []
-    for i in range(1, int(n**0.5)+1):
-        if n % i == 0:
-            divisors.append(i)
-            if i**2 != n:
-                divisors.append(n // i)
-    return divisors
-
-@numba.jit(cache=True)
 def count_divisors(n: int, /) -> int:
     divisors = 0
     for i in range(1, int(n**0.5)+1):
@@ -346,25 +339,18 @@ def mod_sub(a: int, b: int, mod: int, /):
 def mod_mul(a: int, b: int, mod: int, /):
     return ((a % mod) * (b % mod)) % mod
 
-###############################################################################
+# sympy drop-in replacements ##################################################
+#
+# isprime, factorint, divisors, and primerange mirror the sympy API for the
+# scripts that used to depend on it. Primality below 2**62 is the
+# deterministic Miller-Rabin is_prime above (its int64 mulmod is only valid
+# there), with a pure-Python Baillie-PSW fallback for larger n. Full
+# factorization strips small primes by trial division and splits the
+# survivors with Brent's variant of Pollard's rho, so 18-19 digit inputs
+# (e.g. 2 * 10**18 + 2 or F_88 ~ 1.1e18) factor in milliseconds where
+# find_prime_factors_dict's O(sqrt(n)) trial division would not return.
 
-"""Drop-in replacements for the sympy calls used by these scripts.
-
-Built on funcs.py: primality below 2**62 is funcs.is_prime (deterministic
-Miller-Rabin; its int64 mulmod is only valid there) with a pure-Python
-Baillie-PSW fallback above, and prime generation is funcs.prime_sieve_int. Full
-factorization strips small primes by trial division and splits the survivors
-with Brent's variant of Pollard's rho, so 18-19 digit inputs (the largest any
-of the five scripts produces, e.g. 2 * 10**18 + 2 or F_88 ~ 1.1e18) factor in
-milliseconds where funcs.find_prime_factors_dict's O(sqrt(n)) trial division
-would not return.
-"""
-import math
-import random
-
-import numpy as np
-
-_TRIAL_PRIMES = [int(p) for p in prime_sieve_int(10_000)]
+_trial_primes: list[int] = []
 _rng = random.Random(0xC0FFEE)  # fixed seed: deterministic factorizations
 
 
@@ -452,7 +438,7 @@ def isprime(n: int) -> bool:
     if n < 2:
         return False
     if n < (1 << 62):
-        return bool(_is_prime_bounded(n))
+        return bool(is_prime(n))
     return _is_prime_py(n)
 
 
@@ -491,8 +477,10 @@ def _pollard_brent(n: int) -> int:
 def factorint(n: int) -> dict[int, int]:
     """Prime factorization {p: e} of n >= 1 (sympy.factorint replacement)."""
     n = int(n)
+    if not _trial_primes:
+        _trial_primes.extend(int(p) for p in prime_sieve_int(10_000))
     factors: dict[int, int] = {}
-    for p in _TRIAL_PRIMES:
+    for p in _trial_primes:
         if p * p > n:
             break
         while n % p == 0:

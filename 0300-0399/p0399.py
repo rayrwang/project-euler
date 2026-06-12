@@ -2,8 +2,7 @@ import math
 
 import numpy as np
 
-from funcs import factorint, primerange
-from funcs import divisors
+from funcs import divisors, factorint, primerange
 
 LAST_DIGITS = 10**16
 
@@ -38,7 +37,7 @@ def _entry_point(p: int) -> int:
     we test the divisors of that value in increasing order."""
     if p == 5:
         return 5
-    for d in sorted(divisors(p - _legendre5(p))):
+    for d in divisors(p - _legendre5(p)):  # divisors() is already sorted
         if _fib_mod(d, p) == 0:
             return d
     return p - _legendre5(p)
