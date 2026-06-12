@@ -5,7 +5,12 @@ import time
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
-        problems = [f"p{n.rjust(4, "0")}.py" for n in sys.argv[1:]]
+        problems = [
+            f"{str((int(n)//100) * 100).rjust(4, "0")}"
+            f"-{str((int(n)//100 + 1)*100 - 1).rjust(4, "0")}"
+            f"/p{n.rjust(4, "0")}.py"
+            for n in sys.argv[1:]
+        ]
     else:
         ds = [
             "0000-0099", "0100-0199", "0200-0299", "0300-0399", "0400-0499",
