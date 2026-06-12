@@ -13,7 +13,6 @@ answer is the digit string of A..J; a missing tenth letter takes the
 leftover digit.
 """
 
-import os
 from functools import lru_cache
 from itertools import combinations
 
