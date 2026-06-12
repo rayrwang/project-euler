@@ -23,17 +23,33 @@ arithmetic; summing M(k) over k <= 2021 is a double loop with precomputed
 factorials.
 """
 
+import numba as nb
+import numpy as np
+
 MOD = 1_000_000_007
 NMAX = 2021
 
 
+@nb.njit(cache=True)
+def _powmod(a, e, m):
+    r = 1
+    a %= m
+    while e > 0:
+        if e & 1:
+            r = r * a % m
+        a = a * a % m
+        e >>= 1
+    return r
+
+
+@nb.njit(cache=True)
 def main():
     lim = 4 * NMAX + 10
-    fact = [1] * (lim + 1)
+    fact = np.ones(lim + 1, dtype=np.int64)
     for i in range(1, lim + 1):
         fact[i] = fact[i - 1] * i % MOD
-    inv_fact = [1] * (lim + 1)
-    inv_fact[lim] = pow(fact[lim], MOD - 2, MOD)
+    inv_fact = np.ones(lim + 1, dtype=np.int64)
+    inv_fact[lim] = _powmod(fact[lim], MOD - 2, MOD)
     for i in range(lim, 0, -1):
         inv_fact[i - 1] = inv_fact[i] * i % MOD
 
@@ -53,11 +69,11 @@ def main():
                 continue
             # cyclic count of j non-overlapping blocks of length 4 on a 4k-cycle:
             # (4k)/(4k-3j) * C(4k-3j, j)
-            block = (4 * k) % MOD * pow(d % MOD, MOD - 2, MOD) % MOD * comb(d, j) % MOD
+            block = (4 * k) % MOD * _powmod(d % MOD, MOD - 2, MOD) % MOD * comb(d, j) % MOD
             term = (
                 fact[k] * inv_fact[k - j] % MOD  # k!/(k-j)! = C(k,j) j!
                 * block % MOD
-                * pow(4, j, MOD) % MOD
+                * _powmod(4, j, MOD) % MOD
                 * (fact[2 * k - 2 * j] ** 2 % MOD) % MOD
             )
             if j & 1:
@@ -67,7 +83,10 @@ def main():
         return 2 * total % MOD
 
     assert m_of(3) == 890880
-    return sum(m_of(k) for k in range(2, NMAX + 1)) % MOD
+    total = 0
+    for k in range(2, NMAX + 1):
+        total = (total + m_of(k)) % MOD
+    return total
 
 
 if __name__ == "__main__":

@@ -37,35 +37,51 @@ D(10^6) = 1303, D(10^12) = 1014800.
 """
 
 
-def count_b(E: int, N: int) -> int:
+import numba as nb
+
+
+@nb.njit(cache=True)
+def _cpow(base, exp, cap):
+    """base**exp, saturating at cap+1 to stay inside int64."""
+    r = 1
+    for _ in range(exp):
+        if r > cap // base:  # r * base would exceed cap (and may overflow int64)
+            return cap + 1
+        r *= base
+    return r
+
+
+@nb.njit(cache=True)
+def count_b(E, N):
     """#{b >= 2 : b + b^E <= N} by integer root + adjust."""
-    if 2 + (1 << E) > N:
+    if 2 + _cpow(2, E, N) > N:
         return 0
     hi = int(round(N ** (1.0 / E))) + 2
-    while hi + hi**E > N:
+    while hi + _cpow(hi, E, N) > N:
         hi -= 1
     return max(0, hi - 1)
 
 
-def D(N: int) -> int:
+@nb.njit(cache=True)
+def D(N):
     total = 0
     # cycles: n = b + b^(e^k), k sequences each
     e = 2
-    while 2 + (1 << e) <= N:
+    while 2 + _cpow(2, e, N) <= N:
         k = 1
-        while 2 + (1 << e**k) <= N:
+        while 2 + _cpow(2, e**k, N) <= N:
             total += k * count_b(e**k, N)
             k += 1
         e += 1
     # transients: n = c^(e^t) + c^(e^(t+k)), one sequence each
     e = 2
-    while (1 << e) + (1 << e**2) <= N:
+    while _cpow(2, e, N) + _cpow(2, e**2, N) <= N:
         t = 1
-        while (1 << e**t) + (1 << e ** (t + 1)) <= N:
+        while _cpow(2, e**t, N) + _cpow(2, e ** (t + 1), N) <= N:
             k = 1
-            while (1 << e**t) + (1 << e ** (t + k)) <= N:
+            while _cpow(2, e**t, N) + _cpow(2, e ** (t + k), N) <= N:
                 c = 2
-                while c ** (e**t) + c ** (e ** (t + k)) <= N:
+                while _cpow(c, e**t, N) + _cpow(c, e ** (t + k), N) <= N:
                     total += 1
                     c += 1
                 k += 1
@@ -74,19 +90,23 @@ def D(N: int) -> int:
     return total
 
 
-def D_brute(N: int) -> int:
+@nb.njit(cache=True)
+def D_brute(N):
     """Direct semantics: count surviving (n, e, a_0) triples."""
     total = 0
+    stamp = [0] * (N + 1)
+    cur = 0
     for n in range(6, N + 1):
         e = 2
-        while 2**e <= n:  # a_0 = 2 must at least allow one step
+        while _cpow(2, e, n) <= n:  # a_0 = 2 must at least allow one step
             for a0 in range(2, n):
-                seen = set()
+                cur += 1
                 x = a0
                 ok = True
-                while x not in seen:
-                    seen.add(x)
-                    nxt = min(x**e, n - x**e)
+                while stamp[x] != cur:
+                    stamp[x] = cur
+                    xe = _cpow(x, e, n)
+                    nxt = min(xe, n - xe)
                     if nxt <= 1:
                         ok = False
                         break

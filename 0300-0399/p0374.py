@@ -1,3 +1,6 @@
+import numba as nb
+import numpy as np
+
 P = 982451653  # the 50-millionth prime, the required modulus
 
 
@@ -26,13 +29,18 @@ def solve(n_max: int) -> int:
     n = 1 is the lone exception (f(1) = m(1) = 1), and the block k = 2
     cleanly accounts for n = 2, 3, 4.
     """
+    return int(_solve_jit(n_max))
+
+
+@nb.njit(cache=True)
+def _solve_jit(n_max):
     # Largest k with S_k <= n_max, where S_k = k(k+1)/2 - 1.
     k_max = int((2 * n_max) ** 0.5) + 2
     while k_max * (k_max + 1) // 2 - 1 > n_max:
         k_max -= 1
 
     # inv[i] = i^{-1} mod P for i = 1..k_max+2 via inv[i] = -(P//i) inv[P%i].
-    inv = [0] * (k_max + 3)
+    inv = np.zeros(k_max + 3, dtype=np.int64)
     inv[1] = 1
     for i in range(2, k_max + 3):
         inv[i] = (P - (P // i) * inv[P % i]) % P

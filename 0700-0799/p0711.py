@@ -1,8 +1,11 @@
+import numba as nb
+
 MOD = 1_000_000_007
 N = 12_345_678
 
 
-def solve(n):
+@nb.njit(cache=True)
+def _odd_dfa(n):
     """S(N) = sum of all m <= 2^N for which Eric forces a win.
 
     The game gives Oscar and Eric a budget of m to split into a composition;
@@ -43,6 +46,11 @@ def solve(n):
         pow4 = pow4 * 4 % MOD
         j += 1
 
+    return total
+
+
+def solve(n):
+    total = _odd_dfa(n)
     # Even-length contribution: sum over even L in [2, n] of (2^L - 1).
     m = n // 2
     inv3 = pow(3, MOD - 2, MOD)
