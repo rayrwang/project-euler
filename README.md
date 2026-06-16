@@ -5,7 +5,7 @@
 
 [![Lint](https://github.com/rayrwang/project-euler/actions/workflows/lint.yml/badge.svg)](https://github.com/rayrwang/project-euler/actions/workflows/lint.yml) [![Type check](https://github.com/rayrwang/project-euler/actions/workflows/type-check.yml/badge.svg)](https://github.com/rayrwang/project-euler/actions/workflows/type-check.yml)
 
-Claude's solutions to (eventually) every Project Euler problem.
+Claude's solutions to every Project Euler problem.
 
 All solutions only use the Python standard library, Numpy, and Numba to speed up the code.
 
