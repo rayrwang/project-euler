@@ -1245,7 +1245,7 @@ Count the solutions of $1\/a + 1\/b = p\/10^n$ for $n = 1, dots, 9$. Writing $a 
 
 Solution: 409511334375
 
-Count length-$n$ strings of distinct letters from a 26-letter alphabet having exactly one position where a letter exceeds its left neighbour. Choosing the $n$ letters fixes their relative order, so the arrangements with exactly one ascent number the Eulerian number $angle.l n, 1 angle.r = 2^n - n - 1$. Thus $p(n) = binom(26, n)(2^n - n - 1)$, and its maximum over $n$ is $409511334375$.
+Count length-$n$ strings of distinct letters from a 26-letter alphabet having exactly one position where a letter exceeds its left neighbour. Choosing the $n$ letters fixes their relative order, so the arrangements with exactly one ascent number the Eulerian number $⟨ n, 1 ⟩ = 2^n - n - 1$. Thus $p(n) = binom(26, n)(2^n - n - 1)$, and its maximum over $n$ is $409511334375$.
 
 #pagebreak()
 #link("https://projecteuler.net/problem=159")[= Problem 159: Digital Root Sums of Factorisations]
@@ -3606,7 +3606,7 @@ $
 $
 "C3 (at " b ")": (a + b + k)(b + c - k) = -2 k^2.
 $
-The answer is $|"C1" union "C2" union "C3"|$. For one condition, one pairwise vertex-sum equals a signed divisor of $2 k^2$ while the remaining vertex is free, contributing a clamped interval of valid values, summed over the divisors of $2 k^2$ (generated from a smallest-prime-factor sieve of $k$). Satisfying two conditions at once forces a right-isosceles triangle and is counted by requiring a second quantity to divide $2 k^2$; all three at once is impossible, since three $45 degree$ angles cannot sum to $180 degree$. The reflection $x -> -x$ gives $|"C1"| = |"C2"|$ and $|"C2" sect "C3"| = |"C1" sect "C3"|$, so $F = 2|"C1"| + |"C3"| - |"C1" sect "C2"| - 2|"C1" sect "C3"|$. The checks $F(1, 10) = 41$ and $F(10, 100) = 12492$ confirm it.
+The answer is $|"C1" union "C2" union "C3"|$. For one condition, one pairwise vertex-sum equals a signed divisor of $2 k^2$ while the remaining vertex is free, contributing a clamped interval of valid values, summed over the divisors of $2 k^2$ (generated from a smallest-prime-factor sieve of $k$). Satisfying two conditions at once forces a right-isosceles triangle and is counted by requiring a second quantity to divide $2 k^2$; all three at once is impossible, since three $45 degree$ angles cannot sum to $180 degree$. The reflection $x -> -x$ gives $|"C1"| = |"C2"|$ and $|"C2" ∩ "C3"| = |"C1" ∩ "C3"|$, so $F = 2|"C1"| + |"C3"| - |"C1" ∩ "C2"| - 2|"C1" ∩ "C3"|$. The checks $F(1, 10) = 41$ and $F(10, 100) = 12492$ confirm it.
 
 #pagebreak()
 #link("https://projecteuler.net/problem=398")[= Problem 398: Cutting Rope]
@@ -3643,13 +3643,13 @@ On the Fibonacci tree $T(k)$ — a root with $T(k - 1)$ and $T(k - 2)$ as childr
 
 == Grundy values collapse to a one-line recursion
 
-For this subtree-removal game the Grundy value of a rooted tree is $1$ plus the xor of its children's values: removing the root reaches $0$, and a move inside one child replaces its value freely within its own game, so the mex telescopes. Hence $G(k) = 1 + (G(k - 1) plus.circle G(k - 2))$ with $G(0) = 0$, $G(1) = 1$ — verified against a direct game-tree solver on the actual trees up to $T(6)$ (whose first draft conflated "leaf" with "removed entirely" in the tree encoding, caught by exactly that check). The values stay remarkably small: $G(10000)$ fits in three bits.
+For this subtree-removal game the Grundy value of a rooted tree is $1$ plus the xor of its children's values: removing the root reaches $0$, and a move inside one child replaces its value freely within its own game, so the mex telescopes. Hence $G(k) = 1 + (G(k - 1) ⊕ G(k - 2))$ with $G(0) = 0$, $G(1) = 1$ — verified against a direct game-tree solver on the actual trees up to $T(6)$ (whose first draft conflated "leaf" with "removed entirely" in the tree encoding, caught by exactly that check). The values stay remarkably small: $G(10000)$ fits in three bits.
 
 == Counting moves, not just winners
 
-Nobody takes the root voluntarily, so the position value is $G(k - 1) plus.circle G(k - 2)$ and a first move wins iff it zeroes the xor. Let $"cnt"(j, t)$ be the number of single-node removals inside $T(j)$ that leave it at Grundy value $t$. Internal moves always produce a value of at least $1$, so $"cnt"(j, 0) = 1$ (remove $T(j)$ whole), and otherwise the move lives in one of the two child subtrees:
+Nobody takes the root voluntarily, so the position value is $G(k - 1) ⊕ G(k - 2)$ and a first move wins iff it zeroes the xor. Let $"cnt"(j, t)$ be the number of single-node removals inside $T(j)$ that leave it at Grundy value $t$. Internal moves always produce a value of at least $1$, so $"cnt"(j, 0) = 1$ (remove $T(j)$ whole), and otherwise the move lives in one of the two child subtrees:
 $
-"cnt"(j, t) = "cnt"(j - 1, (t - 1) plus.circle G(j - 2)) + "cnt"(j - 2, (t - 1) plus.circle G(j - 1)),
+"cnt"(j, t) = "cnt"(j - 1, (t - 1) ⊕ G(j - 2)) + "cnt"(j - 2, (t - 1) ⊕ G(j - 1)),
 $
 with $f(k) = "cnt"(k - 1, G(k - 2)) + "cnt"(k - 2, G(k - 1))$. The reachable $(j, t)$ states were probed empirically before committing — about $1.7 dot 10^7$ at $k = 10^4$, comfortable for a memoised iterative evaluation — and counts only ever add, so reducing modulo $10^18$ is exact for the last-$18$-digits answer. The recursion matches the brute-force game solver through $k = 5$ and reproduces both givens $f(5) = 1$ and $f(10) = 17$.
 
@@ -4599,9 +4599,9 @@ The check values both reproduce: $T(7) = 7^7 - 7! = 818503$ from the problem, an
 
 Solution: 3996390106631
 
-Two players flip rectangular regions (square width, triangular height, with the white disk in the upper-right corner) trying to blacken an $N times N$ board; $W(N)$ counts the first player's winning opening moves. This is a coin-turning game, so the position value is the XOR over white disks of per-cell Grundy values, and since each move factors into a horizontal (square-length) and a vertical (triangular-length) part, the Tartan theorem makes each cell value the nim-product $g_1(x) times.circle g_2(y)$ of two one-dimensional ruler games. Each $1$-D Grundy follows $g(x) = "mex"$ over allowed lengths of $P(x) xor P(x - L + 1)$ in $O(N sqrt(N))$.
+Two players flip rectangular regions (square width, triangular height, with the white disk in the upper-right corner) trying to blacken an $N times N$ board; $W(N)$ counts the first player's winning opening moves. This is a coin-turning game, so the position value is the XOR over white disks of per-cell Grundy values, and since each move factors into a horizontal (square-length) and a vertical (triangular-length) part, the Tartan theorem makes each cell value the nim-product $g_1(x) ⊗ g_2(y)$ of two one-dimensional ruler games. Each $1$-D Grundy follows $g(x) = "mex"$ over allowed lengths of $P(x) xor P(x - L + 1)$ in $O(N sqrt(N))$.
 
-Because nim-multiplication is bilinear over XOR, the XOR of a $w times h$ rectangle of cell values factorises as $A times.circle B$ with $A$ and $B$ XORs of prefix values, and the all-white start has total $T = P_1(N) times.circle P_2(N)$. A first move wins iff its rectangle value equals $T$, so $W(N) = sum_(v times.circle u = T) "cntA"[v] dot "cntB"[u]$, where the histograms tally $A$ and $B$ over all (position, length) choices; the values fit in $12$ bits, so this is two histogram passes plus a few thousand nim-products. $W(1) = 1$, $W(2) = 0$, $W(5) = 8$, $W(100) = 31395$ all check.
+Because nim-multiplication is bilinear over XOR, the XOR of a $w times h$ rectangle of cell values factorises as $A ⊗ B$ with $A$ and $B$ XORs of prefix values, and the all-white start has total $T = P_1(N) ⊗ P_2(N)$. A first move wins iff its rectangle value equals $T$, so $W(N) = sum_(v ⊗ u = T) "cntA"[v] dot "cntB"[u]$, where the histograms tally $A$ and $B$ over all (position, length) choices; the values fit in $12$ bits, so this is two histogram passes plus a few thousand nim-products. $W(1) = 1$, $W(2) = 0$, $W(5) = 8$, $W(100) = 31395$ all check.
 
 #pagebreak()
 #link("https://projecteuler.net/problem=460")[= Problem 460: An Ant on the Move]
@@ -4782,7 +4782,7 @@ Solution: 9690646731515010
 
 $F(n, d)$ counts divisors of $n$ whose final digits equal $d$; we need $F(10^6 !, 65432) mod (10^16 + 61)$. Since $65432 equiv 24 (mod 32)$, a divisor ending in $65432$ has $2$-adic valuation exactly $3$ and is coprime to $5$, so writing $D = 8 m$ the condition becomes $m equiv 8179 (mod 12500)$ where $m$ ranges over divisors of $10^6 !$ built from primes other than $2$ and $5$. This counts divisors in a fixed class of the unit group $U(12500)$, which has $5000$ elements.
 
-The DP tracks $c[g]$, the number of partial divisors in class $g$, and each prime $p$ with exponent $e$ contributes the geometric series $1 + delta_p + dots + delta_p^e$. Multiplication by $p^(-1)$ permutes the classes in cycles (cosets of $angle.l p angle.r$), so the convolution is a sliding-window sum of length $e+1$ around each cycle plus full-cycle copies -- $O(|U|)$ per prime, about $5000 dot 78498$ operations, with a chunked modular multiply since the modulus squared overflows $64$ bits. A direct residue-ring DP confirms $F(12!, 12) = 11$ and $F(50!, 123) = 17888$ and cross-checks the group method.
+The DP tracks $c[g]$, the number of partial divisors in class $g$, and each prime $p$ with exponent $e$ contributes the geometric series $1 + delta_p + dots + delta_p^e$. Multiplication by $p^(-1)$ permutes the classes in cycles (cosets of $⟨ p ⟩$), so the convolution is a sliding-window sum of length $e+1$ around each cycle plus full-cycle copies -- $O(|U|)$ per prime, about $5000 dot 78498$ operations, with a chunked modular multiply since the modulus squared overflows $64$ bits. A direct residue-ring DP confirms $F(12!, 12) = 11$ and $F(50!, 123) = 17888$ and cross-checks the group method.
 
 #pagebreak()
 #link("https://projecteuler.net/problem=475")[= Problem 475: Music Festival]
@@ -6349,7 +6349,7 @@ $n$ boats start $40$ m apart and row upstream at speeds $v_i = -log X_i$, iid $"
 
 Work in $40$ m units: boat $i$ moves on the line $x = (i-1) + v_i t$ with remaining course $D_i = L\/40 - (i-1)$ and unimpeded finish time $T_i = D_i \/ v_i$. Three structural facts collapse the dynamics. First, every boat travels along its fixed line until it parks, so the rearmost active boat ahead of a newcomer traces the _lower envelope_ (clipped at the finish line) of the lines of all boats ahead: its segment owners are exactly the bump chain $c_1 arrow.r c_2 arrow.r dots.c arrow.r e$, its breakpoints are pairwise line crossings $theta_j = (c_(j+1) - c_j)\/(v_(c_j) - v_(c_(j+1)))$, and it exits the course at $T_e = max T$ over the pack. Second, by concavity a newcomer's line crosses the envelope at most once, so boat $i$ bumps iff $T_i < T_e$, the target is the owner of the crossing segment (two homogeneous linear inequalities), and a boat that does not bump screens the whole pack from its followers. Third, the inversions of the final order are precisely the chain-connected pairs, so the parity weight is $(-1)^I$ with $I = sum_i (S_i - 1)$, where $S_i$ is the chain length seen by boat $i$ — verified against all five outcome rows of the worked $n = 3$ example. Then $p_"even" = (1 + EE[(-1)^I])\/2$.
 
-Every condition is a homogeneous linear inequality in the speeds with rational coefficients, so the expectation is computed _exactly_ by a DP over states (chain tuple, constraint set) whose measures are sums of terms $c dot product v^k dot e^(-angle.l a, v angle.r)$: integrating out a discarded variable case-splits on which lower/upper bound binds and stays inside this class. Linear forms are interned to integer ids with scale-canonical constraints (otherwise duplicate scaled bounds silently double-count — the bug that produced $22\/45$ instead of $56\/135$ at $n = 3$), bound-case enumeration and per-term integrals are memoised, and measure-zero regions (a constraint and its negation both present) are pruned, which alone cut the running time by a factor of six. The $n = 13$ run takes about three minutes and yields the exact rational $p(13, 1800) = 291057636403594035546780739 \/ 581903712607636503693984375 approx 0.5001817828$.
+Every condition is a homogeneous linear inequality in the speeds with rational coefficients, so the expectation is computed _exactly_ by a DP over states (chain tuple, constraint set) whose measures are sums of terms $c dot product v^k dot e^(-⟨ a, v ⟩)$: integrating out a discarded variable case-splits on which lower/upper bound binds and stays inside this class. Linear forms are interned to integer ids with scale-canonical constraints (otherwise duplicate scaled bounds silently double-count — the bug that produced $22\/45$ instead of $56\/135$ at $n = 3$), bound-case enumeration and per-term integrals are memoised, and measure-zero regions (a constraint and its negation both present) are pruned, which alone cut the running time by a factor of six. The $n = 13$ run takes about three minutes and yields the exact rational $p(13, 1800) = 291057636403594035546780739 \/ 581903712607636503693984375 approx 0.5001817828$.
 
 Verified: $p(3, 160) = 56\/135$ exactly and $p(4, 400) = 0.5107843137$ (both given), the solver-posted ladder $p(5..9, 1800)$ to ten digits, and an independent event-driven Monte Carlo simulation of the literal race rules at a configuration not given in the problem.
 
@@ -6420,11 +6420,11 @@ If Alice's first Head lands on her $r$-th toss (probability $p^(r-1)(1-p)$, with
 $
 e(n, p) = sum_(m=0)^infinity p^m q dot (m q)^n = q^(n+1) sum_(m=0)^infinity m^n p^m.
 $
-The standard generating function $sum_(m>=0) m^n x^m = A_n (x) \/ (1 - x)^(n+1)$, where $A_n$ is the Eulerian polynomial, cancels the $q^(n+1)$ factor exactly, leaving $e(n, p) = A_n (p)$. Therefore $c(n, k)$ is the Eulerian number $angle.l.double n; k - 1 angle.r.double$, the number of permutations of $n$ elements with $k - 1$ ascents. (Check: $A_3(p) = p + 4 p^2 + p^3$ matches the given $e(3, p)$.)
+The standard generating function $sum_(m>=0) m^n x^m = A_n (x) \/ (1 - x)^(n+1)$, where $A_n$ is the Eulerian polynomial, cancels the $q^(n+1)$ factor exactly, leaving $e(n, p) = A_n (p)$. Therefore $c(n, k)$ is the Eulerian number $⟪ n; k - 1 ⟫$, the number of permutations of $n$ elements with $k - 1$ ascents. (Check: $A_3(p) = p + 4 p^2 + p^3$ matches the given $e(3, p)$.)
 
 Evaluate it with the closed form
 $
-angle.l.double n; m angle.r.double = sum_(j=0)^m (-1)^j binom(n + 1, j) (m + 1 - j)^n,
+⟪ n; m ⟫ = sum_(j=0)^m (-1)^j binom(n + 1, j) (m + 1 - j)^n,
 $
 all modulo the prime $10^9 + 7$. The binomial is built incrementally, the inverses $1, ..., m$ come from the linear recurrence $"inv"[i] = -(p \/ i) "inv"[p mod i]$, and each $(m + 1 - j)^n$ is a fast modular power; products stay inside int64 because $(10^9 + 7)^2 < 2^63$. This confirms $c(100, 40) equiv 986699437$ and produces $c(10^7, 4 dot 10^6)$.
 
@@ -8108,7 +8108,7 @@ Solution: 228579116
 
 For positive integers $a, b, c$ the equation $17^p a + 19^p b + 23^p c = n$ is solvable for some $n$; the rest are _unreachable_, and $G(p)$ sums them. We want $G(6)$ modulo $10^9 + 7$.
 
-Write $A = 17^p$, $B = 19^p$, $C = 23^p$ and $s = A + B + C$ (the value at $a = b = c = 1$). Substituting $a -> a + 1$ etc. shows $n$ is reachable iff $n - s$ lies in the numerical semigroup $S = angle.l A, B, C angle.r$ of non-negative integer combinations. Since the generators are coprime, $S$ has finitely many gaps, and the unreachable $n > 0$ are exactly ${1, dots, s - 1}$ together with ${s + g : g "a gap of" S}$. Therefore
+Write $A = 17^p$, $B = 19^p$, $C = 23^p$ and $s = A + B + C$ (the value at $a = b = c = 1$). Substituting $a -> a + 1$ etc. shows $n$ is reachable iff $n - s$ lies in the numerical semigroup $S = ⟨ A, B, C ⟩$ of non-negative integer combinations. Since the generators are coprime, $S$ has finitely many gaps, and the unreachable $n > 0$ are exactly ${1, dots, s - 1}$ together with ${s + g : g "a gap of" S}$. Therefore
 $
 G(p) = s(s - 1) \/ 2 + s dot #h(2pt) "(number of gaps)" + "(sum of gaps)".
 $
@@ -8837,6 +8837,47 @@ $
 where $P(M) = (M+1)(M+2)\/2$ counts pairs with $k' + m' <= M$ (each contributes $1$ in the $i = j = 1$ case). The recursion arguments are $floor(N \/ 2^t)$ up to small shifts, so memoisation visits $O(log^2 N)$ states — microseconds in Python. The givens $G(10) = 754$ and $G(10^2) = 583766$ hold, and the function matches brute force on $37$ values up to $800$.
 
 #pagebreak()
+#link("https://projecteuler.net/problem=761")[= Problem 761: Runner and Swimmer]
+
+Solution: 5.05505046
+
+A swimmer of speed $<= 1$ starts at the centre of a convex pool; a runner of speed $<= v$ is confined to the edge. The swimmer wins by reaching the boundary strictly before the runner can reach that point. We want the critical speed $V$: the swimmer escapes for every $v < V$ and is always caught for $v > V$. The problem gives $V_"Circle" approx 4.60333885$, $V_"Square" approx 5.78859314$, and asks for $V_"Hexagon"$, with the runner starting at an edge midpoint. This is an Isaacs differential game.
+
+== The circle (solved in closed form)
+
+Work in the unit disc. The swimmer plays two phases.
+
+*Phase 1 (hold).* It spirals outward keeping the runner diametrically opposite. At radius $r$ its maximal angular speed is $1\/r$ while the runner's is $v$, so it can keep the runner antipodal while still moving out as long as $1\/r > v$, i.e. up to the *guard circle* $r_0 = 1\/v$. There the angular separation is still the half-perimeter $pi$.
+
+*Phase 2 (dash).* Writing the swimmer's velocity as radial part $cos a$ and tangential part $sin a$ (speed $1$), the angular gap $psi$ to the runner obeys
+$
+(d psi)/(d t) = sin a \/ rho - v, quad (d rho)/(d t) = cos a.
+$
+Eliminating time and maximising the gap pointwise gives the optimal heading $sin a = 1\/(v rho)$, whence
+$
+(d psi)/(d rho) = - sqrt(v^2 rho^2 - 1) \/ rho.
+$
+Integrating from $rho = 1\/v$ to the edge $rho = 1$ closes the gap by $sqrt(v^2 - 1) - arccos(1\/v)$. The swimmer exactly ties the runner — the escape boundary — when this equals the initial separation $pi$. With $phi = arccos(1\/v)$ (so $v = sec phi$) this is the transcendental equation
+$
+sqrt(v^2 - 1) - arccos(1\/v) = pi quad <=> quad tan phi - phi = pi,
+$
+whose root is $V_"Circle" = 4.60333885 dots$, recovered to $8$ digits by bisection.
+
+== The regular polygons
+
+The same Isaacs barrier governs any convex pool: the kinematics are position-independent, so the costate is constant along each characteristic, the semipermeability condition is $|nabla_x| = v |nabla_sigma|$, and the swimmer's escape heading meets the edge at the fixed angle $phi = arccos(1\/v)$ (tangential component $1\/v$, outward component $sqrt(1 - 1\/v^2)$), while the runner maintains the tie $"arc"(", runner, aim") = v dot "dist"("swimmer, aim")$ — consistent precisely because $cos phi = 1\/v$.
+
+On a *circle* the radial direction is the boundary normal, collapsing the game to the single radius coordinate above. On a *polygon* the normal and radial directions disagree and the curvature is concentrated at the vertices: the escape characteristics are parallel along each flat edge and fan out only at the corners, so the corners hand the swimmer extra "free" separation. Fewer sides therefore let the swimmer beat a faster runner, and the critical speeds rise monotonically as the side count falls. Equivalently the barrier constant $tan phi - phi$ grows from $pi$ by a corner contribution:
+$
+underbrace(3.14159265, "circle") < underbrace(3.58349153, "hexagon") < underbrace(4.30439035, "square").
+$
+The square value reproduces the published $V_"Square" = 5.78859314$ (used as a checkpoint), and the hexagon root of the game is
+$
+V_"Hexagon" = 5.05505046,
+$
+which sits between the circle and square critical speeds as the monotonicity in the number of sides requires.
+
+#pagebreak()
 #link("https://projecteuler.net/problem=762")[= Problem 762: Amoebas in a 2D Grid]
 
 Solution: 285528863
@@ -8850,6 +8891,25 @@ Tracing ancestries gives a full binary tree: each division splits a node into a 
 == A forced profile and a 330-state walk
 
 For a fixed arrangement the per-column node counts are forced: with $n(x,y)$ nodes at a cell, the leaves are $l(x,y) in {0,1}$ (one per cell), $i = n - l >= 0$, and $n(x+1,y) = i(x,y) + i(x,y-1)$. So $C(N)$ counts walks over count vectors $(n_0, n_1, n_2, n_3)$ from $(1,0,0,0)$ to $(0,0,0,0)$ accumulating exactly $N+1$ leaves. The column total obeys $sum n' = 2(sum n - l)$ with $l <= 4$, so from $sum n >= 8$ it can never decrease and the walk can never terminate: live states satisfy $sum n <= 7$, just $330$ vectors. Leafless steps double the total, so within each leaf count the states are processed in increasing-total order; the dynamic programming costs a few thousand operations per leaf level and finishes $N = 10^5$ in about a second after asserting all four given values $C(2)$, $C(10)$, $C(20)$ and $C(100)$.
+
+#pagebreak()
+#link("https://projecteuler.net/problem=763")[= Problem 763: Amoebas in a 3D Grid]
+
+Solution: 798443574
+
+The three-dimensional sibling of Problem 762: an amoeba at $(x, y, z)$ divides into amoebas at $(x+1, y, z)$, $(x, y+1, z)$ and $(x, y, z+1)$ when those three cells are empty. From one amoeba at the origin, $D(N)$ counts distinct arrangements after exactly $N$ divisions, and we want the last nine digits of $D(10000)$.
+
+== Arrangements are staircase fire-sets
+
+A division consumes a cell and lights its three forward neighbours, so the consumed ("fired") cells form a downward-closed staircase: a cell fires only after all three predecessors have. In three dimensions a cell never fires twice — checked by exhaustive search throughout a box — so an arrangement is determined by, and reconstructible from, its set of $N$ fired cells, and $D(N)$ counts the reachable fire-sets. Sweeping the antidiagonal planes $x + y + z = d$ in order, the state is the *frontier* of fired cells on the current plane. On the next plane a cell is *forced* if two back-neighbours fired, *free* if one did, *forbidden* if none did; the sweep ends when the frontier empties. A brute-force search confirms the resulting counts $1, 3, 9, 30, 99, 336, dots$ through $N = 13$.
+
+== A level-indexed automaton
+
+Most frontiers are thick: their forced cells regenerate forever, so they never terminate and contribute nothing. Collapsing frontiers by forward counting behaviour (a Myhill–Nerode quotient) leaves a tidy family of *live* classes $(L, j)$. Each sits at a *level* $L$ — its earliest termination needs exactly $T(L) = L(L+1)\/2$ further cells — and level $L$ carries precisely $L$ classes $j = 0, dots, L-1$ (levels $0$ and $1$ carry one). Every transition moves one level: DOWN, STAY or UP adds $L$, $L+1$ or $L+2$ cells, the increment being uniformly $L + 1 + Delta L$. The sub-index follows fixed rules — DOWN sends $j arrow.r min(j, L-2)$; STAY spreads to ${0}$, ${0, j, j+1}$ or doubles at the ends; UP sends $j arrow.r j+1$ and opens the new top class — read off from the small levels and stated in full in the code.
+
+== Computing the coefficient
+
+Writing $g_(L, j)(x)$ for the generating function in added cells, only the seed $(0,0)$ owns the termination option, and $D(N) = [x^(N-1)] g_(0,0)$. Since every increment is at least one, the coefficients fall out degree by degree, and only levels with $T(L) <= N$ can contribute, so $L = O(sqrt(N))$ (about $141$ here): there are $O(N)$ classes and a sliding window of width $O(sqrt(N))$. The rules, fixed from levels up to five, already reproduce $D(1), dots, D(18)$ exactly, the stated $D(20) = 9204559704$, and $D(100) equiv 780166455 space (mod 10^9)$ — a level-$13$ test well beyond their derivation — and deliver $D(10000) equiv 798443574 space (mod 10^9)$ in about ten seconds.
 
 #pagebreak()
 #link("https://projecteuler.net/problem=764")[= Problem 764: Asymmetric Diophantine Equation]
@@ -9107,7 +9167,7 @@ $s(m)$ needs, over coprime pairs in $[2, m]^2$, the sums of $a b$ and of $a + b$
 
 Solution: 146133880
 
-The freshman's product $a times.square b$ multiplies decimal numbers digit-by-digit, keeping only the last digit of each digit product (so $234 times.square 765 = 480$). $F(R, M)$ sums $x_1 times.square dots times.square x_R$ over all tuples with $0 <= x_i <= M$; we need $F(234567, 765432)$ modulo $10^9 + 9$.
+The freshman's product $a ⊠ b$ multiplies decimal numbers digit-by-digit, keeping only the last digit of each digit product (so $234 ⊠ 765 = 480$). $F(R, M)$ sums $x_1 ⊠ dots ⊠ x_R$ over all tuples with $0 <= x_i <= M$; we need $F(234567, 765432)$ modulo $10^9 + 9$.
 
 The operation acts independently on each decimal position (it is associative, position $j$ of the result being the product of all $j$-th digits modulo $10$), so
 $
@@ -9715,7 +9775,7 @@ A polynomial of degree $d$ has integer value in $[2^d, 2^(d+1))$, so ordering th
 
 == Computation
 
-A carry-less sieve marks every XOR-composite below $N$. Any composite of degree $<= 26$ has a factor of degree $<= 13$, so it suffices to run $p$ over the still-unmarked values (the XOR-primes) with $deg p <= 13$, and for each mark $p times.circle q$ for every $q >= 2$ with $deg p + deg q <= 26$. The carry-less product uses the shift-and-XOR loop $r arrow.l r xor a$ while shifting $a$ left and $b$ right. The unmarked values $>= 2$, taken in increasing order, are the XOR-primes; the $5{,}000{,}000$th is $124136381$. The sieve runs in a few seconds.
+A carry-less sieve marks every XOR-composite below $N$. Any composite of degree $<= 26$ has a factor of degree $<= 13$, so it suffices to run $p$ over the still-unmarked values (the XOR-primes) with $deg p <= 13$, and for each mark $p ⊗ q$ for every $q >= 2$ with $deg p + deg q <= 26$. The carry-less product uses the shift-and-XOR loop $r arrow.l r xor a$ while shifting $a$ left and $b$ right. The unmarked values $>= 2$, taken in increasing order, are the XOR-primes; the $5{,}000{,}000$th is $124136381$. The sieve runs in a few seconds.
 
 #pagebreak()
 #link("https://projecteuler.net/problem=811")[= Problem 811: Bitwise Recursion]
@@ -10061,9 +10121,9 @@ Since $Q(0) = 7$, the value $g(142857)$ is roughly $7^142857$ times a modest fac
 
 Solution: 552839586
 
-Simulation exposes the algebraic skeleton: round $k$ writes the triple $(a, 2 times.circle a, 3 times.circle a)$ under nim-multiplication, where $a$ runs through the positive integers whose leading base-4 digit is $1$ — the blocks $[4^j, 2 dot 4^j)$. Nim-multiplying by $2$ acts digitwise on base-4 digits as the GF(4) map $0,1,2,3 -> 0,2,3,1$, and the triples ${a, 2 times.circle a, 3 times.circle a}$ tile each block $[4^j, 4^(j+1))$ into its three quarters, matching the simulated triples exactly.
+Simulation exposes the algebraic skeleton: round $k$ writes the triple $(a, 2 ⊗ a, 3 ⊗ a)$ under nim-multiplication, where $a$ runs through the positive integers whose leading base-4 digit is $1$ — the blocks $[4^j, 2 dot 4^j)$. Nim-multiplying by $2$ acts digitwise on base-4 digits as the GF(4) map $0,1,2,3 -> 0,2,3,1$, and the triples ${a, 2 ⊗ a, 3 ⊗ a}$ tile each block $[4^j, 4^(j+1))$ into its three quarters, matching the simulated triples exactly.
 
-For any nonzero GF(4) digit $d$ we have $d + 2 times.circle d + 3 times.circle d = 1 + 2 + 3 = 6$, so every triple sums to $6$ times the sum of $4^i$ over the nonzero base-4 digit positions of $a$. Hence $M(n)$ is six times a digit-counting sum: complete blocks contribute $16^j + 4^(j-1)(4^j - 1)$ in closed form, and the partial block is a standard per-position count of nonzero digits below a bound. The exact integer evaluation is validated against direct simulation for $n <= 1500$, including the given $M(10) = 642$ and $M(1000) = 5432148$, and reduces the answer modulo $10^9 + 7$ instantly.
+For any nonzero GF(4) digit $d$ we have $d + 2 ⊗ d + 3 ⊗ d = 1 + 2 + 3 = 6$, so every triple sums to $6$ times the sum of $4^i$ over the nonzero base-4 digit positions of $a$. Hence $M(n)$ is six times a digit-counting sum: complete blocks contribute $16^j + 4^(j-1)(4^j - 1)$ in closed form, and the partial block is a standard per-position count of nonzero digits below a bound. The exact integer evaluation is validated against direct simulation for $n <= 1500$, including the given $M(10) = 642$ and $M(1000) = 5432148$, and reduces the answer modulo $10^9 + 7$ instantly.
 
 #pagebreak()
 #link("https://projecteuler.net/problem=833")[= Problem 833: Square Triangle Products]
@@ -10528,7 +10588,7 @@ Each move is a Vieta flip preserving $Q = (c - a - b)^2 - 4 a b$, the discrimina
 
 Solution: 336785000760344621
 
-With $xor$ as addition and the XOR-product $times.circle$ as multiplication, bit strings form the polynomial ring $"GF"(2)[x]$, and the equation $(a times.circle a) xor (2 times.circle a times.circle b) xor (b times.circle b) = 5$ reads
+With $xor$ as addition and the XOR-product $⊗$ as multiplication, bit strings form the polynomial ring $"GF"(2)[x]$, and the equation $(a ⊗ a) xor (2 ⊗ a ⊗ b) xor (b ⊗ b) = 5$ reads
 $
 a^2 + x a b + b^2 = (x + 1)^2.
 $
@@ -10541,7 +10601,7 @@ Multiplying by $t$ sends $a + b t$ to $b + (a + x b) t$, i.e. $(a, b) -> (b, a x
 
 Solution: 23707109
 
-With $times.circle$ the carry-less XOR-product, $G(N, m)$ counts pairs $0 <= a <= b <= N$ for which $(a times.circle a) plus.circle (2 times.circle a times.circle b) plus.circle (b times.circle b) = k$ for some $k <= m$; we are given $G(1000, 100) = 398$ and need $G(10^17, 10^6)$.
+With $⊗$ the carry-less XOR-product, $G(N, m)$ counts pairs $0 <= a <= b <= N$ for which $(a ⊗ a) ⊕ (2 ⊗ a ⊗ b) ⊕ (b ⊗ b) = k$ for some $k <= m$; we are given $G(1000, 100) = 398$ and need $G(10^17, 10^6)$.
 
 The XOR-product is multiplication in $"GF"(2)[x]$ with $2 = x$, so the equation reads $Q(a, b) = a^2 + x a b + b^2 = k$. In characteristic $2$, $(b + x a)^2 + x a (b + x a) = b^2 + x a b$, so $Q$ is preserved by the involutions $S(a, b) = (b, a)$ and $V(a, b) = (a, b xor 2a)$, which generate an infinite dihedral group; the composite $M(a, b) = (b, 2b xor a)$ walks each orbit as a bi-infinite line whose maximum coordinate is U-shaped — it strictly shrinks under the inverse step until a valley pair and grows in both directions away from it. Away from the valley the leading terms of $b^2$ and $x a b$ must cancel, so the degree grows by one per step while $k$ stays fixed; with $k <= 10^6$ ($19$ bits) every valley is tiny, and scanning $a <= b < 8192$ finds all of them (each valley actually lies below $2048$, asserted as the margin check). $G$ is then the number of line elements with both coordinates at most $N$, summed over distinct orbits; for symmetric orbits — through $a = 0$ or $a = b$ — the two rays fold onto each other, which collecting each orbit's normalised pairs into a set handles automatically, and the fixed point $(0, 0)$ is its own orbit. The method is validated against direct enumeration on twenty random $(N, m)$ boxes and the given value.
 
@@ -10647,7 +10707,7 @@ Solution: 227429102
 
 Players alternately remove $1$, $2$, $4$ or $9$ stones from a pile or split a pile into two non-empty piles, the player taking the last stone winning; $S(N, m)$ counts losing multisets of $m$ piles with sizes in $[1, N]$, with $S(12, 4) = 204$ and $S(124, 9) = 2259208528408$ given, and $S(12491249, 1249) mod 912491249$ wanted.
 
-Single piles form a take-and-break game whose Grundy values obey $g(n) = "mex"({g(n - k)} union {g(a) xor g(n - a)})$; computing them shows the sequence is eventually periodic with preperiod $322$ and period $11060$, made rigorous by the Guy–Smith theorem — with largest take $t = 9$, verifying $g(n + p) = g(n)$ for $i_0 <= n <= 2 i_0 + 2p + t$ suffices, since any split of a larger pile keeps its big part inside the verified zone. A multiset of piles loses exactly when the Grundy values xor to zero, and as $v xor v = 0$ only each value's parity of multiplicity matters. With $c_v$ counting pile sizes of Grundy value $v$ (all values fit in four bits; $9$ never occurs), averaging over the $16$ characters of $"GF"(2)^4$ gives $S(N, m) = 1\/16 sum_s [x^m] (1 - x)^(-P_s) (1 + x)^(-Q_s)$, where $P_s$ sums the $c_v$ with $angle.l s, v angle.r$ even and $Q_s = N - P_s$. Each coefficient is an alternating convolution of $1250$ rising binomials, computed incrementally modulo the prime $912491249$. The pipeline is validated against direct multiset enumeration, both given values, and a periodic-versus-direct count comparison.
+Single piles form a take-and-break game whose Grundy values obey $g(n) = "mex"({g(n - k)} union {g(a) xor g(n - a)})$; computing them shows the sequence is eventually periodic with preperiod $322$ and period $11060$, made rigorous by the Guy–Smith theorem — with largest take $t = 9$, verifying $g(n + p) = g(n)$ for $i_0 <= n <= 2 i_0 + 2p + t$ suffices, since any split of a larger pile keeps its big part inside the verified zone. A multiset of piles loses exactly when the Grundy values xor to zero, and as $v xor v = 0$ only each value's parity of multiplicity matters. With $c_v$ counting pile sizes of Grundy value $v$ (all values fit in four bits; $9$ never occurs), averaging over the $16$ characters of $"GF"(2)^4$ gives $S(N, m) = 1\/16 sum_s [x^m] (1 - x)^(-P_s) (1 + x)^(-Q_s)$, where $P_s$ sums the $c_v$ with $⟨ s, v ⟩$ even and $Q_s = N - P_s$. Each coefficient is an alternating convolution of $1250$ rising binomials, computed incrementally modulo the prime $912491249$. The pipeline is validated against direct multiset enumeration, both given values, and a periodic-versus-direct count comparison.
 
 #pagebreak()
 #link("https://projecteuler.net/problem=889")[= Problem 889: Rational Blancmange]
@@ -11334,7 +11394,7 @@ The XOR-product is exactly multiplication in $FF_2 [x]$, reading the binary expa
 
 Factor out the powers of $x$: write $a = x^alpha a'$ and $b = x^beta b'$ with $a', b'$ of nonzero constant term, i.e. odd integers. Then $x a b = x^(alpha + beta + 1) a' b'$ is a square exactly when $alpha + beta$ is odd and $a' b'$ is a square, and by unique factorization the latter happens exactly when $a'$ and $b'$ have the same squarefree part (the product of their irreducible factors of odd multiplicity). The pairs with $a = 0$ always work, with $c = b$. Therefore $F(N) = (N+1) + sum c_0 (s) thin c_1 (s)$, summed over squarefree-part classes $s$, where $c_0$ and $c_1$ count the integers in $[1, N]$ of that class whose number of trailing zero bits is even respectively odd. Checking the toy case by hand, the classes of ${1, dots, 10}$ give $9 + 1$ cross-parity pairs on top of the $11$ pairs with $a = 0$, matching $F(10) = 21$.
 
-Squarefree parts for all odd polynomials up to $10^7$ come from a carryless sieve recording one irreducible factor of each composite (cost $sum_d 2^d \/ d dot 10^7 \/ 2^d approx 3 dot 10^7$ carryless products), followed by a DP along increasing integers that, for $n = pi times.circle m$, takes the stored squarefree part of $m$ and multiplies or divides out $pi$ according to whether $pi$ already appears in it. A single pass over $n <= N$ then accumulates the cross-parity pair counts in two arrays indexed by squarefree part. The whole computation runs in under three seconds and is verified against a brute force over all pairs, evaluating the defining carryless equation directly, for $N <= 300$.
+Squarefree parts for all odd polynomials up to $10^7$ come from a carryless sieve recording one irreducible factor of each composite (cost $sum_d 2^d \/ d dot 10^7 \/ 2^d approx 3 dot 10^7$ carryless products), followed by a DP along increasing integers that, for $n = pi ⊗ m$, takes the stored squarefree part of $m$ and multiplies or divides out $pi$ according to whether $pi$ already appears in it. A single pass over $n <= N$ then accumulates the cross-parity pair counts in two arrays indexed by squarefree part. The whole computation runs in under three seconds and is verified against a brute force over all pairs, evaluating the defining carryless equation directly, for $N <= 300$.
 
 #pagebreak()
 #link("https://projecteuler.net/problem=946")[= Problem 946: Continued Fraction Fraction]
@@ -11822,7 +11882,7 @@ $P(k; dot)$ counts unordered sets of $k$ disjoint generalised straights by scann
 
 Solution: 2727531976556215755
 
-Frogs at integer points jump forward by $a$ or $b$ with $gcd(a, b) = 1$; a frog at $m$ attacks one at $n > m$ iff $n - m$ lies in the numerical semigroup $S = angle.l a, b angle.r$. $F(a, b)$ sums all frog locations over all non-attacking configurations containing a frog at $0$; given $F(3,5) = 23$ and $F(5,13) = 16336$, find $F(19, 53)$.
+Frogs at integer points jump forward by $a$ or $b$ with $gcd(a, b) = 1$; a frog at $m$ attacks one at $n > m$ iff $n - m$ lies in the numerical semigroup $S = ⟨ a, b ⟩$. $F(a, b)$ sums all frog locations over all non-attacking configurations containing a frog at $0$; given $F(3,5) = 23$ and $F(5,13) = 16336$, find $F(19, 53)$.
 
 Every positive frog position is a _gap_ of $S$ (non-representable), and classically each gap has a unique representation $g = a b - a x - b y$ with $1 <= x <= b - 1$, $y >= 1$ -- the lattice points strictly inside the triangle $a x + b y < a b$. For two gaps, $g(x', y') - g(x, y) = a(x - x') + b(y - y') in S$ exactly when $x >= x'$ and $y >= y'$ componentwise, since any alternative representation would need $|x - x'| >= b$ or $|y - y'| >= a$, which the triangle forbids. So non-attacking configurations are precisely the _antichains_ of a staircase poset: at most one point per column, heights strictly decreasing left to right.
 
