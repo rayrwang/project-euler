@@ -10,7 +10,8 @@ Per the project's own convention, solutions committed on or before 2026‑04‑2
 were written by hand and everything after is Claude‑assisted. The audited set is
 defined by checking out the repository at the cutoff commit and diffing the
 problem set against the current tree: **896 of 1001 solutions are
-Claude‑assisted** (105 predate the cutoff and are excluded).
+Claude‑assisted** (105 predate the cutoff and are excluded). Throughout this
+note, "Claude" refers to the author of those assisted solutions.
 
 ## The three reference sets
 
@@ -32,7 +33,7 @@ Three independent checks, plus a manual read:
 
 1. **Structural similarity.** Each file is reduced to a token stream that keeps
    keywords, operators, builtin names, and numeric constants, but rewrites every
-   user‑chosen identifier to a single placeholder. This catches algorithmic
+   author‑chosen identifier to a single placeholder. This catches algorithmic
    copying even through renaming or reformatting, while ignoring cosmetic
    differences. Similarity is the ratio between two such streams.
 
@@ -74,26 +75,26 @@ of course expected of any correct solver and is not evidence of shared code.)
 
 ## Manual method audit (sample)
 
-Sixteen problems were read in full, including the three most recently added.
-"Method" means the underlying algorithm; "code" means the concrete implementation.
+Sixteen problems were read in full. "Method" means the underlying algorithm;
+"code" means the concrete implementation.
 
 | Prob | Finding |
 |---|---|
-| P54 poker | Same canonical "categorise + tiebreak tuple"; user uses a distinctive frequency‑sorted tiebreak and *omits* the wheel‑straight case both references handle. Independent. |
-| P60 prime sets | Same DFS‑clique‑with‑pruning idea; user *partitions* candidates by residue mod 3, cirosantilli uses mod‑3 only as a filter, eulersolve uses neither. Three different implementations. |
-| P61 figurate | Same canonical chaining method; user shares per‑type formulas with eulersolve but the "anchor one type" trick with cirosantilli — different sub‑features from each. Independent convergence. |
+| P54 poker | Same canonical "categorise + tiebreak tuple"; Claude uses a distinctive frequency‑sorted tiebreak and *omits* the wheel‑straight case both references handle. Independent. |
+| P60 prime sets | Same DFS‑clique‑with‑pruning idea; Claude *partitions* candidates by residue mod 3, cirosantilli uses mod‑3 only as a filter, eulersolve uses neither. Three different implementations. |
+| P61 figurate | Same canonical chaining method; Claude shares per‑type formulas with eulersolve but the "anchor one type" trick with cirosantilli — different sub‑features from each. Independent convergence. |
 | P64 / P66 | Textbook continued‑fraction / Pell recurrence; the core loop is identical everywhere because there is one standard algorithm, with conventional `m,d,a` names. Forced convergence. |
-| P78 partitions | Euler's pentagonal recurrence — the single canonical method. User wraps it in numba. Forced convergence. |
-| P109 darts | Same enumeration as cirosantilli (1/2/3‑dart, unordered first two); user uses plain ints where cirosantilli builds dataclass objects. Same method, independent code. |
-| P119 digit‑power | User matches eulersolve's simple, obvious brute‑force (sim 0.78) but is unlike cirosantilli, which adapts an elaborate `BigNum` class from a third party (sim 0.19). User wrote the natural solution; bounds still differ. |
-| P344 hard game | User matches cirosantilli's non‑obvious carry‑DP technique but *not* eulersolve's CRT/binomial approach. The shared modulus is given in the problem statement. |
-| P479 Vieta | Same forced Vieta reduction (the only tractable route). cirosantilli *openly* adapts igorvanloo; the user re‑derives the result in their own docstring and implements the series differently. Independent re‑derivation. |
-| P251 Cardano | Different methods; user's blocked‑sieve + DFS is elaborate and distinctive. eulersolve's "Python" here is a subprocess stub around its C++. No match. |
-| P488 Nim | Three different methods; user derives an original closed form (long docstring). No match. |
-| P945 XOR‑eqn | User's GF(2)[x] / Frobenius derivation is original and extensive. No match. |
-| **P761** (new) | User derives the *circle* case from first principles and argues the hexagon value qualitatively; cirosantilli computes it with a concrete general‑`n` formula. Entirely different approaches. |
-| **P763** (new) | User builds a bespoke Myhill–Nerode state collapse with a hand‑built automaton + generating‑function recurrence; cirosantilli uses a different "red path" state compression. Different derivations. |
-| **P949** (new) | User derives a partizan scoring‑game solution via convolution histograms; cirosantilli *explicitly* adapts a lucky‑bai forum post. Both invoke the standard "simplest number between the stops" concept (forced by the problem); the code differs. |
+| P78 partitions | Euler's pentagonal recurrence — the single canonical method. Claude wraps it in numba. Forced convergence. |
+| P109 darts | Same enumeration as cirosantilli (1/2/3‑dart, unordered first two); Claude uses plain ints where cirosantilli builds dataclass objects. Same method, independent code. |
+| P119 digit‑power | Claude matches eulersolve's simple, obvious brute‑force (sim 0.78) but is unlike cirosantilli, which adapts an elaborate `BigNum` class from a third party (sim 0.19). Claude wrote the natural solution; bounds still differ. |
+| P344 hard game | Claude matches cirosantilli's non‑obvious carry‑DP technique but *not* eulersolve's CRT/binomial approach. The shared modulus is given in the problem statement. |
+| P479 Vieta | Same forced Vieta reduction (the only tractable route). cirosantilli *openly* adapts igorvanloo; Claude re‑derives the result in its own docstring and implements the series differently. Independent re‑derivation. |
+| P251 Cardano | Different methods; Claude's blocked‑sieve + DFS is elaborate and distinctive. eulersolve's "Python" here is a subprocess stub around its C++. No match. |
+| P488 Nim | Three different methods; Claude derives an original closed form (long docstring). No match. |
+| P945 XOR‑eqn | Claude's GF(2)[x] / Frobenius derivation is original and extensive. No match. |
+| P761 swimmer | Claude derives the *circle* case from first principles and argues the hexagon value qualitatively; cirosantilli computes it with a concrete general‑`n` formula. Entirely different approaches. |
+| P763 amoebas | Claude builds a bespoke Myhill–Nerode state collapse with a hand‑built automaton + generating‑function recurrence; cirosantilli uses a different "red path" state compression. Different derivations. |
+| P949 scoring game | Claude derives a partizan scoring‑game solution via convolution histograms; cirosantilli *explicitly* adapts a lucky‑bai forum post. Both invoke the standard "simplest number between the stops" concept (forced by the problem); the code differs. |
 
 ## Patterns
 
@@ -104,17 +105,17 @@ Three observations explain the high‑similarity tail and argue against copying:
   or the obvious brute‑force for an easy problem. Structural convergence there is
   expected; the variable names follow from the mathematics.
 
-- **The user tracks no single source.** They resemble eulersolve on one problem
-  (P119) and cirosantilli on another (P344), and on the same problem can borrow
-  different sub‑features from each (P61). A copier resembles one source
-  consistently. Here, the user resembles whichever reference happened to write
-  the natural solution and diverges from whichever overengineered it.
+- **Claude tracks no single source.** Its solutions resemble eulersolve on one
+  problem (P119) and cirosantilli on another (P344), and on the same problem can
+  borrow different sub‑features from each (P61). A copier resembles one source
+  consistently. Here, Claude resembles whichever reference happened to write the
+  natural solution and diverges from whichever overengineered it.
 
 - **The hard solutions are demonstrably self‑derived.** On difficult problems the
   files carry multi‑paragraph original derivations in their docstrings (P251,
   P479, P488, P763, P949). In several cases (P119, P479, P949) it is *cirosantilli*
-  that openly adapts third‑party code, while this repository re‑derives the
-  result independently.
+  that openly adapts third‑party code, while Claude re‑derives the result
+  independently.
 
 ## Conclusion
 
